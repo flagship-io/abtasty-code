@@ -4,7 +4,7 @@
   "description": "Extension to manage flagship from vscode",
   "publisher": "AB Tasty",
   "license": "SEE LICENSE IN LICENSE.md",
-  "repository": "https://github.com/microsoft/vscode-extension-samples/tree/main/helloworld-minimal-sample",
+  "repository": "https://github.com/flagship-io/flagship-code",
   "version": "0.1.0",
   "engines": {
     "vscode": "^1.72.0"
@@ -480,7 +480,7 @@
   },
   "homepage": "https://docs.developers.flagship.io/",
   "bugs": {
-    "url": "https://github.com/microsoft/vscode-extension-samples/tree/main/helloworld-minimal-sample"
+    "url": "https://github.com/flagship-io/flagship-code/issues"
   },
   "scripts": {
     "vscode:prepublish": "yarn run package",
