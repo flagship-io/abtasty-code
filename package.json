@@ -2,7 +2,7 @@
   "name": "flagship-vscode",
   "displayName": "Flagship",
   "description": "Extension to manage flagship from vscode",
-  "publisher": "AB Tasty",
+  "publisher": "ABTasty",
   "license": "SEE LICENSE IN LICENSE.md",
   "repository": "https://github.com/flagship-io/flagship-code",
   "version": "0.1.0",
