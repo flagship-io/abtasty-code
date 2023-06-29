@@ -1,0 +1,520 @@
+{
+  "name": "flagship-vscode",
+  "displayName": "Flagship",
+  "description": "Extension to manage flagship from vscode",
+  "publisher": "AB Tasty",
+  "license": "SEE LICENSE IN LICENSE.md",
+  "repository": "https://github.com/microsoft/vscode-extension-samples/tree/main/helloworld-minimal-sample",
+  "version": "0.1.0",
+  "engines": {
+    "vscode": "^1.72.0"
+  },
+  "categories": [
+    "Data Science"
+  ],
+  "icon": "media/logo.png",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "configuration": {
+      "type": "object",
+      "title": "Flagship",
+      "properties": {
+        "flagship.baseUri": {
+          "type": "string",
+          "default": "https://app.flagship.io"
+        },
+        "flagship.enableFlagshipExplorer": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable feature flag explorer in your sidebar"
+        },
+        "flagship.flagsInFile": {
+          "type": "boolean",
+          "default": "",
+          "description": "Flagship Flags in File"
+        },
+        "flagship.configurationList": {
+          "type": "CredentialStore[]",
+          "default": [],
+          "description": "List of configuration stored"
+        },
+        "flagship.currentConfiguration": {
+          "type": "CredentialStore",
+          "default": {},
+          "description": "current running configuration"
+        }
+      }
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "flagship",
+          "title": "Flagship",
+          "icon": "resources/logo.svg"
+        }
+      ]
+    },
+    "views": {
+      "flagship": [
+        {
+          "id": "configWelcome",
+          "name": "Configure your extension",
+          "when": "!flagship:enableFlagshipExplorer"
+        },
+        {
+          "id": "quickAccess",
+          "name": "Quick Access",
+          "contextualTitle": "Flagship",
+          "when": "flagship:enableFlagshipExplorer"
+        },
+        {
+          "id": "flagsInFile",
+          "name": "Flags in file",
+          "when": "flagship:enableFlagshipExplorer"
+        },
+        {
+          "id": "projectList",
+          "name": "Project",
+          "when": "flagship:enableFlagshipExplorer"
+        },
+        {
+          "id": "flagList",
+          "name": "Feature Flags",
+          "when": "flagship:enableFlagshipExplorer"
+        },
+        {
+          "id": "targetingKeyList",
+          "name": "Targeting Key",
+          "when": "flagship:enableFlagshipExplorer"
+        },
+        {
+          "id": "goalList",
+          "name": "Goal",
+          "when": "flagship:enableFlagshipExplorer"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "configWelcome",
+        "contents": "Welcome to Flagship !\n Here are your first steps into our extension which will help you work with us.\nFirst, you have to set your credentials to connect your account \n[Configure](command:flagship.setCredentials)\n[Read our docs](https://docs.developers.flagship.io) to learn more about how to use the Flagship extension.\nIf you need some help to understand how to retrieve your IDs [here are all the informations you need](https://flagship.zendesk.com/hc/en-us/articles/4499017687708--Acting-on-your-account-remotely).\n If you need some help to setup a JSON file to store your credentials [here are all the informations you need](https://docs.developers.flagship.io/docs/cli-configure)."
+      }
+    ],
+    "commands": [
+      {
+        "command": "flagList.reveal",
+        "title": "Flag list: Reveal"
+      },
+      {
+        "command": "flagList.changeTitle",
+        "title": "Flag list: Change Title"
+      },
+      {
+        "command": "flagList.on_item_clicked",
+        "title": "view item"
+      },
+      {
+        "command": "flagship.clearConfig",
+        "title": "Clear Flagship configuration"
+      },
+      {
+        "command": "flagship.checkCliVersion",
+        "title": "Check Flagship CLI version"
+      },
+      {
+        "command": "flagsInFile.on_item_clicked",
+        "title": "tree view item"
+      },
+      {
+        "command": "flagship.openBrowser",
+        "title": "Open in browser"
+      },
+      {
+        "command": "flagsInFile.refresh",
+        "title": "refresh",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "flagsInFile.listFlagInWorkspace",
+        "title": "list flags in the workspace",
+        "icon": "$(list-flat)"
+      },
+      {
+        "command": "flagship.createFlag",
+        "title": "create",
+        "icon": "$(add)"
+      },
+      {
+        "command": "flagList.refresh",
+        "title": "refresh",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "flagList.openInBrowser",
+        "title": "open in browser",
+        "icon": "$(globe)"
+      },
+      {
+        "command": "flagList.copyFlag",
+        "title": "Copy the flag",
+        "icon": "$(clippy)"
+      },
+      {
+        "command": "flagList.editFlag",
+        "title": "Edit the flag",
+        "icon": "$(pencil)"
+      },
+      {
+        "command": "flagList.deleteFlag",
+        "title": "Remove the flag",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "flagship.createProject",
+        "title": "create",
+        "icon": "$(add)"
+      },
+      {
+        "command": "projectList.refresh",
+        "title": "refresh",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "projectList.editProject",
+        "title": "Edit the project",
+        "icon": "$(pencil)"
+      },
+      {
+        "command": "projectList.deleteProject",
+        "title": "Remove the project",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "flagship.createTargetingKey",
+        "title": "create",
+        "icon": "$(add)"
+      },
+      {
+        "command": "targetingKeyList.refresh",
+        "title": "refresh",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "targetingKeyList.editTargetingKey",
+        "title": "Edit the targeting key",
+        "icon": "$(pencil)"
+      },
+      {
+        "command": "targetingKeyList.deleteTargetingKey",
+        "title": "Remove the targeting key",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "flagship.createGoal",
+        "title": "create",
+        "icon": "$(add)"
+      },
+      {
+        "command": "goalList.refresh",
+        "title": "refresh",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "goalList.editGoal",
+        "title": "Edit the goal",
+        "icon": "$(pencil)"
+      },
+      {
+        "command": "goalList.deleteGoal",
+        "title": "Remove the goal",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "flagsInFile.findInFile",
+        "title": "Find flag in file",
+        "icon": "$(search)"
+      },
+      {
+        "command": "flagsInFile.addFlag",
+        "title": "Add Flag",
+        "icon": "$(add)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "flagsInFile.refresh",
+          "when": "view == flagsInFile",
+          "group": "navigation@0"
+        },
+        {
+          "command": "flagsInFile.listFlagInWorkspace",
+          "when": "view == flagsInFile",
+          "group": "navigation@0"
+        },
+        {
+          "command": "flagship.createProject",
+          "when": "view == projectList",
+          "group": "navigation@0"
+        },
+        {
+          "command": "projectList.refresh",
+          "when": "view == projectList",
+          "group": "navigation@0"
+        },
+        {
+          "command": "flagship.createTargetingKey",
+          "when": "view == targetingKeyList",
+          "group": "navigation@0"
+        },
+        {
+          "command": "targetingKeyList.refresh",
+          "when": "view == targetingKeyList",
+          "group": "navigation@0"
+        },
+        {
+          "command": "flagship.createGoal",
+          "when": "view == goalList",
+          "group": "navigation@0"
+        },
+        {
+          "command": "goalList.refresh",
+          "when": "view == goalList",
+          "group": "navigation@0"
+        },
+        {
+          "command": "flagship.createFlag",
+          "when": "view == flagList",
+          "group": "navigation@0"
+        },
+        {
+          "command": "flagList.refresh",
+          "when": "view == flagList",
+          "group": "navigation@0"
+        },
+        {
+          "command": "flagList.openInBrowser",
+          "when": "view == flagList",
+          "group": "navigation@0"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "projectList.deleteProject",
+          "when": "view == projectList && viewItem == projectItem",
+          "group": "inline"
+        },
+        {
+          "command": "projectList.editProject",
+          "when": "view == projectList && viewItem == projectItem",
+          "group": "inline"
+        },
+        {
+          "command": "targetingKeyList.deleteTargetingKey",
+          "when": "view == targetingKeyList && viewItem == targetingKeyItem",
+          "group": "inline"
+        },
+        {
+          "command": "targetingKeyList.editTargetingKey",
+          "when": "view == targetingKeyList && viewItem == targetingKeyItem",
+          "group": "inline"
+        },
+        {
+          "command": "goalList.deleteGoal",
+          "when": "view == goalList && viewItem == goalItem",
+          "group": "inline"
+        },
+        {
+          "command": "goalList.editGoal",
+          "when": "view == goalList && viewItem == goalItem",
+          "group": "inline"
+        },
+        {
+          "command": "flagList.deleteFlag",
+          "when": "view == flagList && viewItem == flagItem",
+          "group": "inline"
+        },
+        {
+          "command": "flagList.editFlag",
+          "when": "view == flagList && viewItem == flagItem",
+          "group": "inline"
+        },
+        {
+          "command": "flagList.copyFlag",
+          "when": "view == flagList && viewItem == flagItem",
+          "group": "inline"
+        },
+        {
+          "command": "flagsInFile.findInFile",
+          "when": "view == flagsInFile && viewItem == flagAnalyzedItem",
+          "group": "inline"
+        },
+        {
+          "command": "flagsInFile.addFlag",
+          "when": "view == flagsInFile && viewItem == flagAnalyzedItem",
+          "group": "inline"
+        }
+      ]
+    },
+    "languages": [
+      {
+        "id": "dart",
+        "aliases": [
+          "Dart"
+        ],
+        "extensions": [
+          ".dart"
+        ]
+      },
+      {
+        "id": "kotlin",
+        "aliases": [
+          "Kotlin"
+        ],
+        "extensions": [
+          ".kt",
+          ".kts"
+        ]
+      },
+      {
+        "id": "go",
+        "aliases": [
+          "Go"
+        ],
+        "extensions": [
+          ".go"
+        ]
+      },
+      {
+        "id": "javascript",
+        "aliases": [
+          "Javascript"
+        ],
+        "extensions": [
+          ".js"
+        ]
+      },
+      {
+        "id": "typescript",
+        "aliases": [
+          "Typescript"
+        ],
+        "extensions": [
+          ".ts"
+        ]
+      },
+      {
+        "id": "java",
+        "aliases": [
+          "Java"
+        ],
+        "extensions": [
+          ".java"
+        ]
+      },
+      {
+        "id": "php",
+        "aliases": [
+          "PHP"
+        ],
+        "extensions": [
+          ".php"
+        ]
+      },
+      {
+        "id": "python",
+        "aliases": [
+          "Python"
+        ],
+        "extensions": [
+          ".py"
+        ]
+      },
+      {
+        "id": "csharp",
+        "aliases": [
+          "CSharp"
+        ],
+        "extensions": [
+          ".cs"
+        ]
+      },
+      {
+        "id": "fsharp",
+        "aliases": [
+          "FSharp"
+        ],
+        "extensions": [
+          ".fs"
+        ]
+      },
+      {
+        "id": "vb",
+        "extensions": [
+          ".vb"
+        ]
+      },
+      {
+        "id": "swift",
+        "aliases": [
+          "Swift"
+        ],
+        "extensions": [
+          ".swift"
+        ]
+      },
+      {
+        "id": "objective-c",
+        "extensions": [
+          ".m"
+        ]
+      }
+    ]
+  },
+  "galleryBanner": {
+    "color": "#343434",
+    "theme": "dark"
+  },
+  "homepage": "https://docs.developers.flagship.io/",
+  "bugs": {
+    "url": "https://github.com/microsoft/vscode-extension-samples/tree/main/helloworld-minimal-sample"
+  },
+  "scripts": {
+    "vscode:prepublish": "yarn run package",
+    "compile": "webpack",
+    "watch": "webpack --watch",
+    "package": "webpack --mode production --devtool hidden-source-map",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "yarn run compile-tests && yarn run compile && yarn run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/glob": "^8.1.0",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "16.x",
+    "@types/tar-fs": "^2.0.1",
+    "@types/vscode": "^1.72.0",
+    "@types/js-yaml": "^4.0.5",
+    "@typescript-eslint/eslint-plugin": "^5.56.0",
+    "@typescript-eslint/parser": "^5.56.0",
+    "@vscode/test-electron": "^2.3.0",
+    "eslint": "^8.36.0",
+    "glob": "^8.1.0",
+    "mocha": "^10.2.0",
+    "ts-loader": "^9.4.2",
+    "typescript": "^4.9.5",
+    "webpack": "^5.76.3",
+    "webpack-cli": "^5.0.1"
+  },
+  "dependencies": {
+    "axios": "^1.3.5",
+    "gunzip-maybe": "^1.4.2",
+    "rimraf": "^5.0.0",
+    "tar-fs": "^2.1.1"
+  }
+}
