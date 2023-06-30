@@ -12,7 +12,6 @@ import {
   QUICK_ACCESS_REFRESH,
   TARGETING_KEY_LIST_REFRESH,
 } from './commands/const';
-import { rootPath } from './setupProviders';
 
 var stateTrigger: boolean = false;
 
@@ -43,6 +42,7 @@ export async function activate(context: vscode.ExtensionContext) {
   fs.access(binaryDir, fs.constants.F_OK, async (err) => {
     if (err) {
       await CliDownloader(context, binaryDir);
+      //await rimraf(`${context.asAbsolutePath('flagship')}/*.tar.gz`);
       return;
     }
   });
