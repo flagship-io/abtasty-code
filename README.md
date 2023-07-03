@@ -2,7 +2,7 @@
 
 [Flagship](https://www.abtasty.com/feature-experimentation) optimization platform lets you manage, release, and experiment with features across all codebases and devices to drive growth with every deployment. This extension is designed to enhance your productivity within the VSCode environment, it offers a comprehensive set of utilities that simplify the management and utilization of feature flags using Flagship and let you handle most aspects of feature flag workflows directly within VSCode, eliminating the need to switch between your coding environment and the  platform.
 
-<img src="https://github.com/flagship-io/flagship-code/tree/main/media/screen.png?raw=true" alt="screen" width="100%">
+![Overview screen](media/screen.png)
 
 ## Features
 
