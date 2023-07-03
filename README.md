@@ -11,15 +11,19 @@
   ![Configuration feature](media/configuration.png)
 
 - Manage your Flagship resources (Project, Feature Flags, Targeting Keys, Goals).
+  
   ![Manage resource feature](media/resource.png)
 
 - Check feature flags in your files.
+ 
   ![Flags in file](media/flagsInFile.png)
 
 - Auto complete for feature flags.
+  
   ![Configuration feature](media/autoComplete.png)
 
 - Hover your feature flags.
+  
   ![Configuration feature](media/hover.png)
 
 ## Contributors
