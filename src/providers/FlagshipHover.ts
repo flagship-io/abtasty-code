@@ -4,6 +4,7 @@ import { CredentialStore, Flag } from '../model';
 import { Configuration } from '../configuration';
 import { CURRENT_CONFIGURATION, DEFAULT_BASE_URI } from '../const';
 import { FLAGSHIP_CREATE_FLAG, FLAGSHIP_OPEN_BROWSER } from '../commands/const';
+import { isGetFlagFunction } from '../setupProviders';
 
 export const CANDIDATE_REGEX = /[\w\d][.\w\d\_\-]*/;
 
@@ -35,7 +36,7 @@ export default class FlagshipHoverProvider implements vscode.HoverProvider {
     mark.supportHtml = true;
     mark.supportThemeIcons = true;
     const flag = flagList.find((f) => f.name === candidate);
-    if (isGetFlagFunctionHover(linePrefix)) {
+    if (isGetFlagFunction(linePrefix)) {
       if (flag) {
         switch (flag.type) {
           case 'string':
@@ -75,25 +76,3 @@ export default class FlagshipHoverProvider implements vscode.HoverProvider {
     return;
   }
 }
-
-export const isGetFlagFunctionHover = (linePrefix: string): boolean => {
-  return (
-    (!!linePrefix.match(/getFlag\(["'][\w\-\_]*/g) && !linePrefix.match(/getFlag\(["'][\w\-\_]*["']/g)) ||
-    (!!linePrefix.match(/getModification\(["'][\w\-\_]*/g) &&
-      !linePrefix.match(/getModification\(["'][\w\-\_]*["']/g)) ||
-    (!!linePrefix.match(/get_modification\(["'][\w\-\_]*/g) &&
-      !linePrefix.match(/get_modification\(["'][\w\-\_]*["']/g)) ||
-    (!!linePrefix.match(/GetModification(String|Number|Bool|Object|Array)\(["'][\w\-\_]*/g) &&
-      !linePrefix.match(/GetModification(String|Number|Bool|Object|Array)\(["'][\w\-\_]*["']/g)) ||
-    (!!linePrefix.match(/GetModification\(["'][\w\-\_]*/g) &&
-      !linePrefix.match(/GetModification\(["'][\w\-\_]*["']/g)) ||
-    (!!linePrefix.match(/GetFlag\(["'][\w\-\_]*/g) && !linePrefix.match(/GetFlag\(["'][\w\-\_]*["']/g)) ||
-    (!!linePrefix.match(/useFsFlag\(["'][\w\-\_]*/g) && !linePrefix.match(/useFsFlag\(["'][\w\-\_]*["']/g)) ||
-    (!!linePrefix.match(/getModification:\s*@\s*["'][\w\-\_]*/g) &&
-      !linePrefix.match(/getModification:\s*@\s*["'][\w\-\_]*["']/g)) ||
-    (!!linePrefix.match(/getFlagWithKey:\s*@\s*["'][\w\-\_]*/g) &&
-      !linePrefix.match(/getFlagWithKey:\s*@\s*["'][\w\-\_]*["']/g)) ||
-    (!!linePrefix.match(/getFlag\(\s*key\s*:\s*["'][\w\-\_]*/g) &&
-      !linePrefix.match(/getFlag\(\s*key\s*:\s*["'][\w\-\_]*["']/g))
-  );
-};

@@ -102,6 +102,23 @@ const documentSelector: vscode.DocumentSelector = [
   },
 ];
 
+export const isGetFlagFunction = (linePrefix: string): boolean =>
+  (!!linePrefix.match(/getFlag\(["'][\w\-\_]*/g) && !linePrefix.match(/getFlag\(["'][\w\-\_]*["']/g)) ||
+  (!!linePrefix.match(/getModification\(["'][\w\-\_]*/g) && !linePrefix.match(/getModification\(["'][\w\-\_]*["']/g)) ||
+  (!!linePrefix.match(/get_modification\(["'][\w\-\_]*/g) &&
+    !linePrefix.match(/get_modification\(["'][\w\-\_]*["']/g)) ||
+  (!!linePrefix.match(/GetModification(String|Number|Bool|Object|Array)\(["'][\w\-\_]*/g) &&
+    !linePrefix.match(/GetModification(String|Number|Bool|Object|Array)\(["'][\w\-\_]*["']/g)) ||
+  (!!linePrefix.match(/GetModification\(["'][\w\-\_]*/g) && !linePrefix.match(/GetModification\(["'][\w\-\_]*["']/g)) ||
+  (!!linePrefix.match(/GetFlag\(["'][\w\-\_]*/g) && !linePrefix.match(/GetFlag\(["'][\w\-\_]*["']/g)) ||
+  (!!linePrefix.match(/useFsFlag\(["'][\w\-\_]*/g) && !linePrefix.match(/useFsFlag\(["'][\w\-\_]*["']/g)) ||
+  (!!linePrefix.match(/getModification:\s*@\s*["'][\w\-\_]*/g) &&
+    !linePrefix.match(/getModification:\s*@\s*["'][\w\-\_]*["']/g)) ||
+  (!!linePrefix.match(/getFlagWithKey:\s*@\s*["'][\w\-\_]*/g) &&
+    !linePrefix.match(/getFlagWithKey:\s*@\s*["'][\w\-\_]*["']/g)) ||
+  (!!linePrefix.match(/getFlag\(\s*key\s*:\s*["'][\w\-\_]*/g) &&
+    !linePrefix.match(/getFlag\(\s*key\s*:\s*["'][\w\-\_]*["']/g));
+
 export const rootPath =
   vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0
     ? vscode.workspace.workspaceFolders[0].uri.fsPath

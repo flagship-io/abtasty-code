@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { FlagItem } from './FlagList';
 import { Cli } from './Cli';
 import { Flag } from '../model';
+import { isGetFlagFunction } from '../setupProviders';
 
 export default class FlagshipCompletionProvider implements vscode.CompletionItemProvider {
   private readonly context: vscode.ExtensionContext;
@@ -50,19 +51,4 @@ const transformFlagToItem = (flagList: Flag[]) => {
     flagItems.push(flag);
   });
   return flagItems;
-};
-
-export const isGetFlagFunction = (linePrefix: string): boolean => {
-  return (
-    !!linePrefix.match(/getFlag\(["']/) ||
-    !!linePrefix.match(/getModification\(["']/) ||
-    !!linePrefix.match(/get_modification\(["']/) ||
-    !!linePrefix.match(/GetModification(String|Number|Bool|Object|Array)\(["']/) ||
-    !!linePrefix.match(/GetModification\(["']/) ||
-    !!linePrefix.match(/GetFlag\(["']/) ||
-    !!linePrefix.match(/getModification:\s*@\s*["']/) ||
-    !!linePrefix.match(/getFlagWithKey:\s*@\s*["']/) ||
-    !!linePrefix.match(/getFlag\(\s*key\s*:\s*["']/) ||
-    !!linePrefix.match(/useFsFlag\(["']/)
-  );
 };
