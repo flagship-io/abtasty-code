@@ -100,7 +100,7 @@
     "viewsWelcome": [
       {
         "view": "configWelcome",
-        "contents": "Welcome to Flagship !\n Here are your first steps into our extension which will help you work with us.\nFirst, you have to set your credentials to connect your account \n[Configure](command:flagship.setCredentials)\n[Read our docs](https://docs.developers.flagship.io) to learn more about how to use the Flagship extension.\nIf you need some help to understand how to retrieve your IDs [here are all the informations you need](https://flagship.zendesk.com/hc/en-us/articles/4499017687708--Acting-on-your-account-remotely).\n If you need some help to setup a JSON file to store your credentials [here are all the informations you need](https://docs.developers.flagship.io/docs/cli-configure)."
+        "contents": "Welcome to Flagship !\n Here are your first steps into our extension which will help you work with us.\nFirst, you have to set your credentials to connect your account \n[Configure](command:flagship.setCredentials)\n[Read our docs](https://docs.developers.flagship.io/docs/flagship-code) to learn more about how to use the Flagship extension.\nIf you need some help to understand how to retrieve your IDs [here are all the informations you need](https://flagship.zendesk.com/hc/en-us/articles/4499017687708--Acting-on-your-account-remotely).\n If you need some help to setup a JSON file to store your credentials [here are all the informations you need](https://docs.developers.flagship.io/docs/cli-configure)."
       }
     ],
     "commands": [
@@ -131,6 +131,10 @@
       {
         "command": "flagship.openBrowser",
         "title": "Open in browser"
+      },
+      {
+        "command": "flagship.triggerFlagCompletion",
+        "title": "Trigger flag autocompletion"
       },
       {
         "command": "flagsInFile.refresh",
@@ -359,6 +363,13 @@
         }
       ]
     },
+    "keybindings": [
+      {
+        "command": "flagship.triggerFlagCompletion",
+        "key": "ctrl+alt+g",
+        "mac": "cmd+alt+g"
+      }
+    ],
     "languages": [
       {
         "id": "dart",

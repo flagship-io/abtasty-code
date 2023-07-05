@@ -1,5 +1,7 @@
 # Flagship for Visual Studio Code
 
+## Overview
+
 [Flagship](https://www.abtasty.com/feature-experimentation) optimization platform lets you manage, release, and experiment with features across all codebases and devices to drive growth with every deployment. This extension is designed to enhance your productivity within the VSCode environment, it offers a comprehensive set of utilities that simplify the management and utilization of feature flags using Flagship and let you handle most aspects of feature flag workflows directly within VSCode, eliminating the need to switch between your coding environment and the platform.
 
 ![Overview screen](media/screen.png)
@@ -14,7 +16,7 @@
   
   ![Manage resource feature](media/resource.png)
 
-- Check feature flags in your files. This feature gives you informations on the flags in your current working file and retrive the flag directly in the code.
+- Check feature flags in your files. This feature gives you informations on the flags in your current working file and retrieve the flag directly in the code.
  
   ![Flags in file](media/flagsInFile.png)
 
@@ -25,6 +27,10 @@
 - Hover your feature flags.
   
   ![Hover feature](media/hover.png)
+
+## Documentation
+
+Check out our [documentation](https://docs.developers.flagship.io/docs/flagship-code) for further explanation. 
 
 ## Contributors
 

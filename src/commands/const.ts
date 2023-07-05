@@ -18,6 +18,7 @@ export const FLAG_LIST_EDIT = 'flagList.editFlag';
 export const FLAG_LIST_DELETE = 'flagList.deleteFlag';
 export const FLAG_LIST_COPY = 'flagList.copyFlag';
 export const FLAG_LIST_OPEN_IN_BROWSER = 'flagList.openInBrowser';
+export const TRIGGER_FLAG_COMPLETION = 'flagship.triggerFlagCompletion';
 
 export const FLAGSHIP_CREATE_TARGETING_KEY = 'flagship.createTargetingKey';
 export const TARGETING_KEY_LIST_REFRESH = 'targetingKeyList.refresh';

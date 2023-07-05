@@ -3,6 +3,9 @@ import { FlagItem } from './FlagList';
 import { Cli } from './Cli';
 import { Flag } from '../model';
 import { isGetFlagFunction } from '../setupProviders';
+import { TRIGGER_FLAG_COMPLETION } from '../commands/const';
+
+var triggerFlagCompletion = false;
 
 export default class FlagshipCompletionProvider implements vscode.CompletionItemProvider {
   private readonly context: vscode.ExtensionContext;
@@ -11,6 +14,11 @@ export default class FlagshipCompletionProvider implements vscode.CompletionItem
   constructor(context: vscode.ExtensionContext, cli: Cli) {
     this.context = context;
     this.cli = cli;
+
+    vscode.commands.registerCommand(TRIGGER_FLAG_COMPLETION, async () => {
+      triggerFlagCompletion = true;
+      vscode.commands.executeCommand('editor.action.triggerSuggest');
+    });
   }
 
   async provideCompletionItems(
@@ -18,8 +26,10 @@ export default class FlagshipCompletionProvider implements vscode.CompletionItem
     position: vscode.Position,
   ): Promise<vscode.CompletionItem[] | undefined> {
     const linePrefix = document.lineAt(position).text.substring(0, position.character);
-    if (isGetFlagFunction(linePrefix)) {
+    if (isGetFlagFunction(linePrefix) || triggerFlagCompletion) {
+      triggerFlagCompletion = false;
       const flagItems = transformFlagToItem(await this.cli.ListFlag());
+
       return flagItems.map((flag: FlagItem) => {
         const flagCompletion = new vscode.CompletionItem(flag.key!, vscode.CompletionItemKind.Field);
         const mark = new vscode.MarkdownString();
