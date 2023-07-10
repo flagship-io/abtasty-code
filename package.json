@@ -105,145 +105,129 @@
     ],
     "commands": [
       {
-        "command": "flagList.reveal",
-        "title": "Flag list: Reveal"
-      },
-      {
-        "command": "flagList.changeTitle",
-        "title": "Flag list: Change Title"
-      },
-      {
-        "command": "flagList.on_item_clicked",
-        "title": "view item"
-      },
-      {
         "command": "flagship.clearConfig",
-        "title": "Clear Flagship configuration"
+        "title": "Flagship: Clear all configurations"
       },
       {
         "command": "flagship.checkCliVersion",
-        "title": "Check Flagship CLI version"
-      },
-      {
-        "command": "flagsInFile.on_item_clicked",
-        "title": "tree view item"
+        "title": "Flagship: Check CLI version"
       },
       {
         "command": "flagship.openBrowser",
-        "title": "Open in browser"
+        "title": "Flagship: Open in browser"
       },
       {
         "command": "flagship.triggerFlagCompletion",
-        "title": "Trigger flag autocompletion"
+        "title": "Flagship: Trigger flag autocompletion"
       },
       {
         "command": "flagsInFile.refresh",
-        "title": "refresh",
+        "title": "Flagship: Refresh flags in file panel",
         "icon": "$(refresh)"
       },
       {
         "command": "flagsInFile.listFlagInWorkspace",
-        "title": "list flags in the workspace",
+        "title": "Flagship: List flags in the workspace",
         "icon": "$(list-flat)"
       },
       {
         "command": "flagship.createFlag",
-        "title": "create",
+        "title": "Flagship: Create a flag",
         "icon": "$(add)"
       },
       {
         "command": "flagList.refresh",
-        "title": "refresh",
+        "title": "Flagship: Refresh flag panel",
         "icon": "$(refresh)"
       },
       {
         "command": "flagList.openInBrowser",
-        "title": "open in browser",
+        "title": "Flagship: Open the flag list in browser",
         "icon": "$(globe)"
       },
       {
         "command": "flagList.copyFlag",
-        "title": "Copy the flag",
+        "title": "Flagship: Copy the flag in clipboard",
         "icon": "$(clippy)"
       },
       {
         "command": "flagList.editFlag",
-        "title": "Edit the flag",
+        "title": "Flagship: Edit the flag",
         "icon": "$(pencil)"
       },
       {
         "command": "flagList.deleteFlag",
-        "title": "Remove the flag",
+        "title": "Flagship: Remove the flag",
         "icon": "$(trash)"
       },
       {
         "command": "flagship.createProject",
-        "title": "create",
+        "title": "Flagship: Create a project",
         "icon": "$(add)"
       },
       {
         "command": "projectList.refresh",
-        "title": "refresh",
+        "title": "Flagship: Refresh project panel",
         "icon": "$(refresh)"
       },
       {
         "command": "projectList.editProject",
-        "title": "Edit the project",
+        "title": "Flagship: Edit the project",
         "icon": "$(pencil)"
       },
       {
         "command": "projectList.deleteProject",
-        "title": "Remove the project",
+        "title": "Flagship: Remove the project",
         "icon": "$(trash)"
       },
       {
         "command": "flagship.createTargetingKey",
-        "title": "create",
+        "title": "Flagship: Create a targeting key",
         "icon": "$(add)"
       },
       {
         "command": "targetingKeyList.refresh",
-        "title": "refresh",
+        "title": "Flagship: Refresh targeting key panel",
         "icon": "$(refresh)"
       },
       {
         "command": "targetingKeyList.editTargetingKey",
-        "title": "Edit the targeting key",
+        "title": "Flagship: Edit the targeting key",
         "icon": "$(pencil)"
       },
       {
         "command": "targetingKeyList.deleteTargetingKey",
-        "title": "Remove the targeting key",
+        "title": "Flagship: Remove the targeting key",
         "icon": "$(trash)"
       },
       {
         "command": "flagship.createGoal",
-        "title": "create",
+        "title": "Flagship: Create a goal",
         "icon": "$(add)"
       },
       {
         "command": "goalList.refresh",
-        "title": "refresh",
+        "title": "Flagship: Refresh goal panel",
         "icon": "$(refresh)"
       },
       {
         "command": "goalList.editGoal",
-        "title": "Edit the goal",
+        "title": "Flagship: Edit the goal",
         "icon": "$(pencil)"
       },
       {
         "command": "goalList.deleteGoal",
-        "title": "Remove the goal",
+        "title": "Flagship: Remove the goal",
         "icon": "$(trash)"
       },
       {
         "command": "flagsInFile.findInFile",
-        "title": "Find flag in file",
+        "title": "Flagship: Find flag in file",
         "icon": "$(search)"
       },
       {
         "command": "flagsInFile.addFlag",
-        "title": "Add Flag",
+        "title": "Flagship: Add Flag found in flag in file panel",
         "icon": "$(add)"
       }
     ],
