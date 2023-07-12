@@ -14,6 +14,7 @@ import {
 } from './commands/const';
 
 var stateTrigger: boolean = false;
+var showSurvey: boolean = true;
 
 let timer: NodeJS.Timeout | undefined;
 
@@ -63,6 +64,21 @@ export async function activate(context: vscode.ExtensionContext) {
       }
     }
   });
+
+  const showWarningNotificationWithActions = vscode.commands.registerCommand('flagship.showSurvey', async () => {
+    const selection = await vscode.window.showInformationMessage('Please give us your feedback 🙏', 'Open survey');
+
+    if (selection !== undefined) {
+      vscode.env.openExternal(vscode.Uri.parse('https://abtasty.typeform.com/to/EzrJXwRY'));
+    }
+  });
+
+  context.subscriptions.push(showWarningNotificationWithActions);
+
+  if (showSurvey) {
+    vscode.commands.executeCommand('flagship.showSurvey');
+    showSurvey = false;
+  }
 
   try {
     await registerCommands(context, config);

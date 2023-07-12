@@ -121,6 +121,10 @@
         "title": "Flagship: Trigger flag autocompletion"
       },
       {
+        "command": "flagship.showSurvey",
+        "title": "Flagship: Show survey"
+      },
+      {
         "command": "flagsInFile.refresh",
         "title": "Flagship: Refresh flags in file panel",
         "icon": "$(refresh)"
