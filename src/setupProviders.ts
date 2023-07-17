@@ -4,8 +4,22 @@ import { Cli } from './providers/Cli';
 import { QuickAccessListProvider } from './providers/QuickAccessList';
 import { deleteFlagBox, flagInputBox } from './menu/FlagMenu';
 import { FlagItem, FlagListProvider } from './providers/FlagList';
-import { deleteProjectBox, projectInputBox } from './menu/ProjectMenu';
-import { ProjectItem, ProjectListProvider } from './providers/ProjectList';
+import {
+  deleteCampaignBox,
+  deleteProjectBox,
+  deleteVariationBox,
+  deleteVariationGroupBox,
+  projectInputBox,
+  switchCampaignBox,
+  switchProjectBox,
+} from './menu/ProjectMenu';
+import {
+  CampaignItem,
+  ProjectItem,
+  ProjectListProvider,
+  VariationGroupItem,
+  VariationItem,
+} from './providers/ProjectList';
 import { FileAnalyzedProvider, FlagAnalyzed } from './providers/FlagAnalyzeList';
 import { deleteTargetingKeyBox, targetingKeyInputBox } from './menu/TargetingKeyMenu';
 import { TargetingKeyItem, TargetingKeyListProvider } from './providers/TargetingKeyList';
@@ -15,6 +29,9 @@ import FlagshipCompletionProvider from './providers/FlagshipCompletion';
 import FlagshipHoverProvider from './providers/FlagshipHover';
 import {
   ADD_FLAG,
+  CAMPAIGN_LIST_COPY_CAMPAIGN,
+  CAMPAIGN_LIST_DELETE_CAMPAIGN,
+  CAMPAIGN_LIST_SWITCH_CAMPAIGN,
   FIND_IN_FILE,
   FLAGSHIP_CREATE_FLAG,
   FLAGSHIP_CREATE_GOAL,
@@ -33,10 +50,15 @@ import {
   PROJECT_LIST_DELETE,
   PROJECT_LIST_EDIT,
   PROJECT_LIST_REFRESH,
+  PROJECT_LIST_SWITCH,
   SET_CONTEXT,
   TARGETING_KEY_LIST_DELETE,
   TARGETING_KEY_LIST_EDIT,
   TARGETING_KEY_LIST_REFRESH,
+  VARIATION_GROUP_LIST_COPY_VARIATION_GROUP,
+  VARIATION_GROUP_LIST_DELETE_VARIATION_GROUP,
+  VARIATION_LIST_COPY_VARIATION,
+  VARIATION_LIST_DELETE_VARIATION,
 } from './commands/const';
 
 const documentSelector: vscode.DocumentSelector = [
@@ -170,6 +192,11 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
     await vscode.commands.executeCommand(PROJECT_LIST_REFRESH);
   });
 
+  /*   const createCampaign = vscode.commands.registerCommand(CAMPAIGN_LIST_ADD_CAMPAIGN, async (project: ProjectItem) => {
+    await cli.CreateCampaign(project.id!);
+    await vscode.commands.executeCommand(PROJECT_LIST_REFRESH);
+  }); */
+
   const createFlag = vscode.commands.registerCommand(FLAGSHIP_CREATE_FLAG, async (flagKey: string | undefined) => {
     const flag = new FlagItem();
     if (flagKey) {
@@ -199,6 +226,60 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
 
     vscode.commands.registerCommand(PROJECT_LIST_DELETE, async (project: ProjectItem) => {
       await deleteProjectBox(context, project, cli);
+      await vscode.commands.executeCommand(PROJECT_LIST_REFRESH);
+    }),
+
+    vscode.commands.registerCommand(PROJECT_LIST_SWITCH, async (project: ProjectItem) => {
+      await switchProjectBox(context, project, cli);
+      await vscode.commands.executeCommand(PROJECT_LIST_REFRESH);
+    }),
+  ];
+
+  const campaignDisposables = [
+    vscode.commands.registerCommand(CAMPAIGN_LIST_COPY_CAMPAIGN, async (campaign: CampaignItem) => {
+      vscode.env.clipboard.writeText(campaign.id!);
+      vscode.window.showInformationMessage(`[Flagship] Campaign: ${campaign.name}'s ID copied to your clipboard.`);
+    }),
+
+    vscode.commands.registerCommand(CAMPAIGN_LIST_DELETE_CAMPAIGN, async (campaign: CampaignItem) => {
+      await deleteCampaignBox(context, campaign, cli);
+      await vscode.commands.executeCommand(PROJECT_LIST_REFRESH);
+    }),
+
+    vscode.commands.registerCommand(CAMPAIGN_LIST_SWITCH_CAMPAIGN, async (campaign: CampaignItem) => {
+      await switchCampaignBox(context, campaign, cli);
+      await vscode.commands.executeCommand(PROJECT_LIST_REFRESH);
+    }),
+  ];
+
+  const variationGroupDisposables = [
+    vscode.commands.registerCommand(
+      VARIATION_GROUP_LIST_COPY_VARIATION_GROUP,
+      async (variationGroup: VariationGroupItem) => {
+        vscode.env.clipboard.writeText(variationGroup.id!);
+        vscode.window.showInformationMessage(
+          `[Flagship] Variation group: ${variationGroup.name}'s ID copied to your clipboard.`,
+        );
+      },
+    ),
+
+    vscode.commands.registerCommand(
+      VARIATION_GROUP_LIST_DELETE_VARIATION_GROUP,
+      async (variationGroup: VariationGroupItem) => {
+        await deleteVariationGroupBox(context, variationGroup, cli);
+        await vscode.commands.executeCommand(PROJECT_LIST_REFRESH);
+      },
+    ),
+  ];
+
+  const variationDisposables = [
+    vscode.commands.registerCommand(VARIATION_LIST_COPY_VARIATION, async (variation: VariationItem) => {
+      vscode.env.clipboard.writeText(variation.id!);
+      vscode.window.showInformationMessage(`[Flagship] Variation: ${variation.name}'s ID copied to your clipboard.`);
+    }),
+
+    vscode.commands.registerCommand(VARIATION_LIST_DELETE_VARIATION, async (variation: VariationItem) => {
+      await deleteVariationBox(context, variation, cli);
       await vscode.commands.executeCommand(PROJECT_LIST_REFRESH);
     }),
   ];
@@ -281,6 +362,9 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
     createFlag,
     quickAccessProvider,
     ...projectDisposables,
+    ...campaignDisposables,
+    ...variationGroupDisposables,
+    ...variationDisposables,
     ...flagDisposables,
     ...targetingKeyDisposables,
     ...goalDispoables,
