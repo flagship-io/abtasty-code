@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as path from 'path';
 import { Cli } from './Cli';
 import {
   BRACKET,
@@ -8,6 +9,7 @@ import {
   FOLDER_ACTIVE,
   FOLDER_INTERRUPTED,
   GROUP_BY_REF_TYPE,
+  KEY,
   LAYOUT,
   MILESTONE,
   MILESTONE_ACTIVE,
@@ -58,8 +60,15 @@ export class ProjectListProvider implements vscode.TreeDataProvider<vscode.TreeI
     const campaignList = await this.cli.ListCampaign();
 
     this._tree = projectList.map((p) => {
+      const campaignItems = [];
+      const abCampaigns: ProjectTreeItem[] = [];
+      const toggleCampaigns: ProjectTreeItem[] = [];
+      const persoCampaigns: ProjectTreeItem[] = [];
+      const deploymentCampaigns: ProjectTreeItem[] = [];
+      const flagCampaigns: ProjectTreeItem[] = [];
+      const customCampaigns: ProjectTreeItem[] = [];
       let projectActive = false;
-      const rightCampaigns = campaignList
+      campaignList
         .filter((c) => c.project_id === p.id)
         .map((c) => {
           if (c.status === 'active') {
@@ -68,19 +77,23 @@ export class ProjectListProvider implements vscode.TreeDataProvider<vscode.TreeI
           const variationGroups = c.variation_groups.map((vg) => {
             const variations = vg.variations.map((v) => {
               let values = undefined;
-              let modificationItem = undefined;
               if (v.modifications && v.modifications.type && v.modifications.value) {
-                values = Object.entries(v.modifications.value).map(
-                  ([key, value]) => new ValueItem(key, value, undefined, v.id),
-                );
-                modificationItem = new ModificationItem(v.modifications.type, values, v.id);
+                values = Object.entries(v.modifications.value).map(([key, valueItem]) => {
+                  const val =
+                    Object.entries(valueItem!).length !== 0 && v.modifications.type === 'FLAG'
+                      ? Object.entries(valueItem!).map(([key, value]) => new SimpleItem(key, value, undefined))
+                      : [new SimpleItem('value', valueItem, undefined)];
+                  return new ValueItem(key, valueItem, val!, v.id);
+                });
               }
-              return new VariationItem(v.id, v.name, [modificationItem!], vg.id, c.id);
+              return new VariationItem(v.id, v.name, values!, vg.id, c.id);
             });
             const variation = new ProjectTreeItem('Variations', [...variations], undefined, LAYOUT);
             const targetings = vg.targeting.targeting_groups.flatMap((tg) => {
               return tg.targetings.map((t) => {
-                var targetingItem = Object.entries(t).map(([key, value]) => new ValueItem(key, value, undefined));
+                var targetingItem = Object.entries(t).map(
+                  ([key, value]) => new TargetingValueItem(key, value, undefined),
+                );
                 return new TargetingItem(t.key, t, targetingItem);
               });
             });
@@ -97,9 +110,64 @@ export class ProjectListProvider implements vscode.TreeDataProvider<vscode.TreeI
             undefined,
             GROUP_BY_REF_TYPE,
           );
-          return new CampaignItem(c.id, c.name, c.status, [variationGroup, scheduler], p.id);
+          switch (c.type) {
+            case 'ab':
+              abCampaigns.push(new CampaignItem(c.id, c.name, c.type, c.status, [variationGroup, scheduler], p.id));
+              break;
+            case 'toggle':
+              toggleCampaigns.push(new CampaignItem(c.id, c.name, c.type, c.status, [variationGroup, scheduler], p.id));
+              break;
+            case 'perso':
+              persoCampaigns.push(new CampaignItem(c.id, c.name, c.type, c.status, [variationGroup, scheduler], p.id));
+              break;
+            case 'deployment':
+              deploymentCampaigns.push(
+                new CampaignItem(c.id, c.name, c.type, c.status, [variationGroup, scheduler], p.id),
+              );
+              break;
+            case 'flag':
+              flagCampaigns.push(new CampaignItem(c.id, c.name, c.type, c.status, [variationGroup, scheduler], p.id));
+              break;
+            case 'custom':
+              customCampaigns.push(new CampaignItem(c.id, c.name, c.type, c.status, [variationGroup, scheduler], p.id));
+              break;
+          }
         });
-      return new ProjectItem(p.id, p.name, rightCampaigns, projectActive);
+      const abCampaign = new ProjectTreeItem(`AB Test - ${abCampaigns.length} campaign(s)`, abCampaigns);
+      const toggleCampaign = new ProjectTreeItem(`Toggle - ${toggleCampaigns.length} campaign(s)`, toggleCampaigns);
+      const persoCampaign = new ProjectTreeItem(
+        `Personalisation - ${persoCampaigns.length} campaign(s)`,
+        persoCampaigns,
+      );
+      const deploymentCampaign = new ProjectTreeItem(
+        `Deployment - ${deploymentCampaigns.length} campaign(s)`,
+        deploymentCampaigns,
+      );
+      const flagCampaign = new ProjectTreeItem(`Flag - ${flagCampaigns.length} campaign(s)`, flagCampaigns);
+      const customCampaign = new ProjectTreeItem(
+        `Customization - ${customCampaigns.length} campaign(s)`,
+        customCampaigns,
+      );
+      if (abCampaigns.length !== 0) {
+        campaignItems.push(abCampaign);
+      }
+      if (toggleCampaigns.length !== 0) {
+        campaignItems.push(toggleCampaign);
+      }
+      if (persoCampaigns.length !== 0) {
+        campaignItems.push(persoCampaign);
+      }
+      if (deploymentCampaigns.length !== 0) {
+        campaignItems.push(deploymentCampaign);
+      }
+      if (flagCampaigns.length !== 0) {
+        campaignItems.push(flagCampaign);
+      }
+      if (customCampaigns.length !== 0) {
+        campaignItems.push(customCampaign);
+      }
+
+      return new ProjectItem(p.id, p.name, campaignItems, projectActive);
     });
   }
 }
@@ -108,10 +176,10 @@ class ProjectTreeItem extends vscode.TreeItem {
   children: ProjectTreeItem[] | undefined;
   parentID: string | undefined;
 
-  constructor(label: string, children?: ProjectTreeItem[], parentID?: string, iconPath?: vscode.ThemeIcon) {
+  constructor(label?: string, children?: ProjectTreeItem[], parentID?: string, iconPath?: vscode.ThemeIcon) {
     super(
-      label,
-      children === undefined ? vscode.TreeItemCollapsibleState.None : vscode.TreeItemCollapsibleState.Expanded,
+      label!,
+      children === undefined ? vscode.TreeItemCollapsibleState.None : vscode.TreeItemCollapsibleState.Collapsed,
     );
     this.children = children;
     this.parentID = parentID;
@@ -144,6 +212,7 @@ export class CampaignItem extends ProjectTreeItem {
   constructor(
     public readonly id?: string,
     public readonly name?: string,
+    public readonly type?: string,
     public readonly status?: string,
     children?: ProjectTreeItem[],
     parent?: any,
@@ -197,15 +266,6 @@ export class VariationItem extends ProjectTreeItem {
   contextValue = 'variationItem';
 }
 
-export class ModificationItem extends ProjectTreeItem {
-  constructor(public readonly type?: string, children?: ProjectTreeItem[], parent?: any) {
-    super(type!, children, parent);
-  }
-  iconPath = TEST_VIEW_ICON;
-
-  contextValue = 'modificationItem';
-}
-
 export class ValueItem extends ProjectTreeItem {
   constructor(
     public readonly key?: string,
@@ -217,12 +277,15 @@ export class ValueItem extends ProjectTreeItem {
     this.tooltip = JSON.stringify(value);
     this.description = JSON.stringify(value);
   }
-  iconPath = BRACKET;
+  iconPath = {
+    light: path.join(__filename, '..', '..', 'resources', 'light', 'flag.svg'),
+    dark: path.join(__filename, '..', '..', 'resources', 'dark', 'flag.svg'),
+  };
 
   contextValue = 'valueItem';
 }
 
-export class SimpleItem extends ProjectTreeItem {
+class TargetingValueItem extends ProjectTreeItem {
   constructor(
     public readonly key?: string,
     public readonly value?: unknown,
@@ -233,12 +296,28 @@ export class SimpleItem extends ProjectTreeItem {
     this.tooltip = JSON.stringify(value);
     this.description = JSON.stringify(value);
   }
-  iconPath = CIRCLE_OUTLINE;
+  iconPath = CIRCLE_FILLED;
+
+  contextValue = 'targetingValueItem';
+}
+
+class SimpleItem extends ProjectTreeItem {
+  constructor(
+    public readonly key?: string,
+    public readonly value?: unknown,
+    children?: ProjectTreeItem[],
+    parent?: any,
+  ) {
+    super(key!, children, parent);
+    this.tooltip = JSON.stringify(value);
+    this.description = JSON.stringify(value);
+  }
+  iconPath = CIRCLE_FILLED;
 
   contextValue = 'simpleItem';
 }
 
-export class SchedulerItem extends ProjectTreeItem {
+class SchedulerItem extends ProjectTreeItem {
   constructor(
     public readonly key?: string,
     public readonly scheduler?: unknown,
@@ -254,7 +333,7 @@ export class SchedulerItem extends ProjectTreeItem {
   contextValue = 'schedulerItem';
 }
 
-export class TargetingItem extends ProjectTreeItem {
+class TargetingItem extends ProjectTreeItem {
   constructor(
     public readonly key?: string,
     public readonly targeting?: unknown,
@@ -265,7 +344,7 @@ export class TargetingItem extends ProjectTreeItem {
     this.tooltip = JSON.stringify(targeting);
     this.description = JSON.stringify(targeting);
   }
-  iconPath = CIRCLE_OUTLINE;
+  iconPath = KEY;
 
-  contextValue = 'schedulerItem';
+  contextValue = 'targetingItem';
 }

@@ -170,6 +170,11 @@
         "icon": "$(add)"
       },
       {
+        "command": "projectList.copyProject",
+        "title": "Flagship: Copy the project id",
+        "icon": "$(clippy)"
+      },
+      {
         "command": "projectList.refresh",
         "title": "Flagship: Refresh project panel",
         "icon": "$(refresh)"
@@ -185,19 +190,9 @@
         "icon": "$(trash)"
       },
       {
-        "command": "projectList.switchProject",
-        "title": "Flagship: Switch a project status",
-        "icon": "$(layout-sidebar-left)"
-      },
-      {
-        "command": "campaignList.addCampaign",
-        "title": "Flagship: Create a campaign",
-        "icon": "$(add)"
-      },
-      {
-        "command": "campaignList.deleteCampaign",
-        "title": "Flagship: Remove a campaign",
-        "icon": "$(trash)"
+        "command": "campaignList.openInBrowser",
+        "title": "Flagship: Open campaign in the platform",
+        "icon": "$(link-external)"
       },
       {
         "command": "campaignList.copyCampaign",
@@ -205,24 +200,9 @@
         "icon": "$(clippy)"
       },
       {
-        "command": "campaignList.switchCampaign",
-        "title": "Flagship: Switch a campaign status",
-        "icon": "$(color-mode)"
-      },
-      {
-        "command": "variationGroupList.deleteVariationGroup",
-        "title": "Flagship: Remove a variation group",
-        "icon": "$(trash)"
-      },
-      {
         "command": "variationGroupList.copyVariationGroup",
         "title": "Flagship: Copy the variation group id",
         "icon": "$(clippy)"
-      },
-      {
-        "command": "variationList.deleteVariation",
-        "title": "Flagship: Remove a variation",
-        "icon": "$(trash)"
       },
       {
         "command": "variationList.copyVariation",
@@ -340,6 +320,11 @@
       ],
       "view/item/context": [
         {
+          "command": "projectList.copyProject",
+          "when": "view == projectList && viewItem == projectItem",
+          "group": "inline"
+        },
+        {
           "command": "projectList.deleteProject",
           "when": "view == projectList && viewItem == projectItem",
           "group": "inline"
@@ -350,43 +335,18 @@
           "group": "inline"
         },
         {
-          "command": "projectList.switchProject",
-          "when": "view == projectList && viewItem == projectItem",
-          "group": "inline"
-        },
-        {
-          "command": "campaignList.addCampaign",
-          "when": "view == projectList && viewItem == projectItem",
-          "group": "inline"
-        },
-        {
-          "command": "campaignList.deleteCampaign",
-          "when": "view == projectList && viewItem == campaignItem",
-          "group": "inline"
-        },
-        {
           "command": "campaignList.copyCampaign",
           "when": "view == projectList && viewItem == campaignItem",
           "group": "inline"
         },
         {
-          "command": "campaignList.switchCampaign",
+          "command": "campaignList.openInBrowser",
           "when": "view == projectList && viewItem == campaignItem",
-          "group": "inline"
-        },
-        {
-          "command": "variationGroupList.deleteVariationGroup",
-          "when": "view == projectList && viewItem == variationGroupItem",
           "group": "inline"
         },
         {
           "command": "variationGroupList.copyVariationGroup",
           "when": "view == projectList && viewItem == variationGroupItem",
-          "group": "inline"
-        },
-        {
-          "command": "variationList.deleteVariation",
-          "when": "view == projectList && viewItem == variationItem",
           "group": "inline"
         },
         {
