@@ -2,7 +2,7 @@
 
 #### Disclaimer
 
-> :warning: **Beta phase**
+> ⚠️ **Beta phase**
 >
 > Please note that as a beta phase, it may still contain some bugs and imperfections. Your feedback is instrumental in helping us identify and resolve any issues, so don't hesitate to report them by mail product.feedback@abtasty.com or open a ticket issue at [Github issues](https://github.com/flagship-io/flagship-code/issues)
 >
