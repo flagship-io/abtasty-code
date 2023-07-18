@@ -76,7 +76,11 @@ export async function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(showWarningNotificationWithActions);
 
   if (showSurvey) {
-    vscode.commands.executeCommand('flagship.showSurvey');
+    // Show survey after 2 hours
+    setTimeout(async () => {
+      await vscode.commands.executeCommand('flagship.showSurvey');
+    }, 7200000);
+
     showSurvey = false;
   }
 
