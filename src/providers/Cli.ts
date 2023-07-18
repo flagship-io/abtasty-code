@@ -3,7 +3,7 @@
 import * as vscode from 'vscode';
 import { exec, ExecOptions } from 'child_process';
 import { join } from 'path';
-import { FileAnalyzedType, Flag, Goal, Project, TargetingKey } from '../model';
+import { Campaign, FileAnalyzedType, Flag, Goal, Project, TargetingKey } from '../model';
 import { CliVersion } from '../cli/cliDownloader';
 import * as fs from 'fs';
 export class Cli {
@@ -204,6 +204,27 @@ export class Cli {
       vscode.window.showErrorMessage(err.error);
       console.error(err);
       return [];
+    }
+  }
+
+  async switchProject(id: string, status: string): Promise<boolean> {
+    try {
+      const cliBin = await this.CliBin();
+      if (!cliBin) {
+        return false;
+      }
+      const command = `${cliBin} project switch -i ${id} -s ${status}`;
+      console.log(command);
+      const output = await this.exec(command, {});
+      if (output.stderr) {
+        vscode.window.showErrorMessage(output.stderr);
+        return false;
+      }
+      return true;
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return false;
     }
   }
 
@@ -545,6 +566,145 @@ export class Cli {
       vscode.window.showErrorMessage(err.error);
       console.error(err);
       return [];
+    }
+  }
+
+  async CreateCampaign(projectID: string): Promise<Campaign> {
+    try {
+      const cliBin = await this.CliBin();
+      let command: string;
+      if (!cliBin) {
+        return {} as Campaign;
+      }
+
+      command = `${cliBin} campaign create -d '{"project_id":"${projectID}","name":"test_campaign","description":"DESCRIPTION","type":"ab","variation_groups":[{"variations":[{"name":"VARIATION_NAME","allocation":50,"reference":true}]}]}'`;
+
+      console.log(command);
+
+      const output = await this.exec(command, {});
+      console.log(output);
+      if (output.stderr) {
+        vscode.window.showErrorMessage(output.stderr);
+        return {} as Campaign;
+      }
+      return JSON.parse(output.stdout);
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return {} as Campaign;
+    }
+  }
+
+  async DeleteCampaign(id: string): Promise<boolean> {
+    try {
+      const cliBin = await this.CliBin();
+      let command: string;
+      if (!cliBin) {
+        return false;
+      }
+
+      command = `${cliBin} campaign delete -i ${id}`;
+
+      const output = await this.exec(command, {});
+      console.log(output);
+      if (output.stderr) {
+        vscode.window.showErrorMessage(output.stderr);
+        return false;
+      }
+      return true;
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return false;
+    }
+  }
+
+  async ListCampaign(): Promise<Campaign[]> {
+    try {
+      const cliBin = await this.CliBin();
+      if (!cliBin) {
+        return [];
+      }
+      const command = `${cliBin} campaign list --output-format json`;
+      const output = await this.exec(command, {});
+      if (output.stderr) {
+        vscode.window.showErrorMessage(output.stderr);
+        return [];
+      }
+      return JSON.parse(output.stdout);
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return [];
+    }
+  }
+
+  async switchCampaign(id: string, status: string): Promise<boolean> {
+    try {
+      const cliBin = await this.CliBin();
+      if (!cliBin) {
+        return false;
+      }
+      const command = `${cliBin} campaign switch -i ${id} -s ${status}`;
+      console.log(command);
+      const output = await this.exec(command, {});
+      if (output.stderr) {
+        vscode.window.showErrorMessage(output.stderr);
+        return false;
+      }
+      return true;
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return false;
+    }
+  }
+
+  async DeleteVariationGroup(id: string, campaignID: string): Promise<boolean> {
+    try {
+      const cliBin = await this.CliBin();
+      let command: string;
+      if (!cliBin) {
+        return false;
+      }
+
+      command = `${cliBin} variation-group delete --campaign-id ${campaignID} -i ${id}`;
+
+      const output = await this.exec(command, {});
+      console.log(output);
+      if (output.stderr) {
+        vscode.window.showErrorMessage(output.stderr);
+        return false;
+      }
+      return true;
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return false;
+    }
+  }
+
+  async DeleteVariation(id: string, campaignID: string, variationGroupID: string): Promise<boolean> {
+    try {
+      const cliBin = await this.CliBin();
+      let command: string;
+      if (!cliBin) {
+        return false;
+      }
+
+      command = `${cliBin} variation delete --campaign-id ${campaignID} --variation-group-id ${variationGroupID} -i ${id}`;
+
+      const output = await this.exec(command, {});
+      console.log(output);
+      if (output.stderr) {
+        vscode.window.showErrorMessage(output.stderr);
+        return false;
+      }
+      return true;
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return false;
     }
   }
 }

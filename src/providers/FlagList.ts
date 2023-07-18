@@ -61,7 +61,7 @@ export class FlagListProvider implements vscode.TreeDataProvider<vscode.TreeItem
     }
 
     Object.entries(this._flags.find((f) => f === element)!).forEach(([k, v]) => {
-      if (k === 'id' || k === 'key' || k === 'type' || k === 'flagDescription' || k === 'defaultValue') {
+      if (k === 'id' || k === 'key' || k === 'type' || k === 'flagDescription') {
         if (k === 'flagDescription') {
           k = 'description';
         }

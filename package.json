@@ -5,7 +5,7 @@
   "publisher": "ABTasty",
   "license": "SEE LICENSE IN LICENSE.md",
   "repository": "https://github.com/flagship-io/flagship-code",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "engines": {
     "vscode": "^1.72.0"
   },
@@ -121,6 +121,10 @@
         "title": "Flagship: Trigger flag autocompletion"
       },
       {
+        "command": "flagship.showSurvey",
+        "title": "Flagship: Show survey"
+      },
+      {
         "command": "flagsInFile.refresh",
         "title": "Flagship: Refresh flags in file panel",
         "icon": "$(refresh)"
@@ -166,6 +170,11 @@
         "icon": "$(add)"
       },
       {
+        "command": "projectList.copyProject",
+        "title": "Flagship: Copy the project id",
+        "icon": "$(clippy)"
+      },
+      {
         "command": "projectList.refresh",
         "title": "Flagship: Refresh project panel",
         "icon": "$(refresh)"
@@ -179,6 +188,26 @@
         "command": "projectList.deleteProject",
         "title": "Flagship: Remove the project",
         "icon": "$(trash)"
+      },
+      {
+        "command": "campaignList.openInBrowser",
+        "title": "Flagship: Open campaign in the platform",
+        "icon": "$(link-external)"
+      },
+      {
+        "command": "campaignList.copyCampaign",
+        "title": "Flagship: Copy the campaign id",
+        "icon": "$(clippy)"
+      },
+      {
+        "command": "variationGroupList.copyVariationGroup",
+        "title": "Flagship: Copy the variation group id",
+        "icon": "$(clippy)"
+      },
+      {
+        "command": "variationList.copyVariation",
+        "title": "Flagship: Copy the variation id",
+        "icon": "$(clippy)"
       },
       {
         "command": "flagship.createTargetingKey",
@@ -291,6 +320,11 @@
       ],
       "view/item/context": [
         {
+          "command": "projectList.copyProject",
+          "when": "view == projectList && viewItem == projectItem",
+          "group": "inline"
+        },
+        {
           "command": "projectList.deleteProject",
           "when": "view == projectList && viewItem == projectItem",
           "group": "inline"
@@ -298,6 +332,26 @@
         {
           "command": "projectList.editProject",
           "when": "view == projectList && viewItem == projectItem",
+          "group": "inline"
+        },
+        {
+          "command": "campaignList.copyCampaign",
+          "when": "view == projectList && viewItem == campaignItem",
+          "group": "inline"
+        },
+        {
+          "command": "campaignList.openInBrowser",
+          "when": "view == projectList && viewItem == campaignItem",
+          "group": "inline"
+        },
+        {
+          "command": "variationGroupList.copyVariationGroup",
+          "when": "view == projectList && viewItem == variationGroupItem",
+          "group": "inline"
+        },
+        {
+          "command": "variationList.copyVariation",
+          "when": "view == projectList && viewItem == variationItem",
           "group": "inline"
         },
         {
@@ -473,7 +527,7 @@
     "color": "#343434",
     "theme": "dark"
   },
-  "homepage": "https://docs.developers.flagship.io/",
+  "homepage": "https://docs.developers.flagship.io/docs/flagship-code",
   "bugs": {
     "url": "https://github.com/flagship-io/flagship-code/issues"
   },

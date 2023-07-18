@@ -7,6 +7,57 @@ export type Project = {
   name: string;
 };
 
+export type Campaign = {
+  id: string;
+  name: string;
+  type: string;
+  description: string;
+  project_id: string;
+  status: string;
+  variation_groups: VariationGroup[];
+  scheduler: Scheduler;
+};
+
+export type Scheduler = {
+  start_date: string;
+  stop_date: string;
+  timezone: string;
+};
+
+export type VariationGroup = {
+  id: string;
+  name: string;
+  variations: Variation[];
+  targeting: Targeting;
+};
+
+export type Targeting = {
+  targeting_groups: TargetingGroup[];
+};
+
+export type TargetingGroup = {
+  targetings: Targetings[];
+};
+
+export type Targetings = {
+  key: string;
+  operator: string;
+  value: string;
+};
+
+export type Variation = {
+  id: string;
+  name: string;
+  reference: boolean;
+  allocation: number;
+  modifications: Modification;
+};
+
+export type Modification = {
+  type: string;
+  value: any;
+};
+
 export type Flag = {
   id: string;
   name: string;
