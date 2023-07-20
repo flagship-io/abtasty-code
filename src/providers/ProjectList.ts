@@ -201,7 +201,8 @@ export class ProjectItem extends ProjectTreeItem {
     active?: boolean,
   ) {
     super(name!, children);
-    this.tooltip = `Name: ${this.name}`;
+    this.tooltip = `- id: ${this.id}`;
+    this.description = `- id: ${this.id}`;
     this.status = active ? 'active' : 'interrupted';
     if (active) {
       this.iconPath = FOLDER_ACTIVE;
