@@ -10,8 +10,6 @@ import {
   deleteVariationBox,
   deleteVariationGroupBox,
   projectInputBox,
-  switchCampaignBox,
-  switchProjectBox,
 } from './menu/ProjectMenu';
 import {
   CampaignItem,
@@ -32,7 +30,6 @@ import {
   CAMPAIGN_LIST_COPY,
   CAMPAIGN_LIST_DELETE,
   CAMPAIGN_LIST_OPEN_IN_BROWSER,
-  CAMPAIGN_LIST_SWITCH,
   FIND_IN_FILE,
   FLAGSHIP_CREATE_FLAG,
   FLAGSHIP_CREATE_GOAL,
@@ -53,7 +50,6 @@ import {
   PROJECT_LIST_DELETE,
   PROJECT_LIST_EDIT,
   PROJECT_LIST_REFRESH,
-  PROJECT_LIST_SWITCH,
   SET_CONTEXT,
   TARGETING_KEY_LIST_DELETE,
   TARGETING_KEY_LIST_EDIT,
@@ -303,11 +299,6 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
       );
       return;
     }),
-
-    vscode.commands.registerCommand(PROJECT_LIST_SWITCH, async (project: ProjectItem) => {
-      await switchProjectBox(context, project, cli);
-      await vscode.commands.executeCommand(PROJECT_LIST_REFRESH);
-    }),
   ];
 
   const campaignDisposables = [
@@ -325,11 +316,6 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
 
     vscode.commands.registerCommand(CAMPAIGN_LIST_DELETE, async (campaign: CampaignItem) => {
       await deleteCampaignBox(context, campaign, cli);
-      await vscode.commands.executeCommand(PROJECT_LIST_REFRESH);
-    }),
-
-    vscode.commands.registerCommand(CAMPAIGN_LIST_SWITCH, async (campaign: CampaignItem) => {
-      await switchCampaignBox(context, campaign, cli);
       await vscode.commands.executeCommand(PROJECT_LIST_REFRESH);
     }),
   ];
