@@ -1,8 +1,9 @@
 import * as vscode from 'vscode';
-import { Cli } from './Cli';
-import { ItemResource } from '../model';
-import { ROCKET } from '../icons';
 import { GOAL_LIST_REFRESH } from '../commands/const';
+import { CURRENT_CONFIGURATION } from '../const';
+import { ROCKET } from '../icons';
+import { CredentialStore, ItemResource } from '../model';
+import { Cli } from './Cli';
 
 export class GoalListProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
   private _goals: GoalItem[] = [];
@@ -20,7 +21,10 @@ export class GoalListProvider implements vscode.TreeDataProvider<vscode.TreeItem
 
   async refresh() {
     this._goals = [];
-    await this.getGoals();
+    const { scope } = this.context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+    if (scope?.includes('goal.list')) {
+      await this.getGoals();
+    }
     this._onDidChangeTreeData.fire();
   }
 
@@ -30,6 +34,10 @@ export class GoalListProvider implements vscode.TreeDataProvider<vscode.TreeItem
 
   getChildren(element?: vscode.TreeItem): vscode.ProviderResult<vscode.TreeItem[]> {
     const items: vscode.TreeItem[] = [];
+    const { scope } = this.context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+    if (!scope?.includes('goal.list')) {
+      return [new vscode.TreeItem("You don't have the correct scope for this feature")];
+    }
 
     if (this._goals.length === 0) {
       const noGoal = new vscode.TreeItem('No Goal found');

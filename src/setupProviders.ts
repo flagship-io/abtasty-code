@@ -38,6 +38,7 @@ import {
   FLAGSHIP_CREATE_GOAL,
   FLAGSHIP_CREATE_PROJECT,
   FLAGSHIP_CREATE_TARGETING_KEY,
+  FLAGSHIP_GET_TOKEN_SCOPE,
   FLAGSHIP_OPEN_BROWSER,
   FLAG_IN_FILE_REFRESH,
   FLAG_LIST_COPY,
@@ -63,7 +64,7 @@ import {
   VARIATION_LIST_DELETE,
 } from './commands/const';
 import { CURRENT_CONFIGURATION, DEFAULT_BASE_URI } from './const';
-import { CredentialStore } from './model';
+import { CredentialStore, Scope } from './model';
 
 const documentSelector: vscode.DocumentSelector = [
   {
@@ -190,10 +191,34 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
     vscode.env.openExternal(vscode.Uri.parse(link));
   });
 
+  const getTokenInfo = vscode.commands.registerCommand(FLAGSHIP_GET_TOKEN_SCOPE, async () => {
+    const tokenInfo = await cli.GetTokenInfo();
+    const scopes: any = {};
+    tokenInfo.scope.split(' ').map((s) => {
+      if (s.includes('.')) {
+        const key = s.split('.');
+        scopes[key[0]] = [...(scopes[key[0]] || []), key[1]];
+        return;
+      }
+      const key = s.split(':');
+      scopes[key[0]] = [...(scopes[key[0]] || []), key[1]];
+    });
+    const sc: Scope = JSON.parse(JSON.stringify(scopes));
+    vscode.window.showInformationMessage(JSON.stringify(sc, null, 2), { modal: true });
+  });
+
   const createProject = vscode.commands.registerCommand(FLAGSHIP_CREATE_PROJECT, async () => {
-    const project = new ProjectItem();
-    await projectInputBox(context, project, cli);
-    await vscode.commands.executeCommand(PROJECT_LIST_REFRESH);
+    const { scope } = context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+    if (scope?.includes('project.create')) {
+      const project = new ProjectItem();
+      await projectInputBox(context, project, cli);
+      await vscode.commands.executeCommand(PROJECT_LIST_REFRESH);
+      return;
+    }
+    vscode.window.showInformationMessage(
+      'You dont have the permission to use this feature. Contact your admin to enable the required scopes.',
+    );
+    return;
   });
 
   /*   const createCampaign = vscode.commands.registerCommand(CAMPAIGN_LIST_ADD_CAMPAIGN, async (project: ProjectItem) => {
@@ -202,24 +227,50 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
   }); */
 
   const createFlag = vscode.commands.registerCommand(FLAGSHIP_CREATE_FLAG, async (flagKey: string | undefined) => {
-    const flag = new FlagItem();
-    if (flagKey) {
-      flag.key = flagKey;
+    const { scope } = context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+
+    if (scope?.includes('flag.create')) {
+      const flag = new FlagItem();
+      if (flagKey) {
+        flag.key = flagKey;
+      }
+      await flagInputBox(context, flag, cli);
+      await vscode.commands.executeCommand(FLAG_LIST_REFRESH);
+      return;
     }
-    await flagInputBox(context, flag, cli);
-    await vscode.commands.executeCommand(FLAG_LIST_REFRESH);
+    console.log('here-cancel');
+    vscode.window.showInformationMessage(
+      'You dont have the permission to use this feature. Contact your admin to enable the required scopes.',
+    );
+    return;
   });
 
   const createTargetingKey = vscode.commands.registerCommand(FLAGSHIP_CREATE_TARGETING_KEY, async () => {
-    const targetingKey = new TargetingKeyItem();
-    await targetingKeyInputBox(context, targetingKey, cli);
-    await vscode.commands.executeCommand(TARGETING_KEY_LIST_REFRESH);
+    const { scope } = context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+    if (scope?.includes('targeting_key.create')) {
+      const targetingKey = new TargetingKeyItem();
+      await targetingKeyInputBox(context, targetingKey, cli);
+      await vscode.commands.executeCommand(TARGETING_KEY_LIST_REFRESH);
+      return;
+    }
+    vscode.window.showInformationMessage(
+      'You dont have the permission to use this feature. Contact your admin to enable the required scopes.',
+    );
+    return;
   });
 
   const createGoal = vscode.commands.registerCommand(FLAGSHIP_CREATE_GOAL, async () => {
-    const goal = new GoalItem();
-    await goalInputBox(context, goal, cli);
-    await vscode.commands.executeCommand(GOAL_LIST_REFRESH);
+    const { scope } = context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+    if (scope?.includes('goal.create')) {
+      const goal = new GoalItem();
+      await goalInputBox(context, goal, cli);
+      await vscode.commands.executeCommand(GOAL_LIST_REFRESH);
+      return;
+    }
+    vscode.window.showInformationMessage(
+      'You dont have the permission to use this feature. Contact your admin to enable the required scopes.',
+    );
+    return;
   });
 
   const projectDisposables = [
@@ -228,13 +279,29 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
       vscode.window.showInformationMessage(`[Flagship] Project: ${project.name}'s ID copied to your clipboard.`);
     }),
     vscode.commands.registerCommand(PROJECT_LIST_EDIT, async (project: ProjectItem) => {
-      await projectInputBox(context, project, cli);
-      await vscode.commands.executeCommand(PROJECT_LIST_REFRESH);
+      const { scope } = context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+      if (scope?.includes('project.update')) {
+        await projectInputBox(context, project, cli);
+        await vscode.commands.executeCommand(PROJECT_LIST_REFRESH);
+        return;
+      }
+      vscode.window.showInformationMessage(
+        'You dont have the permission to use this feature. Contact your admin to enable the required scopes.',
+      );
+      return;
     }),
 
     vscode.commands.registerCommand(PROJECT_LIST_DELETE, async (project: ProjectItem) => {
-      await deleteProjectBox(context, project, cli);
-      await vscode.commands.executeCommand(PROJECT_LIST_REFRESH);
+      const { scope } = context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+      if (scope?.includes('project.delete')) {
+        await deleteProjectBox(context, project, cli);
+        await vscode.commands.executeCommand(PROJECT_LIST_REFRESH);
+        return;
+      }
+      vscode.window.showInformationMessage(
+        'You dont have the permission to use this feature. Contact your admin to enable the required scopes.',
+      );
+      return;
     }),
 
     vscode.commands.registerCommand(PROJECT_LIST_SWITCH, async (project: ProjectItem) => {
@@ -299,12 +366,28 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
       vscode.window.showInformationMessage(`[Flagship] Flag: ${flag.key} copied to your clipboard.`);
     }),
     vscode.commands.registerCommand(FLAG_LIST_EDIT, async (flag: FlagItem) => {
-      await flagInputBox(context, flag, cli);
-      await vscode.commands.executeCommand(FLAG_LIST_REFRESH);
+      const { scope } = context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+      if (scope?.includes('flag.update')) {
+        await flagInputBox(context, flag, cli);
+        await vscode.commands.executeCommand(FLAG_LIST_REFRESH);
+        return;
+      }
+      vscode.window.showInformationMessage(
+        'You dont have the permission to use this feature. Contact your admin to enable the required scopes.',
+      );
+      return;
     }),
     vscode.commands.registerCommand(FLAG_LIST_DELETE, async (flag: FlagItem) => {
-      await deleteFlagBox(context, flag, cli);
-      await vscode.commands.executeCommand(FLAG_LIST_REFRESH);
+      const { scope } = context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+      if (scope?.includes('flag.delete')) {
+        await deleteFlagBox(context, flag, cli);
+        await vscode.commands.executeCommand(FLAG_LIST_REFRESH);
+        return;
+      }
+      vscode.window.showInformationMessage(
+        'You dont have the permission to use this feature. Contact your admin to enable the required scopes.',
+      );
+      return;
     }),
     vscode.commands.registerCommand(FIND_IN_FILE, async (flagInFile: FlagAnalyzed) => {
       vscode.workspace
@@ -318,10 +401,18 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
         });
     }),
     vscode.commands.registerCommand(ADD_FLAG, async (flagInFile: FlagAnalyzed) => {
-      const flag = new FlagItem();
-      flag.key = flagInFile.flagKey;
-      await flagInputBox(context, flag, cli);
-      await vscode.commands.executeCommand(FLAG_LIST_REFRESH);
+      const { scope } = context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+      if (scope?.includes('flag.create')) {
+        const flag = new FlagItem();
+        flag.key = flagInFile.flagKey;
+        await flagInputBox(context, flag, cli);
+        await vscode.commands.executeCommand(FLAG_LIST_REFRESH);
+        return;
+      }
+      vscode.window.showInformationMessage(
+        'You dont have the permission to use this feature. Contact your admin to enable the required scopes.',
+      );
+      return;
     }),
     vscode.commands.registerCommand(LIST_FLAG_IN_WORKSPACE, async () => {
       await vscode.commands.executeCommand(FLAG_IN_FILE_REFRESH, rootPath, true);
@@ -330,24 +421,56 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
 
   const targetingKeyDisposables = [
     vscode.commands.registerCommand(TARGETING_KEY_LIST_EDIT, async (targetingKey: TargetingKeyItem) => {
-      await targetingKeyInputBox(context, targetingKey, cli);
-      await vscode.commands.executeCommand(TARGETING_KEY_LIST_REFRESH);
+      const { scope } = context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+      if (scope?.includes('targetong_key.update')) {
+        await targetingKeyInputBox(context, targetingKey, cli);
+        await vscode.commands.executeCommand(TARGETING_KEY_LIST_REFRESH);
+        return;
+      }
+      vscode.window.showInformationMessage(
+        'You dont have the permission to use this feature. Contact your admin to enable the required scopes.',
+      );
+      return;
     }),
     vscode.commands.registerCommand(TARGETING_KEY_LIST_DELETE, async (targetingKey: TargetingKeyItem) => {
-      await deleteTargetingKeyBox(context, targetingKey, cli);
-      await vscode.commands.executeCommand(TARGETING_KEY_LIST_REFRESH);
+      const { scope } = context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+      if (scope?.includes('targeting_key.delete')) {
+        await deleteTargetingKeyBox(context, targetingKey, cli);
+        await vscode.commands.executeCommand(TARGETING_KEY_LIST_REFRESH);
+        return;
+      }
+      vscode.window.showInformationMessage(
+        'You dont have the permission to use this feature. Contact your admin to enable the required scopes.',
+      );
+      return;
     }),
   ];
 
   const goalDispoables = [
     vscode.commands.registerCommand(GOAL_LIST_EDIT, async (goal: GoalItem) => {
-      await goalInputBox(context, goal, cli);
-      await vscode.commands.executeCommand(GOAL_LIST_REFRESH);
+      const { scope } = context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+      if (scope?.includes('goal.update')) {
+        await goalInputBox(context, goal, cli);
+        await vscode.commands.executeCommand(GOAL_LIST_REFRESH);
+        return;
+      }
+      vscode.window.showInformationMessage(
+        'You dont have the permission to use this feature. Contact your admin to enable the required scopes.',
+      );
+      return;
     }),
 
     vscode.commands.registerCommand(GOAL_LIST_DELETE, async (goal: GoalItem) => {
-      await deleteGoalBox(context, goal, cli);
-      await vscode.commands.executeCommand(GOAL_LIST_REFRESH);
+      const { scope } = context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+      if (scope?.includes('goal.delete')) {
+        await deleteGoalBox(context, goal, cli);
+        await vscode.commands.executeCommand(GOAL_LIST_REFRESH);
+        return;
+      }
+      vscode.window.showInformationMessage(
+        'You dont have the permission to use this feature. Contact your admin to enable the required scopes.',
+      );
+      return;
     }),
   ];
 
@@ -365,6 +488,7 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
 
   context.subscriptions.push(
     flagFileProvider,
+    getTokenInfo,
     createProject,
     createGoal,
     createTargetingKey,

@@ -117,6 +117,10 @@
         "title": "Flagship: Open in browser"
       },
       {
+        "command": "flagship.getTokenScope",
+        "title": "Flagship: Get token scope"
+      },
+      {
         "command": "flagship.triggerFlagCompletion",
         "title": "Flagship: Trigger flag autocompletion"
       },

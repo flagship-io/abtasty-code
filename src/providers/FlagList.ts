@@ -33,8 +33,11 @@ export class FlagListProvider implements vscode.TreeDataProvider<vscode.TreeItem
   } */
 
   public async refresh() {
+    const { scope } = this.context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
     this._flags = [];
-    await this.getFlags();
+    if (scope?.includes('flag.list')) {
+      await this.getFlags();
+    }
     this._onDidChangeTreeData.fire();
   }
 
@@ -49,7 +52,12 @@ export class FlagListProvider implements vscode.TreeDataProvider<vscode.TreeItem
   }
 
   getChildren(element?: FlagItem | undefined): vscode.ProviderResult<vscode.TreeItem[]> {
+    const { scope } = this.context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
     let items: vscode.TreeItem[] = [];
+
+    if (!scope?.includes('flag.list')) {
+      return [new vscode.TreeItem("You don't have the correct scope for this feature")];
+    }
 
     if (this._flags.length === 0) {
       const noFlag = new vscode.TreeItem('No flag found');

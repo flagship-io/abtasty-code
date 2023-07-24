@@ -1,6 +1,7 @@
 export const FLAG_IN_FILE_REFRESH = 'flagsInFile.refresh';
 
 export const FLAGSHIP_OPEN_BROWSER = 'flagship.openBrowser';
+export const FLAGSHIP_GET_TOKEN_SCOPE = 'flagship.getTokenScope';
 export const QUICK_ACCESS_REFRESH = 'quickAccess.refresh';
 export const CHECK_CLI_VERSION = 'flagship.checkCliVersion';
 export const CLEAR_CONFIG = 'flagship.clearConfig';

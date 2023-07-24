@@ -14,6 +14,7 @@ import {
   TARGETING_KEY_LIST_REFRESH,
 } from './const';
 import { CONFIGURATION_LIST, CURRENT_CONFIGURATION } from '../const';
+import { extensionReload } from '../extensionReload';
 
 export let currentConfigurationNameStatusBar: vscode.StatusBarItem;
 
@@ -36,9 +37,12 @@ export default async function configureFlagshipCmd(context: vscode.ExtensionCont
       const cliAuthenticated = cliConfigured && (await cli.Authenticate());
 
       if (cliAuthenticated) {
+        const tokenInfo = await cli.GetTokenInfo();
         await context.workspaceState.update('FSConfigured', true);
         await vscode.commands.executeCommand(SET_CONTEXT, 'flagship:enableFlagshipExplorer', true);
         const updatedCurrentConfiguration = (await config.getWorkspaceState(CURRENT_CONFIGURATION)) as CredentialStore;
+        updatedCurrentConfiguration.scope = tokenInfo.scope;
+        await config.updateWorkspaceState(CURRENT_CONFIGURATION, updatedCurrentConfiguration);
         updateStatusBarItem(updatedCurrentConfiguration.name);
         await Promise.all([
           vscode.commands.executeCommand(FLAG_LIST_REFRESH),

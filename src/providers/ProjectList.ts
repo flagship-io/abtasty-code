@@ -1,11 +1,9 @@
-import * as vscode from 'vscode';
 import * as path from 'path';
-import { Cli } from './Cli';
+import * as vscode from 'vscode';
+import { PROJECT_LIST_REFRESH } from '../commands/const';
 import {
-  BRACKET,
   CIRCLE_FILLED,
   CIRCLE_OUTLINE,
-  FOLDER,
   FOLDER_ACTIVE,
   FOLDER_INTERRUPTED,
   GROUP_BY_REF_TYPE,
@@ -16,10 +14,11 @@ import {
   MILESTONE_INTERRUPTED,
   MILESTONE_PAUSED,
   TARGET,
-  TEST_VIEW_ICON,
   WATCH,
 } from '../icons';
-import { PROJECT_LIST_REFRESH } from '../commands/const';
+import { Cli } from './Cli';
+import { CURRENT_CONFIGURATION } from '../const';
+import { CredentialStore } from '../model';
 
 export class ProjectListProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
   private _tree: ProjectTreeItem[] = [];
@@ -36,7 +35,10 @@ export class ProjectListProvider implements vscode.TreeDataProvider<vscode.TreeI
   }
 
   async refresh() {
-    await this.getTree();
+    const { scope } = this.context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+    if (scope?.includes('project.list') && scope?.includes('campaign.list')) {
+      await this.getTree();
+    }
     this._onDidChangeTreeData.fire();
   }
 
@@ -45,7 +47,14 @@ export class ProjectListProvider implements vscode.TreeDataProvider<vscode.TreeI
   }
 
   getChildren(element?: ProjectTreeItem): vscode.ProviderResult<vscode.TreeItem[]> {
+    const { scope } = this.context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
     if (typeof element === 'undefined') {
+      if (!scope?.includes('project.list') || !scope?.includes('campaign.list')) {
+        return [new ProjectTreeItem("You don't have the correct scope for this feature")];
+      }
+      if (this._tree.length === 0) {
+        return [new ProjectTreeItem('No Project found')];
+      }
       return this._tree;
     }
 
