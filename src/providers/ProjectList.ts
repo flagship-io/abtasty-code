@@ -86,7 +86,12 @@ export class ProjectListProvider implements vscode.TreeDataProvider<vscode.TreeI
                   return new ValueItem(key, valueItem, val!, v.id);
                 });
               }
-              return new VariationItem(v.id, v.name, values!, vg.id, c.id);
+              const variationInfo = Object.entries(v).map(([key, value]) => {
+                if (key !== 'modifications') {
+                  return `- ${key}: ${value}`;
+                }
+              });
+              return new VariationItem(v.id, v.name, variationInfo.join('\n'), values!, vg.id, c.id);
             });
             const variation = new ProjectTreeItem('Variations', [...variations], undefined, LAYOUT);
             const targetings = vg.targeting.targeting_groups.flatMap((tg) => {
@@ -196,7 +201,8 @@ export class ProjectItem extends ProjectTreeItem {
     active?: boolean,
   ) {
     super(name!, children);
-    this.tooltip = `Name: ${this.name}`;
+    this.tooltip = `- id: ${this.id}`;
+    this.description = `- id: ${this.id}`;
     this.status = active ? 'active' : 'interrupted';
     if (active) {
       this.iconPath = FOLDER_ACTIVE;
@@ -218,7 +224,8 @@ export class CampaignItem extends ProjectTreeItem {
     parent?: any,
   ) {
     super(name!, children, parent);
-    this.tooltip = `Name: ${this.name}`;
+    this.tooltip = `- id: ${this.id}`;
+    this.description = `- id: ${this.id}`;
     switch (status) {
       case 'active':
         this.iconPath = MILESTONE_ACTIVE;
@@ -241,7 +248,8 @@ export class CampaignItem extends ProjectTreeItem {
 export class VariationGroupItem extends ProjectTreeItem {
   constructor(public readonly id?: string, public readonly name?: string, children?: ProjectTreeItem[], parent?: any) {
     super(name!, children, parent);
-    this.tooltip = `Name: ${this.name}`;
+    this.tooltip = `- id: ${this.id}`;
+    this.description = `- id: ${this.id}`;
   }
   iconPath = CIRCLE_OUTLINE;
 
@@ -253,12 +261,14 @@ export class VariationItem extends ProjectTreeItem {
   constructor(
     public readonly id?: string,
     public readonly name?: string,
+    public readonly description?: string,
     children?: ProjectTreeItem[],
     parent?: any,
     campaignID?: string,
   ) {
     super(name!, children, parent);
-    this.tooltip = `Name: ${this.name}`;
+    this.tooltip = description;
+    this.description = description;
     this.campaignID = campaignID;
   }
   iconPath = CIRCLE_OUTLINE;
