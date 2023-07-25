@@ -59,7 +59,7 @@ import {
   VARIATION_LIST_COPY,
   VARIATION_LIST_DELETE,
 } from './commands/const';
-import { CURRENT_CONFIGURATION, DEFAULT_BASE_URI } from './const';
+import { CURRENT_CONFIGURATION, DEFAULT_BASE_URI, PERMISSION_DENIED } from './const';
 import { CredentialStore, Scope } from './model';
 
 const documentSelector: vscode.DocumentSelector = [
@@ -211,9 +211,7 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
       await vscode.commands.executeCommand(PROJECT_LIST_REFRESH);
       return;
     }
-    vscode.window.showInformationMessage(
-      'You dont have the permission to use this feature. Contact your admin to enable the required scopes.',
-    );
+    vscode.window.showWarningMessage(PERMISSION_DENIED);
     return;
   });
 
@@ -234,10 +232,7 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
       await vscode.commands.executeCommand(FLAG_LIST_REFRESH);
       return;
     }
-    console.log('here-cancel');
-    vscode.window.showInformationMessage(
-      'You dont have the permission to use this feature. Contact your admin to enable the required scopes.',
-    );
+    vscode.window.showWarningMessage(PERMISSION_DENIED);
     return;
   });
 
@@ -249,9 +244,7 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
       await vscode.commands.executeCommand(TARGETING_KEY_LIST_REFRESH);
       return;
     }
-    vscode.window.showInformationMessage(
-      'You dont have the permission to use this feature. Contact your admin to enable the required scopes.',
-    );
+    vscode.window.showWarningMessage(PERMISSION_DENIED);
     return;
   });
 
@@ -263,9 +256,7 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
       await vscode.commands.executeCommand(GOAL_LIST_REFRESH);
       return;
     }
-    vscode.window.showInformationMessage(
-      'You dont have the permission to use this feature. Contact your admin to enable the required scopes.',
-    );
+    vscode.window.showWarningMessage(PERMISSION_DENIED);
     return;
   });
 
@@ -281,9 +272,7 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
         await vscode.commands.executeCommand(PROJECT_LIST_REFRESH);
         return;
       }
-      vscode.window.showInformationMessage(
-        'You dont have the permission to use this feature. Contact your admin to enable the required scopes.',
-      );
+      vscode.window.showWarningMessage(PERMISSION_DENIED);
       return;
     }),
 
@@ -294,9 +283,7 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
         await vscode.commands.executeCommand(PROJECT_LIST_REFRESH);
         return;
       }
-      vscode.window.showInformationMessage(
-        'You dont have the permission to use this feature. Contact your admin to enable the required scopes.',
-      );
+      vscode.window.showWarningMessage(PERMISSION_DENIED);
       return;
     }),
   ];
@@ -358,9 +345,7 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
         await vscode.commands.executeCommand(FLAG_LIST_REFRESH);
         return;
       }
-      vscode.window.showInformationMessage(
-        'You dont have the permission to use this feature. Contact your admin to enable the required scopes.',
-      );
+      vscode.window.showWarningMessage(PERMISSION_DENIED);
       return;
     }),
     vscode.commands.registerCommand(FLAG_LIST_DELETE, async (flag: FlagItem) => {
@@ -370,9 +355,7 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
         await vscode.commands.executeCommand(FLAG_LIST_REFRESH);
         return;
       }
-      vscode.window.showInformationMessage(
-        'You dont have the permission to use this feature. Contact your admin to enable the required scopes.',
-      );
+      vscode.window.showWarningMessage(PERMISSION_DENIED);
       return;
     }),
     vscode.commands.registerCommand(FIND_IN_FILE, async (flagInFile: FlagAnalyzed) => {
@@ -395,9 +378,7 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
         await vscode.commands.executeCommand(FLAG_LIST_REFRESH);
         return;
       }
-      vscode.window.showInformationMessage(
-        'You dont have the permission to use this feature. Contact your admin to enable the required scopes.',
-      );
+      vscode.window.showWarningMessage(PERMISSION_DENIED);
       return;
     }),
     vscode.commands.registerCommand(LIST_FLAG_IN_WORKSPACE, async () => {
@@ -413,9 +394,7 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
         await vscode.commands.executeCommand(TARGETING_KEY_LIST_REFRESH);
         return;
       }
-      vscode.window.showInformationMessage(
-        'You dont have the permission to use this feature. Contact your admin to enable the required scopes.',
-      );
+      vscode.window.showWarningMessage(PERMISSION_DENIED);
       return;
     }),
     vscode.commands.registerCommand(TARGETING_KEY_LIST_DELETE, async (targetingKey: TargetingKeyItem) => {
@@ -425,9 +404,7 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
         await vscode.commands.executeCommand(TARGETING_KEY_LIST_REFRESH);
         return;
       }
-      vscode.window.showInformationMessage(
-        'You dont have the permission to use this feature. Contact your admin to enable the required scopes.',
-      );
+      vscode.window.showWarningMessage(PERMISSION_DENIED);
       return;
     }),
   ];
@@ -440,9 +417,7 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
         await vscode.commands.executeCommand(GOAL_LIST_REFRESH);
         return;
       }
-      vscode.window.showInformationMessage(
-        'You dont have the permission to use this feature. Contact your admin to enable the required scopes.',
-      );
+      vscode.window.showWarningMessage(PERMISSION_DENIED);
       return;
     }),
 
@@ -453,9 +428,7 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
         await vscode.commands.executeCommand(GOAL_LIST_REFRESH);
         return;
       }
-      vscode.window.showInformationMessage(
-        'You dont have the permission to use this feature. Contact your admin to enable the required scopes.',
-      );
+      vscode.window.showWarningMessage(PERMISSION_DENIED);
       return;
     }),
   ];

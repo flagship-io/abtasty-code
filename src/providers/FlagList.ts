@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { Cli } from './Cli';
 import { CredentialStore, ItemResource } from '../model';
-import { CURRENT_CONFIGURATION, DEFAULT_BASE_URI } from '../const';
+import { CURRENT_CONFIGURATION, DEFAULT_BASE_URI, PERMISSION_DENIED_PANEL } from '../const';
 import { FLAGSHIP_OPEN_BROWSER, FLAG_LIST_OPEN_IN_BROWSER, FLAG_LIST_REFRESH } from '../commands/const';
 
 export class FlagListProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
@@ -56,7 +56,7 @@ export class FlagListProvider implements vscode.TreeDataProvider<vscode.TreeItem
     let items: vscode.TreeItem[] = [];
 
     if (!scope?.includes('flag.list')) {
-      return [new vscode.TreeItem("You don't have the correct scope for this feature")];
+      return [new vscode.TreeItem(PERMISSION_DENIED_PANEL)];
     }
 
     if (this._flags.length === 0) {

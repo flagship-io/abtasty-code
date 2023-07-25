@@ -17,7 +17,7 @@ import {
   WATCH,
 } from '../icons';
 import { Cli } from './Cli';
-import { CURRENT_CONFIGURATION } from '../const';
+import { CURRENT_CONFIGURATION, PERMISSION_DENIED_PANEL } from '../const';
 import { CredentialStore } from '../model';
 
 export class ProjectListProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
@@ -50,7 +50,7 @@ export class ProjectListProvider implements vscode.TreeDataProvider<vscode.TreeI
     const { scope } = this.context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
     if (typeof element === 'undefined') {
       if (!scope?.includes('project.list') || !scope?.includes('campaign.list')) {
-        return [new ProjectTreeItem("You don't have the correct scope for this feature")];
+        return [new ProjectTreeItem(PERMISSION_DENIED_PANEL)];
       }
       if (this._tree.length === 0) {
         return [new ProjectTreeItem('No Project found')];
@@ -79,7 +79,7 @@ export class ProjectListProvider implements vscode.TreeDataProvider<vscode.TreeI
       let projectActive = false;
       campaignList
         .filter((c) => c.project_id === p.id)
-        .map((c) => {
+        .forEach((c) => {
           if (c.status === 'active') {
             projectActive = true;
           }

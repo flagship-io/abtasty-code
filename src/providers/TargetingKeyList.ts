@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { TARGETING_KEY_LIST_REFRESH } from '../commands/const';
-import { CURRENT_CONFIGURATION } from '../const';
+import { CURRENT_CONFIGURATION, PERMISSION_DENIED_PANEL } from '../const';
 import { KEY } from '../icons';
 import { CredentialStore, ItemResource } from '../model';
 import { Cli } from './Cli';
@@ -37,7 +37,7 @@ export class TargetingKeyListProvider implements vscode.TreeDataProvider<vscode.
     const { scope } = this.context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
 
     if (!scope?.includes('targeting_key.list')) {
-      return [new vscode.TreeItem("You don't have the correct scope for this feature")];
+      return [new vscode.TreeItem(PERMISSION_DENIED_PANEL)];
     }
 
     if (this._targetingKeyList.length === 0) {

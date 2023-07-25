@@ -214,7 +214,6 @@ export class Cli {
         return false;
       }
       const command = `${cliBin} project switch -i ${id} -s ${status}`;
-      console.log(command);
       const output = await this.exec(command, {});
       if (output.stderr) {
         vscode.window.showErrorMessage(output.stderr);
@@ -576,11 +575,7 @@ export class Cli {
       if (!cliBin) {
         return {} as Campaign;
       }
-
       command = `${cliBin} campaign create -d '{"project_id":"${projectID}","name":"test_campaign","description":"DESCRIPTION","type":"ab","variation_groups":[{"variations":[{"name":"VARIATION_NAME","allocation":50,"reference":true}]}]}'`;
-
-      console.log(command);
-
       const output = await this.exec(command, {});
       console.log(output);
       if (output.stderr) {
@@ -646,7 +641,6 @@ export class Cli {
         return false;
       }
       const command = `${cliBin} campaign switch -i ${id} -s ${status}`;
-      console.log(command);
       const output = await this.exec(command, {});
       if (output.stderr) {
         vscode.window.showErrorMessage(output.stderr);
