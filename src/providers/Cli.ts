@@ -3,7 +3,7 @@
 import * as vscode from 'vscode';
 import { exec, ExecOptions } from 'child_process';
 import { join } from 'path';
-import { Campaign, FileAnalyzedType, Flag, Goal, Project, TargetingKey } from '../model';
+import { Campaign, FileAnalyzedType, Flag, Goal, Project, TargetingKey, TokenInfo } from '../model';
 import { CliVersion } from '../cli/cliDownloader';
 import * as fs from 'fs';
 export class Cli {
@@ -214,7 +214,6 @@ export class Cli {
         return false;
       }
       const command = `${cliBin} project switch -i ${id} -s ${status}`;
-      console.log(command);
       const output = await this.exec(command, {});
       if (output.stderr) {
         vscode.window.showErrorMessage(output.stderr);
@@ -576,11 +575,7 @@ export class Cli {
       if (!cliBin) {
         return {} as Campaign;
       }
-
       command = `${cliBin} campaign create -d '{"project_id":"${projectID}","name":"test_campaign","description":"DESCRIPTION","type":"ab","variation_groups":[{"variations":[{"name":"VARIATION_NAME","allocation":50,"reference":true}]}]}'`;
-
-      console.log(command);
-
       const output = await this.exec(command, {});
       console.log(output);
       if (output.stderr) {
@@ -646,7 +641,6 @@ export class Cli {
         return false;
       }
       const command = `${cliBin} campaign switch -i ${id} -s ${status}`;
-      console.log(command);
       const output = await this.exec(command, {});
       if (output.stderr) {
         vscode.window.showErrorMessage(output.stderr);
@@ -705,6 +699,26 @@ export class Cli {
       vscode.window.showErrorMessage(err.error);
       console.error(err);
       return false;
+    }
+  }
+
+  async GetTokenInfo(): Promise<TokenInfo> {
+    try {
+      const cliBin = await this.CliBin();
+      if (!cliBin) {
+        return {} as TokenInfo;
+      }
+      const command = `${cliBin} token info --output-format json`;
+      const output = await this.exec(command, {});
+      if (output.stderr) {
+        vscode.window.showErrorMessage(output.stderr);
+        return {} as TokenInfo;
+      }
+      return JSON.parse(output.stdout);
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return {} as TokenInfo;
     }
   }
 }

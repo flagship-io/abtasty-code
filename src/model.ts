@@ -100,6 +100,7 @@ export interface Credential {
   client_secret: string;
   expiration: number;
   token: string;
+  scope?: string;
 }
 
 export type FileAnalyzedType = {
@@ -121,6 +122,7 @@ export interface CredentialStore {
   accountId: string;
   accountEnvId: string;
   path: string;
+  scope?: string;
 }
 
 export class ItemResource extends vscode.TreeItem {
@@ -134,3 +136,20 @@ export class ItemResource extends vscode.TreeItem {
 function capitalizeFirstLetter(word: string) {
   return word.charAt(0).toUpperCase() + word.slice(1);
 }
+
+export type TokenInfo = {
+  client_id: string;
+  account: string;
+  expires_in: number;
+  scope: string;
+};
+
+export type Scope = {
+  campaign?: string[];
+  environment?: string[];
+  flag?: string[];
+  flag_analytics?: string[];
+  goal?: string[];
+  project?: string[];
+  targeting_key?: string[];
+};

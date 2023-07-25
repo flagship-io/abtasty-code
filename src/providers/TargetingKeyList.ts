@@ -1,8 +1,9 @@
 import * as vscode from 'vscode';
-import { Cli } from './Cli';
-import { ItemResource } from '../model';
-import { KEY } from '../icons';
 import { TARGETING_KEY_LIST_REFRESH } from '../commands/const';
+import { CURRENT_CONFIGURATION, PERMISSION_DENIED_PANEL } from '../const';
+import { KEY } from '../icons';
+import { CredentialStore, ItemResource } from '../model';
+import { Cli } from './Cli';
 
 export class TargetingKeyListProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
   private _targetingKeyList: TargetingKeyItem[] = [];
@@ -20,7 +21,10 @@ export class TargetingKeyListProvider implements vscode.TreeDataProvider<vscode.
 
   async refresh() {
     this._targetingKeyList = [];
-    await this.getTargetingKeys();
+    const { scope } = this.context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+    if (scope?.includes('targeting_key.list')) {
+      await this.getTargetingKeys();
+    }
     this._onDidChangeTreeData.fire();
   }
 
@@ -30,6 +34,11 @@ export class TargetingKeyListProvider implements vscode.TreeDataProvider<vscode.
 
   getChildren(element?: vscode.TreeItem): vscode.ProviderResult<vscode.TreeItem[]> {
     const items: vscode.TreeItem[] = [];
+    const { scope } = this.context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+
+    if (!scope?.includes('targeting_key.list')) {
+      return [new vscode.TreeItem(PERMISSION_DENIED_PANEL)];
+    }
 
     if (this._targetingKeyList.length === 0) {
       const noTargetingKey = new vscode.TreeItem('No Targeting key found');

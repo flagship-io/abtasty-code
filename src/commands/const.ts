@@ -1,6 +1,7 @@
 export const FLAG_IN_FILE_REFRESH = 'flagsInFile.refresh';
 
 export const FLAGSHIP_OPEN_BROWSER = 'flagship.openBrowser';
+export const FLAGSHIP_GET_TOKEN_SCOPE = 'flagship.getTokenScope';
 export const QUICK_ACCESS_REFRESH = 'quickAccess.refresh';
 export const CHECK_CLI_VERSION = 'flagship.checkCliVersion';
 export const CLEAR_CONFIG = 'flagship.clearConfig';
@@ -12,14 +13,12 @@ export const PROJECT_LIST_COPY = 'projectList.copyProject';
 export const PROJECT_LIST_REFRESH = 'projectList.refresh';
 export const PROJECT_LIST_EDIT = 'projectList.editProject';
 export const PROJECT_LIST_DELETE = 'projectList.deleteProject';
-export const PROJECT_LIST_SWITCH = 'projectList.switchProject';
 
 //export const CAMPAIGN_LIST_ADD_CAMPAIGN = 'campaignList.addCampaign';
 //export const CAMPAIGN_LIST_EDIT_CAMPAIGN = 'campaignList.editCampaign';
 export const CAMPAIGN_LIST_OPEN_IN_BROWSER = 'campaignList.openInBrowser';
 export const CAMPAIGN_LIST_DELETE = 'campaignList.deleteCampaign';
 export const CAMPAIGN_LIST_COPY = 'campaignList.copyCampaign';
-export const CAMPAIGN_LIST_SWITCH = 'campaignList.switchCampaign';
 
 //export const VARIATION_GROUP_LIST_ADD = 'variationGroupList.addVariationGroup';
 //export const VARIATION_GROUP_LIST_EDIT = 'variationGroupList.editVariationGroup';

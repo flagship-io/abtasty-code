@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { Cli } from './Cli';
 import { CredentialStore, ItemResource } from '../model';
-import { CURRENT_CONFIGURATION, DEFAULT_BASE_URI } from '../const';
+import { CURRENT_CONFIGURATION, DEFAULT_BASE_URI, PERMISSION_DENIED_PANEL } from '../const';
 import { FLAGSHIP_OPEN_BROWSER, FLAG_LIST_OPEN_IN_BROWSER, FLAG_LIST_REFRESH } from '../commands/const';
 
 export class FlagListProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
@@ -33,8 +33,11 @@ export class FlagListProvider implements vscode.TreeDataProvider<vscode.TreeItem
   } */
 
   public async refresh() {
+    const { scope } = this.context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
     this._flags = [];
-    await this.getFlags();
+    if (scope?.includes('flag.list')) {
+      await this.getFlags();
+    }
     this._onDidChangeTreeData.fire();
   }
 
@@ -49,7 +52,12 @@ export class FlagListProvider implements vscode.TreeDataProvider<vscode.TreeItem
   }
 
   getChildren(element?: FlagItem | undefined): vscode.ProviderResult<vscode.TreeItem[]> {
+    const { scope } = this.context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
     let items: vscode.TreeItem[] = [];
+
+    if (!scope?.includes('flag.list')) {
+      return [new vscode.TreeItem(PERMISSION_DENIED_PANEL)];
+    }
 
     if (this._flags.length === 0) {
       const noFlag = new vscode.TreeItem('No flag found');
