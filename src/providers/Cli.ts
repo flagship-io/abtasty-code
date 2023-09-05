@@ -8,14 +8,16 @@ import { CliVersion } from '../cli/cliDownloader';
 import * as fs from 'fs';
 export class Cli {
   private context: vscode.ExtensionContext;
+  private extensionVersion: string;
 
   constructor(context: vscode.ExtensionContext) {
+    this.extensionVersion = vscode.extensions.getExtension('ABTasty.flagship-code')?.packageJSON.version;
     this.context = context;
   }
 
   exec(command: string, options: ExecOptions): Promise<{ stdout: string; stderr: string }> {
     return new Promise<{ stdout: string; stderr: string }>((resolve, reject) => {
-      exec(command, options, (error, stdout, stderr) => {
+      exec(command + ' --user-agent=flagship-code/v' + this.extensionVersion, options, (error, stdout, stderr) => {
         if (error) {
           reject({ error, stdout, stderr });
         }

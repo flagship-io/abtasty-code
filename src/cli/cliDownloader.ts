@@ -8,7 +8,7 @@ import axios from 'axios';
 import { rimraf } from 'rimraf';
 import { createGunzip } from 'zlib';
 
-export const CliVersion = '0.7.1'; // 'v' in v0.7.0 is added in download url
+export const CliVersion = '0.7.2'; // 'v' in v0.7.2 is added in download url
 
 export async function CliDownloader(context: vscode.ExtensionContext, binaryDir: string) {
   const flagshipDir = context.asAbsolutePath('flagship');
