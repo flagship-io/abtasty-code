@@ -17,7 +17,7 @@ export class Cli {
 
   exec(command: string, options: ExecOptions): Promise<{ stdout: string; stderr: string }> {
     return new Promise<{ stdout: string; stderr: string }>((resolve, reject) => {
-      exec(command + ' --user-agent=flagship-code/v' + this.extensionVersion, options, (error, stdout, stderr) => {
+      exec(command + ' --user-agent=flagship-ext-vscode/v' + this.extensionVersion, options, (error, stdout, stderr) => {
         if (error) {
           reject({ error, stdout, stderr });
         }
