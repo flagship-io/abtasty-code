@@ -7,8 +7,8 @@ export default async function clearConfigCmd(context: vscode.ExtensionContext, c
   const clearConfig: vscode.Disposable = vscode.commands.registerCommand(CLEAR_CONFIG, async () => {
     try {
       await Promise.all([
-        config.clearWorkspaceConfig(),
-        context.workspaceState.update('FSConfigured', false),
+        config.clearGlobalConfig(),
+        context.globalState.update('FSConfigured', false),
         vscode.commands.executeCommand(SET_CONTEXT, 'flagship:enableFlagshipExplorer', false),
       ]);
       currentConfigurationNameStatusBar.hide();

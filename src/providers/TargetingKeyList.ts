@@ -21,7 +21,7 @@ export class TargetingKeyListProvider implements vscode.TreeDataProvider<vscode.
 
   async refresh() {
     this._targetingKeyList = [];
-    const { scope } = this.context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+    const { scope } = this.context.globalState.get(CURRENT_CONFIGURATION) as CredentialStore;
     if (scope?.includes('targeting_key.list')) {
       await this.getTargetingKeys();
     }
@@ -34,7 +34,7 @@ export class TargetingKeyListProvider implements vscode.TreeDataProvider<vscode.
 
   getChildren(element?: vscode.TreeItem): vscode.ProviderResult<vscode.TreeItem[]> {
     const items: vscode.TreeItem[] = [];
-    const { scope } = this.context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+    const { scope } = this.context.globalState.get(CURRENT_CONFIGURATION) as CredentialStore;
 
     if (!scope?.includes('targeting_key.list')) {
       return [new vscode.TreeItem(PERMISSION_DENIED_PANEL)];

@@ -300,7 +300,7 @@ export class ConfigurationMenu {
         this.configurationList.length > 1
           ? this.configurationList.filter((i) => i.name !== pick.label)
           : this.configurationList.filter((i) => '$(play)' + i.name !== pick.label);
-      await this.config.updateWorkspaceState(CONFIGURATION_LIST, newList);
+      await this.config.updateGlobalState(CONFIGURATION_LIST, newList);
       this.deletingMode = true;
       this.configurationList = [...newList];
 
@@ -329,7 +329,7 @@ export class ConfigurationMenu {
       },
     );
     if (picked) {
-      await this.config.updateWorkspaceState(
+      await this.config.updateGlobalState(
         CONFIGURATION_LIST,
         this.configurationList.filter((i) => '$(play)' + i.name !== pick.label),
       );
@@ -389,7 +389,7 @@ export class ConfigurationMenu {
 
     if (this.editionMode || this.addingMode) {
       if (!this.configurationList.map((i) => i.name).find((i) => i === (<any>this.credState).name)) {
-        await this.config.updateWorkspaceState(CONFIGURATION_LIST, [...this.configurationList, <any>this.credState]);
+        await this.config.updateGlobalState(CONFIGURATION_LIST, [...this.configurationList, <any>this.credState]);
       }
       this.editionMode
         ? vscode.window.showInformationMessage('[Flagship] Configuration edited !')
@@ -406,10 +406,10 @@ export class ConfigurationMenu {
 
     if (configured) {
       if (!this.configurationList.map((i) => i.name).find((i) => i === (<any>this.credState).name)) {
-        await this.config.updateWorkspaceState(CONFIGURATION_LIST, [...this.configurationList, <any>this.credState]);
+        await this.config.updateGlobalState(CONFIGURATION_LIST, [...this.configurationList, <any>this.credState]);
       }
 
-      await this.config.updateWorkspaceState(CURRENT_CONFIGURATION, <any>this.credState);
+      await this.config.updateGlobalState(CURRENT_CONFIGURATION, <any>this.credState);
     }
 
     vscode.window.withProgress(

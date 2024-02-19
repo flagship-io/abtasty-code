@@ -35,7 +35,7 @@ export class ProjectListProvider implements vscode.TreeDataProvider<vscode.TreeI
   }
 
   async refresh() {
-    const { scope } = this.context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+    const { scope } = this.context.globalState.get(CURRENT_CONFIGURATION) as CredentialStore;
     if (scope?.includes('project.list') && scope?.includes('campaign.list')) {
       await this.getTree();
     }
@@ -47,7 +47,7 @@ export class ProjectListProvider implements vscode.TreeDataProvider<vscode.TreeI
   }
 
   getChildren(element?: ProjectTreeItem): vscode.ProviderResult<vscode.TreeItem[]> {
-    const { scope } = this.context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+    const { scope } = this.context.globalState.get(CURRENT_CONFIGURATION) as CredentialStore;
     if (typeof element === 'undefined') {
       if (!scope?.includes('project.list') || !scope?.includes('campaign.list')) {
         return [new ProjectTreeItem(PERMISSION_DENIED_PANEL)];

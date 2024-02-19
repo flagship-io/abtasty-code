@@ -21,8 +21,8 @@ export let currentConfigurationNameStatusBar: vscode.StatusBarItem;
 export default async function configureFlagshipCmd(context: vscode.ExtensionContext, config: Configuration, cli: Cli) {
   const configureExtension: vscode.Disposable = vscode.commands.registerCommand(SET_CREDENTIALS, async () => {
     try {
-      const configurationStore = ((await config.getWorkspaceState(CONFIGURATION_LIST)) as CredentialStore[]) || [];
-      const currentConfiguration = (await config.getWorkspaceState(CURRENT_CONFIGURATION)) as CredentialStore;
+      const configurationStore = ((await config.getGlobalState(CONFIGURATION_LIST)) as CredentialStore[]) || [];
+      const currentConfiguration = (await config.getGlobalState(CURRENT_CONFIGURATION)) as CredentialStore;
       const sortedConfig = configurationStore.sort((a, b) => {
         if (a.name === currentConfiguration.name) {
           return -1;
@@ -38,11 +38,11 @@ export default async function configureFlagshipCmd(context: vscode.ExtensionCont
 
       if (cliAuthenticated) {
         const tokenInfo = await cli.GetTokenInfo();
-        await context.workspaceState.update('FSConfigured', true);
+        await context.globalState.update('FSConfigured', true);
         await vscode.commands.executeCommand(SET_CONTEXT, 'flagship:enableFlagshipExplorer', true);
-        const updatedCurrentConfiguration = (await config.getWorkspaceState(CURRENT_CONFIGURATION)) as CredentialStore;
+        const updatedCurrentConfiguration = (await config.getGlobalState(CURRENT_CONFIGURATION)) as CredentialStore;
         updatedCurrentConfiguration.scope = tokenInfo.scope;
-        await config.updateWorkspaceState(CURRENT_CONFIGURATION, updatedCurrentConfiguration);
+        await config.updateGlobalState(CURRENT_CONFIGURATION, updatedCurrentConfiguration);
         updateStatusBarItem(updatedCurrentConfiguration.name);
         await Promise.all([
           vscode.commands.executeCommand(FLAG_LIST_REFRESH),

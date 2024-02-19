@@ -24,7 +24,7 @@ export default class FlagshipHoverProvider implements vscode.HoverProvider {
     position: vscode.Position,
   ): Promise<vscode.Hover | undefined> {
     const baseUrl = `${DEFAULT_BASE_URI}/env`;
-    const { accountEnvId } = (await this.config.getWorkspaceState(CURRENT_CONFIGURATION)) as CredentialStore;
+    const { accountEnvId } = (await this.config.getGlobalState(CURRENT_CONFIGURATION)) as CredentialStore;
     const flagList: Flag[] = await this.cli.ListFlag();
     const candidate = document.getText(document.getWordRangeAtPosition(position, CANDIDATE_REGEX));
     const linePrefix = document.lineAt(position).text.substring(0, position.character);

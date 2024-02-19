@@ -21,7 +21,7 @@ export class FlagListProvider implements vscode.TreeDataProvider<vscode.TreeItem
     vscode.commands.registerCommand(FLAG_LIST_REFRESH, async () => await this.refresh());
     vscode.commands.registerCommand(FLAG_LIST_OPEN_IN_BROWSER, async () => {
       const baseUrl = `${DEFAULT_BASE_URI}/env`;
-      const { accountEnvId } = (await this.context.workspaceState.get(CURRENT_CONFIGURATION)) as CredentialStore;
+      const { accountEnvId } = (await this.context.globalState.get(CURRENT_CONFIGURATION)) as CredentialStore;
       await vscode.commands.executeCommand(FLAGSHIP_OPEN_BROWSER, `${baseUrl}/${accountEnvId}/flags-list`);
     });
     this.cli = cli;
@@ -33,7 +33,7 @@ export class FlagListProvider implements vscode.TreeDataProvider<vscode.TreeItem
   } */
 
   public async refresh() {
-    const { scope } = this.context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+    const { scope } = this.context.globalState.get(CURRENT_CONFIGURATION) as CredentialStore;
     this._flags = [];
     if (scope?.includes('flag.list')) {
       await this.getFlags();
@@ -52,7 +52,7 @@ export class FlagListProvider implements vscode.TreeDataProvider<vscode.TreeItem
   }
 
   getChildren(element?: FlagItem | undefined): vscode.ProviderResult<vscode.TreeItem[]> {
-    const { scope } = this.context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+    const { scope } = this.context.globalState.get(CURRENT_CONFIGURATION) as CredentialStore;
     let items: vscode.TreeItem[] = [];
 
     if (!scope?.includes('flag.list')) {

@@ -21,7 +21,7 @@ export class GoalListProvider implements vscode.TreeDataProvider<vscode.TreeItem
 
   async refresh() {
     this._goals = [];
-    const { scope } = this.context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+    const { scope } = this.context.globalState.get(CURRENT_CONFIGURATION) as CredentialStore;
     if (scope?.includes('goal.list')) {
       await this.getGoals();
     }
@@ -34,7 +34,7 @@ export class GoalListProvider implements vscode.TreeDataProvider<vscode.TreeItem
 
   getChildren(element?: vscode.TreeItem): vscode.ProviderResult<vscode.TreeItem[]> {
     const items: vscode.TreeItem[] = [];
-    const { scope } = this.context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+    const { scope } = this.context.globalState.get(CURRENT_CONFIGURATION) as CredentialStore;
     if (!scope?.includes('goal.list')) {
       return [new vscode.TreeItem(PERMISSION_DENIED_PANEL)];
     }

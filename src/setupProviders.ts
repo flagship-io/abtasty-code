@@ -150,7 +150,7 @@ export const rootPath =
     : undefined;
 
 export async function setupProviders(context: vscode.ExtensionContext, config: Configuration, cli: Cli) {
-  const configured = await context.workspaceState.get('FSConfigured');
+  const configured = await context.globalState.get('FSConfigured');
 
   if (configured === true) {
     await vscode.commands.executeCommand(SET_CONTEXT, 'flagship:enableFlagshipExplorer', true);
@@ -204,7 +204,7 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
   });
 
   const createProject = vscode.commands.registerCommand(FLAGSHIP_CREATE_PROJECT, async () => {
-    const { scope } = context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+    const { scope } = context.globalState.get(CURRENT_CONFIGURATION) as CredentialStore;
     if (scope?.includes('project.create')) {
       const project = new ProjectItem();
       await projectInputBox(context, project, cli);
@@ -221,7 +221,7 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
   }); */
 
   const createFlag = vscode.commands.registerCommand(FLAGSHIP_CREATE_FLAG, async (flagKey: string | undefined) => {
-    const { scope } = context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+    const { scope } = context.globalState.get(CURRENT_CONFIGURATION) as CredentialStore;
 
     if (scope?.includes('flag.create')) {
       const flag = new FlagItem();
@@ -237,7 +237,7 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
   });
 
   const createTargetingKey = vscode.commands.registerCommand(FLAGSHIP_CREATE_TARGETING_KEY, async () => {
-    const { scope } = context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+    const { scope } = context.globalState.get(CURRENT_CONFIGURATION) as CredentialStore;
     if (scope?.includes('targeting_key.create')) {
       const targetingKey = new TargetingKeyItem();
       await targetingKeyInputBox(context, targetingKey, cli);
@@ -249,7 +249,7 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
   });
 
   const createGoal = vscode.commands.registerCommand(FLAGSHIP_CREATE_GOAL, async () => {
-    const { scope } = context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+    const { scope } = context.globalState.get(CURRENT_CONFIGURATION) as CredentialStore;
     if (scope?.includes('goal.create')) {
       const goal = new GoalItem();
       await goalInputBox(context, goal, cli);
@@ -266,7 +266,7 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
       vscode.window.showInformationMessage(`[Flagship] Project: ${project.name}'s ID copied to your clipboard.`);
     }),
     vscode.commands.registerCommand(PROJECT_LIST_EDIT, async (project: ProjectItem) => {
-      const { scope } = context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+      const { scope } = context.globalState.get(CURRENT_CONFIGURATION) as CredentialStore;
       if (scope?.includes('project.update')) {
         await projectInputBox(context, project, cli);
         await vscode.commands.executeCommand(PROJECT_LIST_REFRESH);
@@ -277,7 +277,7 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
     }),
 
     vscode.commands.registerCommand(PROJECT_LIST_DELETE, async (project: ProjectItem) => {
-      const { scope } = context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+      const { scope } = context.globalState.get(CURRENT_CONFIGURATION) as CredentialStore;
       if (scope?.includes('project.delete')) {
         await deleteProjectBox(context, project, cli);
         await vscode.commands.executeCommand(PROJECT_LIST_REFRESH);
@@ -295,7 +295,7 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
     }),
 
     vscode.commands.registerCommand(CAMPAIGN_LIST_OPEN_IN_BROWSER, async (campaign: CampaignItem) => {
-      const { accountEnvId } = (await context.workspaceState.get(CURRENT_CONFIGURATION)) as CredentialStore;
+      const { accountEnvId } = (await context.globalState.get(CURRENT_CONFIGURATION)) as CredentialStore;
       await vscode.env.openExternal(
         vscode.Uri.parse(`${DEFAULT_BASE_URI}/env/${accountEnvId}/report/${campaign.type}/${campaign.id}/details`),
       );
@@ -339,7 +339,7 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
       vscode.window.showInformationMessage(`[Flagship] Flag: ${flag.key} copied to your clipboard.`);
     }),
     vscode.commands.registerCommand(FLAG_LIST_EDIT, async (flag: FlagItem) => {
-      const { scope } = context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+      const { scope } = context.globalState.get(CURRENT_CONFIGURATION) as CredentialStore;
       if (scope?.includes('flag.update')) {
         await flagInputBox(context, flag, cli);
         await vscode.commands.executeCommand(FLAG_LIST_REFRESH);
@@ -349,7 +349,7 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
       return;
     }),
     vscode.commands.registerCommand(FLAG_LIST_DELETE, async (flag: FlagItem) => {
-      const { scope } = context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+      const { scope } = context.globalState.get(CURRENT_CONFIGURATION) as CredentialStore;
       if (scope?.includes('flag.delete')) {
         await deleteFlagBox(context, flag, cli);
         await vscode.commands.executeCommand(FLAG_LIST_REFRESH);
@@ -370,7 +370,7 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
         });
     }),
     vscode.commands.registerCommand(ADD_FLAG, async (flagInFile: FlagAnalyzed) => {
-      const { scope } = context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+      const { scope } = context.globalState.get(CURRENT_CONFIGURATION) as CredentialStore;
       if (scope?.includes('flag.create')) {
         const flag = new FlagItem();
         flag.key = flagInFile.flagKey;
@@ -388,7 +388,7 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
 
   const targetingKeyDisposables = [
     vscode.commands.registerCommand(TARGETING_KEY_LIST_EDIT, async (targetingKey: TargetingKeyItem) => {
-      const { scope } = context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+      const { scope } = context.globalState.get(CURRENT_CONFIGURATION) as CredentialStore;
       if (scope?.includes('targetong_key.update')) {
         await targetingKeyInputBox(context, targetingKey, cli);
         await vscode.commands.executeCommand(TARGETING_KEY_LIST_REFRESH);
@@ -398,7 +398,7 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
       return;
     }),
     vscode.commands.registerCommand(TARGETING_KEY_LIST_DELETE, async (targetingKey: TargetingKeyItem) => {
-      const { scope } = context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+      const { scope } = context.globalState.get(CURRENT_CONFIGURATION) as CredentialStore;
       if (scope?.includes('targeting_key.delete')) {
         await deleteTargetingKeyBox(context, targetingKey, cli);
         await vscode.commands.executeCommand(TARGETING_KEY_LIST_REFRESH);
@@ -411,7 +411,7 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
 
   const goalDispoables = [
     vscode.commands.registerCommand(GOAL_LIST_EDIT, async (goal: GoalItem) => {
-      const { scope } = context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+      const { scope } = context.globalState.get(CURRENT_CONFIGURATION) as CredentialStore;
       if (scope?.includes('goal.update')) {
         await goalInputBox(context, goal, cli);
         await vscode.commands.executeCommand(GOAL_LIST_REFRESH);
@@ -422,7 +422,7 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
     }),
 
     vscode.commands.registerCommand(GOAL_LIST_DELETE, async (goal: GoalItem) => {
-      const { scope } = context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+      const { scope } = context.globalState.get(CURRENT_CONFIGURATION) as CredentialStore;
       if (scope?.includes('goal.delete')) {
         await deleteGoalBox(context, goal, cli);
         await vscode.commands.executeCommand(GOAL_LIST_REFRESH);
