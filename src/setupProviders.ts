@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { Configuration } from './configuration';
 import { Cli } from './providers/Cli';
 import { QuickAccessListProvider } from './providers/QuickAccessList';
-import { deleteFlagBox, flagInputBox } from './menu/FlagMenu';
+import { deleteFlagInputBox, flagInputBox } from './menu/FlagMenu';
 import { FlagItem, FlagListProvider } from './providers/FlagList';
 import {
   deleteCampaignBox,
@@ -351,7 +351,7 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
     vscode.commands.registerCommand(FLAG_LIST_DELETE, async (flag: FlagItem) => {
       const { scope } = context.globalState.get(CURRENT_CONFIGURATION) as CredentialStore;
       if (scope?.includes('flag.delete')) {
-        await deleteFlagBox(context, flag, cli);
+        await deleteFlagInputBox(context, flag, cli);
         await vscode.commands.executeCommand(FLAG_LIST_REFRESH);
         return;
       }

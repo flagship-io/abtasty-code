@@ -165,7 +165,7 @@ export async function flagInputBox(context: vscode.ExtensionContext, flag: FlagI
   vscode.window.showErrorMessage(`[Flagship] Flag not created`);
 }
 
-export async function deleteFlagBox(context: vscode.ExtensionContext, flag: FlagItem, cli: Cli) {
+export async function deleteFlagInputBox(context: vscode.ExtensionContext, flag: FlagItem, cli: Cli) {
   const picked = await vscode.window.showQuickPick(['yes', 'no'], {
     title: `Delete the flag ${flag.key}`,
     placeHolder: 'Do you confirm ?',

@@ -70,7 +70,7 @@ export class ConfigurationMenu {
 
   async collectInputs() {
     const credential = {} as CredentialStore;
-    if ((await this.config.isWorkspaceConfigured()) || (await this.config.hasWorkspaceConfigured())) {
+    if ((await this.config.isGlobalConfigured()) || (await this.config.hasGlobalConfigured())) {
       await MultiStepInput.run((input) => this.manageConfiguration(input, credential));
       return credential;
     }
