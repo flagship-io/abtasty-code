@@ -1,17 +1,10 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import * as vscode from 'vscode';
 import * as fs from 'fs';
+import * as vscode from 'vscode';
 import { CliDownloader, CliVersion } from './cli/cliDownloader';
+import { FLAG_IN_FILE_REFRESH } from './commands/const';
 import { Configuration } from './configuration';
 import { register as registerCommands } from './register';
-import {
-  FLAG_IN_FILE_REFRESH,
-  FLAG_LIST_REFRESH,
-  GOAL_LIST_REFRESH,
-  PROJECT_LIST_REFRESH,
-  QUICK_ACCESS_REFRESH,
-  TARGETING_KEY_LIST_REFRESH,
-} from './commands/const';
 
 var stateTrigger: boolean = false;
 var showSurvey: boolean = true;

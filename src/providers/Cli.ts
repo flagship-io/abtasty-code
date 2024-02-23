@@ -438,6 +438,7 @@ export class Cli {
         vscode.window.showErrorMessage(output.stderr);
         return [];
       }
+      console.log('refresh targeting key triggered');
       return JSON.parse(output.stdout);
     } catch (err: any) {
       vscode.window.showErrorMessage(err.error);
