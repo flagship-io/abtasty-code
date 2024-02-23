@@ -1,42 +1,52 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { Cli } from './Cli';
 import { CredentialStore, ItemResource } from '../model';
 import { CURRENT_CONFIGURATION, DEFAULT_BASE_URI, PERMISSION_DENIED_PANEL } from '../const';
-import { FLAGSHIP_OPEN_BROWSER, FLAG_LIST_OPEN_IN_BROWSER, FLAG_LIST_REFRESH } from '../commands/const';
+import { FLAGSHIP_OPEN_BROWSER, FLAG_LIST_LOAD, FLAG_LIST_OPEN_IN_BROWSER, FLAG_LIST_REFRESH } from '../commands/const';
+import { FlagStore } from '../store/FlagStore';
 
 export class FlagListProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
   private _flags: FlagItem[] = [];
-  private cli: Cli;
+  private flagStore: FlagStore;
 
   private _onDidChangeTreeData: vscode.EventEmitter<vscode.TreeItem | undefined | void> = new vscode.EventEmitter<
     vscode.TreeItem | undefined | void
   >();
   readonly onDidChangeTreeData: vscode.Event<vscode.TreeItem | undefined | void> = this._onDidChangeTreeData.event;
 
-  public constructor(private context: vscode.ExtensionContext, cli: Cli) {
+  public constructor(private context: vscode.ExtensionContext, flagStore: FlagStore) {
     //commands.registerCommand('flagList.on_item_clicked', (item) => this.on_item_clicked(item));
+    this.flagStore = flagStore;
 
+    vscode.commands.registerCommand(FLAG_LIST_LOAD, () => this.load());
     vscode.commands.registerCommand(FLAG_LIST_REFRESH, async () => await this.refresh());
     vscode.commands.registerCommand(FLAG_LIST_OPEN_IN_BROWSER, async () => {
       const baseUrl = `${DEFAULT_BASE_URI}/env`;
       const { accountEnvId } = (await this.context.globalState.get(CURRENT_CONFIGURATION)) as CredentialStore;
       await vscode.commands.executeCommand(FLAGSHIP_OPEN_BROWSER, `${baseUrl}/${accountEnvId}/flags-list`);
     });
-    this.cli = cli;
   }
 
   /*
   public on_item_clicked(item: TreeItem) {
-    console.log(item);
-  } */
+  } 
+  */
 
   public async refresh() {
     const { scope } = this.context.globalState.get(CURRENT_CONFIGURATION) as CredentialStore;
     this._flags = [];
     if (scope?.includes('flag.list')) {
-      await this.getFlags();
+      await this.getRefreshedFlags();
+    }
+    this._onDidChangeTreeData.fire();
+  }
+
+  public load() {
+    const { scope } = this.context.globalState.get(CURRENT_CONFIGURATION) as CredentialStore;
+    this._flags = [];
+    if (scope?.includes('flag.list')) {
+      this.getLoadedFlags();
     }
     this._onDidChangeTreeData.fire();
   }
@@ -82,8 +92,23 @@ export class FlagListProvider implements vscode.TreeDataProvider<vscode.TreeItem
     return items;
   }
 
-  private async getFlags() {
-    const flagList = await this.cli.ListFlag();
+  private async getRefreshedFlags() {
+    const flagList = await this.flagStore.refreshFlag();
+    flagList.map((f) => {
+      const flag = new FlagItem(
+        f.id,
+        f.name,
+        f.type,
+        f.description,
+        f.default_value,
+        vscode.TreeItemCollapsibleState.Collapsed,
+      );
+      this._flags.push(flag);
+    });
+  }
+
+  private getLoadedFlags() {
+    const flagList = this.flagStore.loadFlag();
     flagList.map((f) => {
       const flag = new FlagItem(
         f.id,

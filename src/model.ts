@@ -5,6 +5,7 @@ import { CIRCLE_FILLED } from './icons';
 export type Project = {
   id: string;
   name: string;
+  campaigns?: Campaign[];
 };
 
 export type Campaign = {

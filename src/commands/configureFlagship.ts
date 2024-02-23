@@ -36,12 +36,13 @@ export default async function configureFlagshipCmd(context: vscode.ExtensionCont
       const cliConfigured = await configurationMenu.configure();
       const cliAuthenticated = cliConfigured && (await cli.Authenticate());
 
+      const tokenInfo = await cli.GetTokenInfo();
+      const updatedCurrentConfiguration = (await config.getGlobalState(CURRENT_CONFIGURATION)) as CredentialStore;
+      updatedCurrentConfiguration.scope = tokenInfo.scope;
+
       if (cliAuthenticated) {
-        const tokenInfo = await cli.GetTokenInfo();
         await context.globalState.update('FSConfigured', true);
         await vscode.commands.executeCommand(SET_CONTEXT, 'flagship:enableFlagshipExplorer', true);
-        const updatedCurrentConfiguration = (await config.getGlobalState(CURRENT_CONFIGURATION)) as CredentialStore;
-        updatedCurrentConfiguration.scope = tokenInfo.scope;
         await config.updateGlobalState(CURRENT_CONFIGURATION, updatedCurrentConfiguration);
         updateStatusBarItem(updatedCurrentConfiguration.name);
         await Promise.all([
@@ -58,6 +59,7 @@ export default async function configureFlagshipCmd(context: vscode.ExtensionCont
         }, 2000);
         return;
       }
+
       await Promise.all([
         vscode.commands.executeCommand(FLAG_LIST_REFRESH),
         vscode.commands.executeCommand(FLAG_IN_FILE_REFRESH),
@@ -66,6 +68,7 @@ export default async function configureFlagshipCmd(context: vscode.ExtensionCont
         vscode.commands.executeCommand(TARGETING_KEY_LIST_REFRESH),
         vscode.commands.executeCommand(QUICK_ACCESS_REFRESH),
       ]);
+
       if (!cliAuthenticated && cliConfigured !== undefined) {
         setTimeout(async () => {
           updateStatusBarItem();

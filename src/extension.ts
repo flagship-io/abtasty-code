@@ -49,22 +49,6 @@ export async function activate(context: vscode.ExtensionContext) {
 
   vscode.window.onDidChangeActiveTextEditor(handleActiveTextEditorChange);
 
-  vscode.window.onDidChangeWindowState(async (p: any) => {
-    if (stateTrigger !== p.active) {
-      stateTrigger = p.active;
-      if (stateTrigger) {
-        await Promise.all([
-          vscode.commands.executeCommand(FLAG_LIST_REFRESH),
-          vscode.commands.executeCommand(FLAG_IN_FILE_REFRESH),
-          vscode.commands.executeCommand(GOAL_LIST_REFRESH),
-          vscode.commands.executeCommand(TARGETING_KEY_LIST_REFRESH),
-          vscode.commands.executeCommand(PROJECT_LIST_REFRESH),
-          vscode.commands.executeCommand(QUICK_ACCESS_REFRESH),
-        ]);
-      }
-    }
-  });
-
   const showWarningNotificationWithActions = vscode.commands.registerCommand('flagship.showSurvey', async () => {
     const selection = await vscode.window.showInformationMessage('Please give us your feedback 🙏', 'Open survey');
 

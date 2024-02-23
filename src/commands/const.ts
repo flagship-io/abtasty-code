@@ -11,6 +11,7 @@ export const SET_CONTEXT = 'setContext';
 export const FLAGSHIP_CREATE_PROJECT = 'flagship.createProject';
 export const PROJECT_LIST_COPY = 'projectList.copyProject';
 export const PROJECT_LIST_REFRESH = 'projectList.refresh';
+export const PROJECT_LIST_LOAD = 'projectList.load';
 export const PROJECT_LIST_EDIT = 'projectList.editProject';
 export const PROJECT_LIST_DELETE = 'projectList.deleteProject';
 
@@ -32,6 +33,7 @@ export const VARIATION_LIST_COPY = 'variationList.copyVariation';
 
 export const FLAGSHIP_CREATE_FLAG = 'flagship.createFlag';
 export const FLAG_LIST_REFRESH = 'flagList.refresh';
+export const FLAG_LIST_LOAD = 'flagList.load';
 export const FLAG_LIST_EDIT = 'flagList.editFlag';
 export const FLAG_LIST_DELETE = 'flagList.deleteFlag';
 export const FLAG_LIST_COPY = 'flagList.copyFlag';
@@ -40,11 +42,13 @@ export const TRIGGER_FLAG_COMPLETION = 'flagship.triggerFlagCompletion';
 
 export const FLAGSHIP_CREATE_TARGETING_KEY = 'flagship.createTargetingKey';
 export const TARGETING_KEY_LIST_REFRESH = 'targetingKeyList.refresh';
+export const TARGETING_KEY_LIST_LOAD = 'targetingKeyList.load';
 export const TARGETING_KEY_LIST_EDIT = 'targetingKeyList.editTargetingKey';
 export const TARGETING_KEY_LIST_DELETE = 'targetingKeyList.deleteTargetingKey';
 
 export const FLAGSHIP_CREATE_GOAL = 'flagship.createGoal';
 export const GOAL_LIST_REFRESH = 'goalList.refresh';
+export const GOAL_LIST_LOAD = 'goalList.load';
 export const GOAL_LIST_EDIT = 'goalList.editGoal';
 export const GOAL_LIST_DELETE = 'goalList.deleteGoal';
 

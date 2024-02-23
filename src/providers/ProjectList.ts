@@ -1,6 +1,6 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { PROJECT_LIST_REFRESH } from '../commands/const';
+import { PROJECT_LIST_LOAD, PROJECT_LIST_REFRESH } from '../commands/const';
 import {
   CIRCLE_FILLED,
   CIRCLE_OUTLINE,
@@ -16,28 +16,37 @@ import {
   TARGET,
   WATCH,
 } from '../icons';
-import { Cli } from './Cli';
 import { CURRENT_CONFIGURATION, PERMISSION_DENIED_PANEL } from '../const';
-import { CredentialStore } from '../model';
+import { CredentialStore, Project } from '../model';
+import { ProjectStore } from '../store/ProjectStore';
 
 export class ProjectListProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
   private _tree: ProjectTreeItem[] = [];
-  private cli: Cli;
+  private projectStore: ProjectStore;
 
   private _onDidChangeTreeData: vscode.EventEmitter<vscode.TreeItem | undefined | void> = new vscode.EventEmitter<
     vscode.TreeItem | undefined | void
   >();
   readonly onDidChangeTreeData: vscode.Event<vscode.TreeItem | undefined | void> = this._onDidChangeTreeData.event;
 
-  public constructor(private context: vscode.ExtensionContext, cli: Cli) {
+  public constructor(private context: vscode.ExtensionContext, projectStore: ProjectStore) {
+    this.projectStore = projectStore;
+    vscode.commands.registerCommand(PROJECT_LIST_LOAD, () => this.load());
     vscode.commands.registerCommand(PROJECT_LIST_REFRESH, async () => await this.refresh());
-    this.cli = cli;
   }
 
   async refresh() {
     const { scope } = this.context.globalState.get(CURRENT_CONFIGURATION) as CredentialStore;
     if (scope?.includes('project.list') && scope?.includes('campaign.list')) {
-      await this.getTree();
+      await this.getRefreshedProjects();
+    }
+    this._onDidChangeTreeData.fire();
+  }
+
+  load() {
+    const { scope } = this.context.globalState.get(CURRENT_CONFIGURATION) as CredentialStore;
+    if (scope?.includes('project.list') && scope?.includes('campaign.list')) {
+      this.getLoadedProjects();
     }
     this._onDidChangeTreeData.fire();
   }
@@ -64,22 +73,18 @@ export class ProjectListProvider implements vscode.TreeDataProvider<vscode.TreeI
     return element.children;
   }
 
-  private async getTree() {
-    const projectList = await this.cli.ListProject();
-    const campaignList = await this.cli.ListCampaign();
-
-    this._tree = projectList.map((p) => {
+  private mappingTree(projectList: Project[]) {
+    return projectList.map((p: Project) => {
       const campaignItems = [];
-      const abCampaigns: ProjectTreeItem[] = [];
-      const toggleCampaigns: ProjectTreeItem[] = [];
-      const persoCampaigns: ProjectTreeItem[] = [];
-      const deploymentCampaigns: ProjectTreeItem[] = [];
-      const flagCampaigns: ProjectTreeItem[] = [];
-      const customCampaigns: ProjectTreeItem[] = [];
       let projectActive = false;
-      campaignList
-        .filter((c) => c.project_id === p.id)
-        .forEach((c) => {
+      if (p.campaigns) {
+        const abCampaigns: ProjectTreeItem[] = [];
+        const toggleCampaigns: ProjectTreeItem[] = [];
+        const persoCampaigns: ProjectTreeItem[] = [];
+        const deploymentCampaigns: ProjectTreeItem[] = [];
+        const flagCampaigns: ProjectTreeItem[] = [];
+        const customCampaigns: ProjectTreeItem[] = [];
+        p.campaigns.forEach((c) => {
           if (c.status === 'active') {
             projectActive = true;
           }
@@ -147,42 +152,55 @@ export class ProjectListProvider implements vscode.TreeDataProvider<vscode.TreeI
               break;
           }
         });
-      const abCampaign = new ProjectTreeItem(`AB Test - ${abCampaigns.length} campaign(s)`, abCampaigns);
-      const toggleCampaign = new ProjectTreeItem(`Toggle - ${toggleCampaigns.length} campaign(s)`, toggleCampaigns);
-      const persoCampaign = new ProjectTreeItem(
-        `Personalisation - ${persoCampaigns.length} campaign(s)`,
-        persoCampaigns,
-      );
-      const deploymentCampaign = new ProjectTreeItem(
-        `Deployment - ${deploymentCampaigns.length} campaign(s)`,
-        deploymentCampaigns,
-      );
-      const flagCampaign = new ProjectTreeItem(`Flag - ${flagCampaigns.length} campaign(s)`, flagCampaigns);
-      const customCampaign = new ProjectTreeItem(
-        `Customization - ${customCampaigns.length} campaign(s)`,
-        customCampaigns,
-      );
-      if (abCampaigns.length !== 0) {
-        campaignItems.push(abCampaign);
-      }
-      if (toggleCampaigns.length !== 0) {
-        campaignItems.push(toggleCampaign);
-      }
-      if (persoCampaigns.length !== 0) {
-        campaignItems.push(persoCampaign);
-      }
-      if (deploymentCampaigns.length !== 0) {
-        campaignItems.push(deploymentCampaign);
-      }
-      if (flagCampaigns.length !== 0) {
-        campaignItems.push(flagCampaign);
-      }
-      if (customCampaigns.length !== 0) {
-        campaignItems.push(customCampaign);
-      }
 
+        const abCampaign = new ProjectTreeItem(`AB Test - ${abCampaigns.length} campaign(s)`, abCampaigns);
+        const toggleCampaign = new ProjectTreeItem(`Toggle - ${toggleCampaigns.length} campaign(s)`, toggleCampaigns);
+        const persoCampaign = new ProjectTreeItem(
+          `Personalisation - ${persoCampaigns.length} campaign(s)`,
+          persoCampaigns,
+        );
+        const deploymentCampaign = new ProjectTreeItem(
+          `Deployment - ${deploymentCampaigns.length} campaign(s)`,
+          deploymentCampaigns,
+        );
+        const flagCampaign = new ProjectTreeItem(`Flag - ${flagCampaigns.length} campaign(s)`, flagCampaigns);
+        const customCampaign = new ProjectTreeItem(
+          `Customization - ${customCampaigns.length} campaign(s)`,
+          customCampaigns,
+        );
+        if (abCampaigns.length !== 0) {
+          campaignItems.push(abCampaign);
+        }
+        if (toggleCampaigns.length !== 0) {
+          campaignItems.push(toggleCampaign);
+        }
+        if (persoCampaigns.length !== 0) {
+          campaignItems.push(persoCampaign);
+        }
+        if (deploymentCampaigns.length !== 0) {
+          campaignItems.push(deploymentCampaign);
+        }
+        if (flagCampaigns.length !== 0) {
+          campaignItems.push(flagCampaign);
+        }
+        if (customCampaigns.length !== 0) {
+          campaignItems.push(customCampaign);
+        }
+      }
       return new ProjectItem(p.id, p.name, campaignItems, projectActive);
     });
+  }
+
+  private async getRefreshedProjects() {
+    const projectList = await this.projectStore.refreshProject();
+
+    this._tree = this.mappingTree(projectList);
+  }
+
+  private getLoadedProjects() {
+    const projectList = this.projectStore.loadProject();
+
+    this._tree = this.mappingTree(projectList);
   }
 }
 

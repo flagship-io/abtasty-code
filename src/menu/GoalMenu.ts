@@ -1,7 +1,8 @@
 import * as vscode from 'vscode';
 import { MultiStepInput } from '../multipleStepInput';
-import { Cli } from '../providers/Cli';
 import { GoalItem } from '../providers/GoalList';
+import { GoalStore } from '../store/GoalStore';
+import { Goal } from '../model';
 
 interface GoalSchema {
   label: string;
@@ -18,12 +19,13 @@ const goalOperators: vscode.QuickPickItem[] = ['contains', 'ignoringParameters',
   label,
 }));
 
-export async function goalInputBox(context: vscode.ExtensionContext, goal: GoalItem, cli: Cli) {
+export async function goalInputBox(goal: GoalItem, goalStore: GoalStore) {
   const goalData = {} as Partial<GoalSchema>;
 
-  const title = 'Create Goal';
+  let title = 'Create Goal';
 
   if (goal.id) {
+    title = 'Edit Goal';
     goalData.label = goal.label;
   }
 
@@ -120,34 +122,39 @@ export async function goalInputBox(context: vscode.ExtensionContext, goal: GoalI
 
   if (label) {
     if (goal.id) {
-      const goalEdited = await cli.EditGoal(goal.id, label, operator?.label, value);
-      if (goalEdited.id) {
-        vscode.window.showInformationMessage(`[Flagship] Goal edited successfully`);
+      const goalEdited = await goalStore.editGoal(goal.id!, { label, operator: operator?.label, value } as Goal);
+
+      if (!goalEdited.id) {
+        vscode.window.showErrorMessage(`[Flagship] Goal not edited`);
         return;
       }
-      vscode.window.showErrorMessage(`[Flagship] Goal not edited`);
       return;
     }
-    const goalCreated = await cli.CreateGoal(label, type!.label, operator?.label, value);
-    if (goalCreated.id) {
-      vscode.window.showInformationMessage(`[Flagship] Goal created successfully`);
+
+    const goalCreated = await goalStore.saveGoal({
+      label,
+      type: type!.label,
+      operator: operator?.label,
+      value,
+    } as Goal);
+
+    if (!goalCreated.id) {
+      vscode.window.showErrorMessage(`[Flagship] Goal not created`);
       return;
     }
-    vscode.window.showErrorMessage(`[Flagship] Goal not created`);
     return;
   }
   vscode.window.showInformationMessage(`[Flagship] Goal not created`);
 }
 
-export async function deleteGoalBox(context: vscode.ExtensionContext, goal: GoalItem, cli: Cli) {
+export async function deleteGoalInputBox(goal: GoalItem, goalStore: GoalStore) {
   const picked = await vscode.window.showQuickPick(['yes', 'no'], {
     title: `Delete the goal ${goal.label}`,
     placeHolder: 'Do you confirm ?',
     ignoreFocusOut: true,
   });
   if (picked === 'yes') {
-    await cli.DeleteGoal(goal.id!);
-    vscode.window.showInformationMessage(`[Flagship] Goal ${goal.label} deleted successfully.`);
+    await goalStore.deleteGoal(goal.id!);
     return;
   }
   return;

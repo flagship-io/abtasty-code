@@ -1,17 +1,20 @@
 import * as vscode from 'vscode';
 import { Cli } from '../providers/Cli';
 import { CampaignItem, ProjectItem, VariationGroupItem, VariationItem } from '../providers/ProjectList';
+import { ProjectStore } from '../store/ProjectStore';
+import { Campaign, Project } from '../model';
 
 interface ProjectSchema {
   name: string;
 }
 
-export async function projectInputBox(context: vscode.ExtensionContext, project: ProjectItem, cli: Cli) {
+export async function projectInputBox(project: ProjectItem, projectStore: ProjectStore) {
   const projectData = {} as Partial<ProjectSchema>;
 
-  const title = 'Create Project';
+  let title = 'Create Project';
 
   if (project.id) {
+    title = 'Edit Project';
     projectData.name = project.name;
   }
 
@@ -34,34 +37,33 @@ export async function projectInputBox(context: vscode.ExtensionContext, project:
 
   if (name) {
     if (project.id) {
-      const projectEdited = await cli.EditProject(project.id, name);
-      if (projectEdited.id) {
-        vscode.window.showInformationMessage(`[Flagship] Project edited successfully`);
+      const projectEdited = await projectStore.editProject(project.id, { name } as Project);
+
+      if (!projectEdited.id) {
+        vscode.window.showErrorMessage(`[Flagship] Project not edited`);
         return;
       }
-      vscode.window.showErrorMessage(`[Flagship] Project not edited`);
       return;
     }
-    const projectCreated = await cli.CreateProject(name);
-    if (projectCreated.id) {
-      vscode.window.showInformationMessage(`[Flagship] Project created successfully`);
+    const projectCreated = await projectStore.saveProject({ name, campaigns: [] as Campaign[] } as Project);
+
+    if (!projectCreated.id) {
+      vscode.window.showErrorMessage(`[Flagship] Project not created`);
       return;
     }
-    vscode.window.showErrorMessage(`[Flagship] Project not created`);
     return;
   }
-  vscode.window.showInformationMessage(`[Flagship] Project not created`);
+  vscode.window.showErrorMessage(`[Flagship] Project not created`);
 }
 
-export async function deleteProjectBox(context: vscode.ExtensionContext, project: ProjectItem, cli: Cli) {
+export async function deleteProjectInputBox(project: ProjectItem, projectStore: ProjectStore) {
   const picked = await vscode.window.showQuickPick(['yes', 'no'], {
     title: `Delete the project ${project.name}`,
     placeHolder: 'Do you confirm ?',
     ignoreFocusOut: true,
   });
   if (picked === 'yes') {
-    await cli.DeleteProject(project.id!);
-    vscode.window.showInformationMessage(`[Flagship] Project ${project.name} deleted successfully.`);
+    await projectStore.deleteProject(project.id!);
     return;
   }
   return;
