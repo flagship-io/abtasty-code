@@ -6,8 +6,6 @@ import { FLAG_IN_FILE_REFRESH } from './commands/const';
 import { Configuration } from './configuration';
 import { register as registerCommands } from './register';
 
-var showSurvey: boolean = true;
-
 let timer: NodeJS.Timeout | undefined;
 
 async function handleActiveTextEditorChange() {
@@ -38,6 +36,8 @@ export async function activate(context: vscode.ExtensionContext) {
       return;
     }
   });
+
+  vscode.window.onDidChangeActiveTextEditor(handleActiveTextEditorChange);
 
   try {
     await registerCommands(context, config);
