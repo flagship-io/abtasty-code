@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { Configuration } from './configuration';
+import { StateConfiguration } from './stateConfiguration';
 import { Cli } from './providers/Cli';
 import { QuickAccessListProvider } from './providers/QuickAccessList';
 import { deleteFlagInputBox, flagInputBox } from './menu/FlagMenu';
@@ -153,7 +153,7 @@ export const rootPath =
     ? vscode.workspace.workspaceFolders[0].uri.fsPath
     : undefined;
 
-export async function setupProviders(context: vscode.ExtensionContext, config: Configuration, cli: Cli) {
+export async function setupProviders(context: vscode.ExtensionContext, stateConfig: StateConfiguration, cli: Cli) {
   const configured = await context.globalState.get('FSConfigured');
 
   const flagStore = new FlagStore(context, cli);
@@ -165,7 +165,7 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
     await vscode.commands.executeCommand(SET_CONTEXT, 'flagship:enableFlagshipExplorer', true);
   }
 
-  const quickAccessView = new QuickAccessListProvider(config);
+  const quickAccessView = new QuickAccessListProvider(stateConfig);
   const quickAccessProvider = vscode.window.registerTreeDataProvider('quickAccess', quickAccessView);
 
   const fileAnalyzedProvider = new FileAnalyzedProvider(context, rootPath, cli);
@@ -456,7 +456,7 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
     "'",
     '"',
   );
-  vscode.languages.registerHoverProvider(documentSelector, new FlagshipHoverProvider(context, cli, config));
+  vscode.languages.registerHoverProvider(documentSelector, new FlagshipHoverProvider(context, cli, stateConfig));
 
   /* const codelensProvider = new CodelensProvider();
 

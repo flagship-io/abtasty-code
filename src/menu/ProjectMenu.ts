@@ -122,17 +122,17 @@ export async function switchProjectBox(context: vscode.ExtensionContext, project
     ignoreFocusOut: true,
   });
   if (picked === 'active') {
-    await cli.switchProject(project.id!, picked);
+    await cli.SwitchProject(project.id!, picked);
     vscode.window.showInformationMessage(`[Flagship] Project ${project.name} set to ${picked} successfully.`);
     return;
   }
   if (picked === 'paused') {
-    await cli.switchProject(project.id!, picked);
+    await cli.SwitchProject(project.id!, picked);
     vscode.window.showInformationMessage(`[Flagship] Project ${project.name} set to ${picked} successfully.`);
     return;
   }
   if (picked === 'interrupted') {
-    await cli.switchProject(project.id!, picked);
+    await cli.SwitchProject(project.id!, picked);
     vscode.window.showInformationMessage(`[Flagship] Project ${project.name} set to ${picked} successfully.`);
     return;
   }
@@ -146,17 +146,17 @@ export async function switchCampaignBox(context: vscode.ExtensionContext, campai
     ignoreFocusOut: true,
   });
   if (picked === 'active') {
-    await cli.switchCampaign(campaign.id!, picked);
+    await cli.SwitchProject(campaign.id!, picked);
     vscode.window.showInformationMessage(`[Flagship] Campaign ${campaign.name} set to ${picked} successfully.`);
     return;
   }
   if (picked === 'paused') {
-    await cli.switchCampaign(campaign.id!, picked);
+    await cli.SwitchProject(campaign.id!, picked);
     vscode.window.showInformationMessage(`[Flagship] Campaign ${campaign.name} set to ${picked} successfully.`);
     return;
   }
   if (picked === 'interrupted') {
-    await cli.switchCampaign(campaign.id!, picked);
+    await cli.SwitchProject(campaign.id!, picked);
     vscode.window.showInformationMessage(`[Flagship] Campaign ${campaign.name} set to ${picked} successfully.`);
     return;
   }

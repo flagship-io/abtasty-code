@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as vscode from 'vscode';
 import { CliDownloader, CliVersion } from './cli/cliDownloader';
 import { FLAG_IN_FILE_REFRESH } from './commands/const';
-import { Configuration } from './configuration';
+import { StateConfiguration } from './stateConfiguration';
 import { register as registerCommands } from './register';
 
 let timer: NodeJS.Timeout | undefined;
@@ -26,7 +26,7 @@ async function handleActiveTextEditorChange() {
 }
 
 export async function activate(context: vscode.ExtensionContext) {
-  const config = new Configuration(context);
+  const stateConfig = new StateConfiguration(context);
 
   const binaryDir = `${context.asAbsolutePath('flagship')}/${CliVersion}`;
 
@@ -40,7 +40,7 @@ export async function activate(context: vscode.ExtensionContext) {
   vscode.window.onDidChangeActiveTextEditor(handleActiveTextEditorChange);
 
   try {
-    await registerCommands(context, config);
+    await registerCommands(context, stateConfig);
   } catch (err) {
     console.error(err);
   }

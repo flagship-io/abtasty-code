@@ -2,6 +2,17 @@
 import * as vscode from 'vscode';
 import { CIRCLE_FILLED } from './icons';
 
+export type Configuration = {
+  name: string;
+  client_id: string;
+  client_secret: string;
+  account_id: string;
+  account_environment_id: string;
+  new_name: string | undefined;
+  path: string;
+  scope?: string;
+};
+
 export type Project = {
   id: string;
   name: string;

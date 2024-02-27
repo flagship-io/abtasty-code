@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { Cli } from './Cli';
-import { CredentialStore, Flag } from '../model';
-import { Configuration } from '../configuration';
+import { Configuration, Flag } from '../model';
+import { StateConfiguration } from '../stateConfiguration';
 import { CURRENT_CONFIGURATION, DEFAULT_BASE_URI } from '../const';
 import { FLAGSHIP_CREATE_FLAG, FLAGSHIP_OPEN_BROWSER } from '../commands/const';
 import { isGetFlagFunction } from '../setupProviders';
@@ -11,12 +11,12 @@ export const CANDIDATE_REGEX = /[\w\d][.\w\d\_\-]*/;
 export default class FlagshipHoverProvider implements vscode.HoverProvider {
   private readonly context: vscode.ExtensionContext;
   private readonly cli: Cli;
-  private readonly config: Configuration;
+  private readonly stateConfig: StateConfiguration;
 
-  constructor(context: vscode.ExtensionContext, cli: Cli, config: Configuration) {
+  constructor(context: vscode.ExtensionContext, cli: Cli, stateConfig: StateConfiguration) {
     this.context = context;
     this.cli = cli;
-    this.config = config;
+    this.stateConfig = stateConfig;
   }
 
   public async provideHover(
@@ -24,7 +24,8 @@ export default class FlagshipHoverProvider implements vscode.HoverProvider {
     position: vscode.Position,
   ): Promise<vscode.Hover | undefined> {
     const baseUrl = `${DEFAULT_BASE_URI}/env`;
-    const { accountEnvId } = (await this.config.getGlobalState(CURRENT_CONFIGURATION)) as CredentialStore;
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    const { account_environment_id } = (await this.stateConfig.getGlobalState(CURRENT_CONFIGURATION)) as Configuration;
     const flagList: Flag[] = await this.cli.ListFlag();
     const candidate = document.getText(document.getWordRangeAtPosition(position, CANDIDATE_REGEX));
     const linePrefix = document.lineAt(position).text.substring(0, position.character);
@@ -59,7 +60,7 @@ export default class FlagshipHoverProvider implements vscode.HoverProvider {
         mark.appendMarkdown(`\n`);
         const openPlatformCommandUri = vscode.Uri.parse(
           `command:${FLAGSHIP_OPEN_BROWSER}?${encodeURIComponent(
-            JSON.stringify(`${baseUrl}/${accountEnvId}/flags-list`),
+            JSON.stringify(`${baseUrl}/${account_environment_id}/flags-list`),
           )}`,
         );
         mark.appendMarkdown(`[Open in the platform $(link-external)](${openPlatformCommandUri})`);
