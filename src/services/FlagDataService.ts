@@ -16,24 +16,24 @@ export class FlagDataService {
     return this.flagList;
   }
 
-  loadState(state: Flag[]) {
+  async loadState(state: Flag[]) {
     this.flagList = state;
-    this.context.globalState.update(GLOBAL_LIST_FLAG, this.flagList);
+    await this.context.globalState.update(GLOBAL_LIST_FLAG, state);
   }
 
-  saveFlag(flag: Flag) {
+  async saveFlag(flag: Flag) {
     const newFlags = [...this.flagList, flag];
-    this.loadState(newFlags);
+    await this.loadState(newFlags);
   }
 
-  editFlag(flagId: string, newFlag: Flag) {
+  async editFlag(flagId: string, newFlag: Flag) {
     const oldFlags = this.flagList.filter((f) => flagId !== f.id);
     const newFlags = [...oldFlags, newFlag];
-    this.loadState(newFlags);
+    await this.loadState(newFlags);
   }
 
-  deleteFlag(flagId: string) {
+  async deleteFlag(flagId: string) {
     const newFlags = this.flagList.filter((f) => flagId !== f.id);
-    this.loadState(newFlags);
+    await this.loadState(newFlags);
   }
 }

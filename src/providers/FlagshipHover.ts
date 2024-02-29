@@ -2,9 +2,10 @@ import * as vscode from 'vscode';
 import { Cli } from './Cli';
 import { Configuration, Flag } from '../model';
 import { StateConfiguration } from '../stateConfiguration';
-import { CURRENT_CONFIGURATION, DEFAULT_BASE_URI } from '../const';
+import { DEFAULT_BASE_URI } from '../const';
 import { FLAGSHIP_CREATE_FLAG, FLAGSHIP_OPEN_BROWSER } from '../commands/const';
 import { isGetFlagFunction } from '../setupProviders';
+import { GLOBAL_CURRENT_CONFIGURATION } from '../services/const';
 
 export const CANDIDATE_REGEX = /[\w\d][.\w\d\_\-]*/;
 
@@ -25,7 +26,9 @@ export default class FlagshipHoverProvider implements vscode.HoverProvider {
   ): Promise<vscode.Hover | undefined> {
     const baseUrl = `${DEFAULT_BASE_URI}/env`;
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    const { account_environment_id } = (await this.stateConfig.getGlobalState(CURRENT_CONFIGURATION)) as Configuration;
+    const { account_environment_id } = (await this.stateConfig.getGlobalState(
+      GLOBAL_CURRENT_CONFIGURATION,
+    )) as Configuration;
     const flagList: Flag[] = await this.cli.ListFlag();
     const candidate = document.getText(document.getWordRangeAtPosition(position, CANDIDATE_REGEX));
     const linePrefix = document.lineAt(position).text.substring(0, position.character);

@@ -127,16 +127,6 @@ export type SecretCredentials = {
   client_secret: string;
 };
 
-export interface CredentialStore {
-  name: string;
-  clientId: string;
-  clientSecret: string;
-  accountId: string;
-  accountEnvId: string;
-  path: string;
-  scope?: string;
-}
-
 export class ItemResource extends vscode.TreeItem {
   public readonly label!: string;
   constructor(label: string, labelValue: string) {

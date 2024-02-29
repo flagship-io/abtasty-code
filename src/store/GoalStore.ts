@@ -18,16 +18,14 @@ export class GoalStore {
 
   async refreshGoal(): Promise<Goal[]> {
     const goals = await this.cli.ListGoal();
-    if (goals) {
-      this.goalService.loadState(goals);
-    }
+    await this.goalService.loadState(goals);
     return goals;
   }
 
   async saveGoal(goal: Goal): Promise<Goal> {
     const cliResponse = await this.cli.CreateGoal(goal);
     if (cliResponse.id) {
-      this.goalService.saveGoal(cliResponse);
+      await this.goalService.saveGoal(cliResponse);
       vscode.window.showInformationMessage(`[Flagship] Goal created successfully !`);
     }
     return cliResponse;
@@ -36,7 +34,7 @@ export class GoalStore {
   async editGoal(goalId: string, newGoal: Goal): Promise<Goal> {
     const cliResponse = goalId ? await this.cli.EditGoal(goalId, newGoal) : ({} as Goal);
     if (cliResponse.id) {
-      this.goalService.editGoal(goalId, cliResponse);
+      await this.goalService.editGoal(goalId, cliResponse);
       vscode.window.showInformationMessage(`[Flagship] Goal edited successfully`);
     }
     return cliResponse;
@@ -45,7 +43,7 @@ export class GoalStore {
   async deleteGoal(goalId: string): Promise<boolean> {
     const cliResponse = goalId ? await this.cli.DeleteGoal(goalId) : false;
     if (cliResponse) {
-      this.goalService.deleteGoal(goalId);
+      await this.goalService.deleteGoal(goalId);
       vscode.window.showInformationMessage(`[Flagship] Goal deleted successfully`);
     }
     return cliResponse;

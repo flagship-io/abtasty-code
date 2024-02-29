@@ -59,12 +59,13 @@ import {
   VARIATION_LIST_COPY,
   VARIATION_LIST_DELETE,
 } from './commands/const';
-import { CURRENT_CONFIGURATION, DEFAULT_BASE_URI, PERMISSION_DENIED } from './const';
-import { CredentialStore, Scope } from './model';
+import { DEFAULT_BASE_URI, PERMISSION_DENIED } from './const';
+import { Configuration, Scope } from './model';
 import { FlagStore } from './store/FlagStore';
 import { ProjectStore } from './store/ProjectStore';
 import { TargetingKeyStore } from './store/TargetingKeyStore';
 import { GoalStore } from './store/GoalStore';
+import { GLOBAL_CURRENT_CONFIGURATION } from './services/const';
 
 const documentSelector: vscode.DocumentSelector = [
   {
@@ -213,7 +214,7 @@ export async function setupProviders(context: vscode.ExtensionContext, stateConf
   });
 
   const createProject = vscode.commands.registerCommand(FLAGSHIP_CREATE_PROJECT, async () => {
-    const { scope } = context.globalState.get(CURRENT_CONFIGURATION) as CredentialStore;
+    const { scope } = context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
     if (scope?.includes('project.create')) {
       const project = new ProjectItem();
       await projectInputBox(project, projectStore);
@@ -231,7 +232,7 @@ export async function setupProviders(context: vscode.ExtensionContext, stateConf
   */
 
   const createFlag = vscode.commands.registerCommand(FLAGSHIP_CREATE_FLAG, async (flagKey: string | undefined) => {
-    const { scope } = context.globalState.get(CURRENT_CONFIGURATION) as CredentialStore;
+    const { scope } = context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
 
     if (scope?.includes('flag.create')) {
       const flag = new FlagItem();
@@ -247,7 +248,7 @@ export async function setupProviders(context: vscode.ExtensionContext, stateConf
   });
 
   const createTargetingKey = vscode.commands.registerCommand(FLAGSHIP_CREATE_TARGETING_KEY, async () => {
-    const { scope } = context.globalState.get(CURRENT_CONFIGURATION) as CredentialStore;
+    const { scope } = context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
     if (scope?.includes('targeting_key.create')) {
       const targetingKey = new TargetingKeyItem();
       await targetingKeyInputBox(targetingKey, targetingKeyStore);
@@ -259,7 +260,7 @@ export async function setupProviders(context: vscode.ExtensionContext, stateConf
   });
 
   const createGoal = vscode.commands.registerCommand(FLAGSHIP_CREATE_GOAL, async () => {
-    const { scope } = context.globalState.get(CURRENT_CONFIGURATION) as CredentialStore;
+    const { scope } = context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
     if (scope?.includes('goal.create')) {
       const goal = new GoalItem();
       await goalInputBox(goal, goalStore);
@@ -277,7 +278,7 @@ export async function setupProviders(context: vscode.ExtensionContext, stateConf
     }),
 
     vscode.commands.registerCommand(PROJECT_LIST_EDIT, async (project: ProjectItem) => {
-      const { scope } = context.globalState.get(CURRENT_CONFIGURATION) as CredentialStore;
+      const { scope } = context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
       if (scope?.includes('project.update')) {
         await projectInputBox(project, projectStore);
         await vscode.commands.executeCommand(PROJECT_LIST_LOAD);
@@ -288,7 +289,7 @@ export async function setupProviders(context: vscode.ExtensionContext, stateConf
     }),
 
     vscode.commands.registerCommand(PROJECT_LIST_DELETE, async (project: ProjectItem) => {
-      const { scope } = context.globalState.get(CURRENT_CONFIGURATION) as CredentialStore;
+      const { scope } = context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
       if (scope?.includes('project.delete')) {
         await deleteProjectInputBox(project, projectStore);
         await vscode.commands.executeCommand(PROJECT_LIST_LOAD);
@@ -306,9 +307,12 @@ export async function setupProviders(context: vscode.ExtensionContext, stateConf
     }),
 
     vscode.commands.registerCommand(CAMPAIGN_LIST_OPEN_IN_BROWSER, async (campaign: CampaignItem) => {
-      const { accountEnvId } = (await context.globalState.get(CURRENT_CONFIGURATION)) as CredentialStore;
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      const { account_environment_id } = (await context.globalState.get(GLOBAL_CURRENT_CONFIGURATION)) as Configuration;
       await vscode.env.openExternal(
-        vscode.Uri.parse(`${DEFAULT_BASE_URI}/env/${accountEnvId}/report/${campaign.type}/${campaign.id}/details`),
+        vscode.Uri.parse(
+          `${DEFAULT_BASE_URI}/env/${account_environment_id}/report/${campaign.type}/${campaign.id}/details`,
+        ),
       );
     }),
 
@@ -351,7 +355,7 @@ export async function setupProviders(context: vscode.ExtensionContext, stateConf
     }),
 
     vscode.commands.registerCommand(FLAG_LIST_EDIT, async (flag: FlagItem) => {
-      const { scope } = context.globalState.get(CURRENT_CONFIGURATION) as CredentialStore;
+      const { scope } = context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
       if (scope?.includes('flag.update')) {
         await flagInputBox(flag, flagStore);
         await vscode.commands.executeCommand(FLAG_LIST_LOAD);
@@ -362,7 +366,7 @@ export async function setupProviders(context: vscode.ExtensionContext, stateConf
     }),
 
     vscode.commands.registerCommand(FLAG_LIST_DELETE, async (flag: FlagItem) => {
-      const { scope } = context.globalState.get(CURRENT_CONFIGURATION) as CredentialStore;
+      const { scope } = context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
       if (scope?.includes('flag.delete')) {
         await deleteFlagInputBox(flag, flagStore);
         await vscode.commands.executeCommand(FLAG_LIST_LOAD);
@@ -385,7 +389,7 @@ export async function setupProviders(context: vscode.ExtensionContext, stateConf
     }),
 
     vscode.commands.registerCommand(ADD_FLAG, async (flagInFile: FlagAnalyzed) => {
-      const { scope } = context.globalState.get(CURRENT_CONFIGURATION) as CredentialStore;
+      const { scope } = context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
       if (scope?.includes('flag.create')) {
         const flag = new FlagItem();
         flag.key = flagInFile.flagKey;
@@ -404,7 +408,7 @@ export async function setupProviders(context: vscode.ExtensionContext, stateConf
 
   const targetingKeyDisposables = [
     vscode.commands.registerCommand(TARGETING_KEY_LIST_EDIT, async (targetingKey: TargetingKeyItem) => {
-      const { scope } = context.globalState.get(CURRENT_CONFIGURATION) as CredentialStore;
+      const { scope } = context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
       if (scope?.includes('targeting_key.update')) {
         await targetingKeyInputBox(targetingKey, targetingKeyStore);
         await vscode.commands.executeCommand(TARGETING_KEY_LIST_LOAD);
@@ -415,7 +419,7 @@ export async function setupProviders(context: vscode.ExtensionContext, stateConf
     }),
 
     vscode.commands.registerCommand(TARGETING_KEY_LIST_DELETE, async (targetingKey: TargetingKeyItem) => {
-      const { scope } = context.globalState.get(CURRENT_CONFIGURATION) as CredentialStore;
+      const { scope } = context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
       if (scope?.includes('targeting_key.delete')) {
         await deleteTargetingKeyInputBox(targetingKey, targetingKeyStore);
         await vscode.commands.executeCommand(TARGETING_KEY_LIST_LOAD);
@@ -428,7 +432,7 @@ export async function setupProviders(context: vscode.ExtensionContext, stateConf
 
   const goalDispoables = [
     vscode.commands.registerCommand(GOAL_LIST_EDIT, async (goal: GoalItem) => {
-      const { scope } = context.globalState.get(CURRENT_CONFIGURATION) as CredentialStore;
+      const { scope } = context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
       if (scope?.includes('goal.update')) {
         await goalInputBox(goal, goalStore);
         await vscode.commands.executeCommand(GOAL_LIST_LOAD);
@@ -439,7 +443,7 @@ export async function setupProviders(context: vscode.ExtensionContext, stateConf
     }),
 
     vscode.commands.registerCommand(GOAL_LIST_DELETE, async (goal: GoalItem) => {
-      const { scope } = context.globalState.get(CURRENT_CONFIGURATION) as CredentialStore;
+      const { scope } = context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
       if (scope?.includes('goal.delete')) {
         await deleteGoalInputBox(goal, goalStore);
         await vscode.commands.executeCommand(GOAL_LIST_LOAD);

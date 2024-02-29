@@ -15,26 +15,26 @@ export class ProjectDataService {
     return this.projectList;
   }
 
-  loadState(state: Project[]) {
+  async loadState(state: Project[]) {
     this.projectList = state;
-    this.context.globalState.update(GLOBAL_LIST_PROJECT, this.projectList);
+    await this.context.globalState.update(GLOBAL_LIST_PROJECT, this.projectList);
   }
 
-  saveProject(project: Project) {
+  async saveProject(project: Project) {
     const newProjects = [...this.projectList, project];
-    this.loadState(newProjects);
+    await this.loadState(newProjects);
   }
 
-  editProject(projectId: string, newProject: Project) {
+  async editProject(projectId: string, newProject: Project) {
     const project = this.projectList.find((p) => projectId === p.id);
     const oldProjects = this.projectList.filter((p) => projectId !== p.id);
     newProject.campaigns = project!.campaigns;
     const newProjects = [...oldProjects, newProject];
-    this.loadState(newProjects);
+    await this.loadState(newProjects);
   }
 
-  deleteProject(projectId: string) {
+  async deleteProject(projectId: string) {
     const newProjects = this.projectList.filter((p) => projectId !== p.id);
-    this.loadState(newProjects);
+    await this.loadState(newProjects);
   }
 }

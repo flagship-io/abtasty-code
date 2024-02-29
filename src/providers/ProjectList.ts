@@ -16,9 +16,10 @@ import {
   TARGET,
   WATCH,
 } from '../icons';
-import { CURRENT_CONFIGURATION, PERMISSION_DENIED_PANEL } from '../const';
-import { CredentialStore, Project } from '../model';
+import { PERMISSION_DENIED_PANEL } from '../const';
+import { Configuration, Project } from '../model';
 import { ProjectStore } from '../store/ProjectStore';
+import { GLOBAL_CURRENT_CONFIGURATION } from '../services/const';
 
 export class ProjectListProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
   private _tree: ProjectTreeItem[] = [];
@@ -36,7 +37,7 @@ export class ProjectListProvider implements vscode.TreeDataProvider<vscode.TreeI
   }
 
   async refresh() {
-    const { scope } = this.context.globalState.get(CURRENT_CONFIGURATION) as CredentialStore;
+    const { scope } = this.context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
     if (scope?.includes('project.list') && scope?.includes('campaign.list')) {
       await this.getRefreshedProjects();
     }
@@ -44,7 +45,7 @@ export class ProjectListProvider implements vscode.TreeDataProvider<vscode.TreeI
   }
 
   load() {
-    const { scope } = this.context.globalState.get(CURRENT_CONFIGURATION) as CredentialStore;
+    const { scope } = this.context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
     if (scope?.includes('project.list') && scope?.includes('campaign.list')) {
       this.getLoadedProjects();
     }
@@ -56,7 +57,7 @@ export class ProjectListProvider implements vscode.TreeDataProvider<vscode.TreeI
   }
 
   getChildren(element?: ProjectTreeItem): vscode.ProviderResult<vscode.TreeItem[]> {
-    const { scope } = this.context.globalState.get(CURRENT_CONFIGURATION) as CredentialStore;
+    const { scope } = this.context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
     if (typeof element === 'undefined') {
       if (!scope?.includes('project.list') || !scope?.includes('campaign.list')) {
         return [new ProjectTreeItem(PERMISSION_DENIED_PANEL)];

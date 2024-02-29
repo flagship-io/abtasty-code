@@ -24,16 +24,14 @@ export class ProjectStore {
       p.campaigns = [...(p.campaigns || []), ...campaigns.filter((c) => c.project_id === p.id)];
     });
 
-    if (projects) {
-      this.projectService.loadState(projects);
-    }
+    await this.projectService.loadState(projects);
     return projects;
   }
 
   async saveProject(project: Project): Promise<Project> {
     const cliResponse = await this.cli.CreateProject(project);
     if (cliResponse.id) {
-      this.projectService.saveProject(cliResponse);
+      await this.projectService.saveProject(cliResponse);
       vscode.window.showInformationMessage(`[Flagship] Project created successfully !`);
     }
     return cliResponse;
@@ -42,7 +40,7 @@ export class ProjectStore {
   async editProject(projectId: string, newProject: Project): Promise<Project> {
     const cliResponse = projectId ? await this.cli.EditProject(projectId, newProject) : ({} as Project);
     if (cliResponse.id) {
-      this.projectService.editProject(projectId, cliResponse);
+      await this.projectService.editProject(projectId, cliResponse);
       vscode.window.showInformationMessage(`[Flagship] Project edited successfully`);
     }
     return cliResponse;
@@ -51,7 +49,7 @@ export class ProjectStore {
   async deleteProject(projectId: string): Promise<boolean> {
     const cliResponse = projectId ? await this.cli.DeleteProject(projectId) : false;
     if (cliResponse) {
-      this.projectService.deleteProject(projectId);
+      await this.projectService.deleteProject(projectId);
       vscode.window.showInformationMessage(`[Flagship] Project deleted successfully`);
     }
     return cliResponse;

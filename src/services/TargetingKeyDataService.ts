@@ -15,24 +15,24 @@ export class TargetingKeyDataService {
     return this.targetingKeyList;
   }
 
-  loadState(state: TargetingKey[]) {
+  async loadState(state: TargetingKey[]) {
     this.targetingKeyList = state;
-    this.context.globalState.update(GLOBAL_LIST_TARGETING_KEY, this.targetingKeyList);
+    await this.context.globalState.update(GLOBAL_LIST_TARGETING_KEY, this.targetingKeyList);
   }
 
-  saveTargetingKey(targetingKey: TargetingKey) {
+  async saveTargetingKey(targetingKey: TargetingKey) {
     const newTargetingKeys = [...this.targetingKeyList, targetingKey];
-    this.loadState(newTargetingKeys);
+    await this.loadState(newTargetingKeys);
   }
 
-  editTargetingKey(targetingKeyId: string, newTargetingKey: TargetingKey) {
+  async editTargetingKey(targetingKeyId: string, newTargetingKey: TargetingKey) {
     const oldTargetingKeys = this.targetingKeyList.filter((t) => targetingKeyId !== t.id);
     const newTargetingKeys = [...oldTargetingKeys, newTargetingKey];
-    this.loadState(newTargetingKeys);
+    await this.loadState(newTargetingKeys);
   }
 
-  deleteTargetingKey(targetingKeyId: string) {
+  async deleteTargetingKey(targetingKeyId: string) {
     const newTargetingKeys = this.targetingKeyList.filter((t) => targetingKeyId !== t.id);
-    this.loadState(newTargetingKeys);
+    await this.loadState(newTargetingKeys);
   }
 }

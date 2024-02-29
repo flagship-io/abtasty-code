@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { CredentialStore, ItemResource } from '../model';
-import { CURRENT_CONFIGURATION, DEFAULT_BASE_URI, PERMISSION_DENIED_PANEL } from '../const';
+import { Configuration, ItemResource } from '../model';
+import { DEFAULT_BASE_URI, PERMISSION_DENIED_PANEL } from '../const';
 import { FLAGSHIP_OPEN_BROWSER, FLAG_LIST_LOAD, FLAG_LIST_OPEN_IN_BROWSER, FLAG_LIST_REFRESH } from '../commands/const';
 import { FlagStore } from '../store/FlagStore';
+import { GLOBAL_CURRENT_CONFIGURATION } from '../services/const';
 
 export class FlagListProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
   private _flags: FlagItem[] = [];
@@ -23,8 +24,10 @@ export class FlagListProvider implements vscode.TreeDataProvider<vscode.TreeItem
     vscode.commands.registerCommand(FLAG_LIST_REFRESH, async () => await this.refresh());
     vscode.commands.registerCommand(FLAG_LIST_OPEN_IN_BROWSER, async () => {
       const baseUrl = `${DEFAULT_BASE_URI}/env`;
-      const { accountEnvId } = (await this.context.globalState.get(CURRENT_CONFIGURATION)) as CredentialStore;
-      await vscode.commands.executeCommand(FLAGSHIP_OPEN_BROWSER, `${baseUrl}/${accountEnvId}/flags-list`);
+      const { account_environment_id } = (await this.context.globalState.get(
+        GLOBAL_CURRENT_CONFIGURATION,
+      )) as Configuration;
+      await vscode.commands.executeCommand(FLAGSHIP_OPEN_BROWSER, `${baseUrl}/${account_environment_id}/flags-list`);
     });
   }
 
@@ -34,7 +37,7 @@ export class FlagListProvider implements vscode.TreeDataProvider<vscode.TreeItem
   */
 
   public async refresh() {
-    const { scope } = this.context.globalState.get(CURRENT_CONFIGURATION) as CredentialStore;
+    const { scope } = this.context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
     this._flags = [];
     if (scope?.includes('flag.list')) {
       await this.getRefreshedFlags();
@@ -43,7 +46,7 @@ export class FlagListProvider implements vscode.TreeDataProvider<vscode.TreeItem
   }
 
   public load() {
-    const { scope } = this.context.globalState.get(CURRENT_CONFIGURATION) as CredentialStore;
+    const { scope } = this.context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
     this._flags = [];
     if (scope?.includes('flag.list')) {
       this.getLoadedFlags();
@@ -62,7 +65,7 @@ export class FlagListProvider implements vscode.TreeDataProvider<vscode.TreeItem
   }
 
   getChildren(element?: FlagItem | undefined): vscode.ProviderResult<vscode.TreeItem[]> {
-    const { scope } = this.context.globalState.get(CURRENT_CONFIGURATION) as CredentialStore;
+    const { scope } = this.context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
     let items: vscode.TreeItem[] = [];
 
     if (!scope?.includes('flag.list')) {

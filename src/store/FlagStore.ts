@@ -18,16 +18,14 @@ export class FlagStore {
 
   async refreshFlag(): Promise<Flag[]> {
     const flags = await this.cli.ListFlag();
-    if (flags) {
-      this.flagService.loadState(flags);
-    }
+    await this.flagService.loadState(flags);
     return flags;
   }
 
   async saveFlag(flag: Flag): Promise<Flag> {
     const cliResponse = await this.cli.CreateFlag(flag);
     if (cliResponse.id) {
-      this.flagService.saveFlag(cliResponse);
+      await this.flagService.saveFlag(cliResponse);
       vscode.window.showInformationMessage(`[Flagship] Flag created successfully !`);
     }
     return cliResponse;
@@ -36,7 +34,7 @@ export class FlagStore {
   async editFlag(flagId: string, newFlag: Flag): Promise<Flag> {
     const cliResponse = flagId ? await this.cli.EditFlag(flagId, newFlag) : ({} as Flag);
     if (cliResponse.id) {
-      this.flagService.editFlag(flagId, cliResponse);
+      await this.flagService.editFlag(flagId, cliResponse);
       vscode.window.showInformationMessage(`[Flagship] Flag edited successfully`);
     }
     return cliResponse;
@@ -45,7 +43,7 @@ export class FlagStore {
   async deleteFlag(flagId: string): Promise<boolean> {
     const cliResponse = flagId ? await this.cli.DeleteFlag(flagId) : false;
     if (cliResponse) {
-      this.flagService.deleteFlag(flagId);
+      await this.flagService.deleteFlag(flagId);
       vscode.window.showInformationMessage(`[Flagship] Flag deleted successfully`);
     }
     return cliResponse;

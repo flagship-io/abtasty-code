@@ -19,7 +19,7 @@ export class TargetingKeyStore {
   async refreshTargetingKey(): Promise<TargetingKey[]> {
     const targetingKeys = await this.cli.ListTargetingKey();
     if (targetingKeys) {
-      this.targetingKeyService.loadState(targetingKeys);
+      await this.targetingKeyService.loadState(targetingKeys);
     }
     return targetingKeys;
   }
@@ -27,7 +27,7 @@ export class TargetingKeyStore {
   async saveTargetingKey(targetingKey: TargetingKey): Promise<TargetingKey> {
     const cliResponse = await this.cli.CreateTargetingKey(targetingKey);
     if (cliResponse.id) {
-      this.targetingKeyService.saveTargetingKey(cliResponse);
+      await this.targetingKeyService.saveTargetingKey(cliResponse);
       vscode.window.showInformationMessage(`[Flagship] Targeting key created successfully !`);
     }
     return cliResponse;
@@ -38,7 +38,7 @@ export class TargetingKeyStore {
       ? await this.cli.EditTargetingKey(targetingKeyId, newTargetingKey)
       : ({} as TargetingKey);
     if (cliResponse.id) {
-      this.targetingKeyService.editTargetingKey(targetingKeyId, cliResponse);
+      await this.targetingKeyService.editTargetingKey(targetingKeyId, cliResponse);
       vscode.window.showInformationMessage(`[Flagship] Targeting key edited successfully`);
     }
     return cliResponse;
@@ -47,7 +47,7 @@ export class TargetingKeyStore {
   async deleteTargetingKey(targetingKeyId: string): Promise<boolean> {
     const cliResponse = targetingKeyId ? await this.cli.DeleteTargetingKey(targetingKeyId) : false;
     if (cliResponse) {
-      this.targetingKeyService.deleteTargetingKey(targetingKeyId);
+      await this.targetingKeyService.deleteTargetingKey(targetingKeyId);
       vscode.window.showInformationMessage(`[Flagship] Targeting key deleted successfully`);
     }
     return cliResponse;

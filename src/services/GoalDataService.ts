@@ -15,24 +15,24 @@ export class GoalDataService {
     return this.goalList;
   }
 
-  loadState(state: Goal[]) {
+  async loadState(state: Goal[]) {
     this.goalList = state;
-    this.context.globalState.update(GLOBAL_LIST_GOAL, this.goalList);
+    await this.context.globalState.update(GLOBAL_LIST_GOAL, this.goalList);
   }
 
-  saveGoal(goal: Goal) {
+  async saveGoal(goal: Goal) {
     const newGoals = [...this.goalList, goal];
-    this.loadState(newGoals);
+    await this.loadState(newGoals);
   }
 
-  editGoal(goalId: string, newGoal: Goal) {
+  async editGoal(goalId: string, newGoal: Goal) {
     const oldGoals = this.goalList.filter((g) => goalId !== g.id);
     const newGoals = [...oldGoals, newGoal];
-    this.loadState(newGoals);
+    await this.loadState(newGoals);
   }
 
-  deleteGoal(goalId: string) {
+  async deleteGoal(goalId: string) {
     const newGoals = this.goalList.filter((g) => goalId !== g.id);
-    this.loadState(newGoals);
+    await this.loadState(newGoals);
   }
 }

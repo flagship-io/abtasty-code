@@ -1,9 +1,10 @@
 import * as vscode from 'vscode';
 import { TARGETING_KEY_LIST_LOAD, TARGETING_KEY_LIST_REFRESH } from '../commands/const';
-import { CURRENT_CONFIGURATION, PERMISSION_DENIED_PANEL } from '../const';
+import { PERMISSION_DENIED_PANEL } from '../const';
 import { KEY } from '../icons';
-import { CredentialStore, ItemResource } from '../model';
+import { Configuration, ItemResource } from '../model';
 import { TargetingKeyStore } from '../store/TargetingKeyStore';
+import { GLOBAL_CURRENT_CONFIGURATION } from '../services/const';
 
 export class TargetingKeyListProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
   private _targetingKeyList: TargetingKeyItem[] = [];
@@ -22,7 +23,7 @@ export class TargetingKeyListProvider implements vscode.TreeDataProvider<vscode.
 
   async refresh() {
     this._targetingKeyList = [];
-    const { scope } = this.context.globalState.get(CURRENT_CONFIGURATION) as CredentialStore;
+    const { scope } = this.context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
     if (scope?.includes('targeting_key.list')) {
       await this.getRefreshedTargetingKeys();
     }
@@ -31,7 +32,7 @@ export class TargetingKeyListProvider implements vscode.TreeDataProvider<vscode.
 
   load() {
     this._targetingKeyList = [];
-    const { scope } = this.context.globalState.get(CURRENT_CONFIGURATION) as CredentialStore;
+    const { scope } = this.context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
     if (scope?.includes('targeting_key.list')) {
       this.getLoadedTargetingKeys();
     }
@@ -44,7 +45,7 @@ export class TargetingKeyListProvider implements vscode.TreeDataProvider<vscode.
 
   getChildren(element?: vscode.TreeItem): vscode.ProviderResult<vscode.TreeItem[]> {
     const items: vscode.TreeItem[] = [];
-    const { scope } = this.context.globalState.get(CURRENT_CONFIGURATION) as CredentialStore;
+    const { scope } = this.context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
 
     if (!scope?.includes('targeting_key.list')) {
       return [new vscode.TreeItem(PERMISSION_DENIED_PANEL)];
