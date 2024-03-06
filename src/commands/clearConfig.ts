@@ -12,7 +12,6 @@ export default async function clearConfigCmd(context: vscode.ExtensionContext, s
         vscode.commands.executeCommand(SET_CONTEXT, 'flagship:enableFlagshipExplorer', false),
       ]);
       currentConfigurationNameStatusBar.hide();
-      vscode.window.showInformationMessage('[Flagship] Configuration removed.');
       vscode.window.showErrorMessage('[Flagship] Not configured.');
     } catch (err) {
       console.error(`[Flagship] Failed clearing configuration: ${err}`);

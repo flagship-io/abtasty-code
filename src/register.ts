@@ -9,7 +9,7 @@ import { Cli } from './providers/Cli';
 export async function register(context: vscode.ExtensionContext, stateConfig: StateConfiguration): Promise<void> {
   const cli = new Cli(context);
   await Promise.all([
-    configureFlagshipCmd(context, stateConfig, cli),
+    configureFlagshipCmd(context, cli),
     clearConfigCmd(context, stateConfig),
     checkCliVersionCmd(context, cli),
     extensionReload(context, stateConfig, cli),

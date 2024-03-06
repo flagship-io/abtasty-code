@@ -63,17 +63,14 @@ export class ConfigurationStore {
     }
   }
 
-  /*   async getCurrentConfiguration() {
+  async getCurrentConfiguration() {
     const cliResponse = await this.cli.CurrentConfiguration();
-    if (cliResponse) {
+    const tokenScope = await this.cli.GetTokenInfo();
+    if (cliResponse.name) {
+      cliResponse.scope = tokenScope.scope;
       this.configurationService.setCurrentConfiguration(cliResponse);
-      vscode.window.showInformationMessage(`[Flagship] Configuration ${cliResponse.name} is used`);
     }
     return cliResponse;
-  } */
-
-  async getCurrentConfiguration() {
-    return this.configurationService.getCurrentConfiguration();
   }
 
   async getTokenInfo(): Promise<TokenInfo> {

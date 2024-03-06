@@ -3,7 +3,7 @@
 import * as vscode from 'vscode';
 import { exec, ExecOptions } from 'child_process';
 import { join } from 'path';
-import { Campaign, FileAnalyzedType, Flag, Goal, Project, TargetingKey, TokenInfo } from '../model';
+import { Campaign, Configuration, FileAnalyzedType, Flag, Goal, Project, TargetingKey, TokenInfo } from '../model';
 import { CliVersion } from '../cli/cliDownloader';
 import * as fs from 'fs';
 export class Cli {
@@ -67,31 +67,59 @@ export class Cli {
     }
   }
 
-  async Credentials(
-    clientId: string | undefined,
-    clientSecret: string | undefined,
-    accountId: string | undefined,
-    accountEnvironmentId: string | undefined,
-  ): Promise<boolean> {
+  async CreateConfiguration(configuration: Configuration): Promise<boolean> {
     try {
       const cliBin = await this.CliBin();
       if (!cliBin) {
         return false;
       }
-      if (clientId || clientSecret || accountEnvironmentId || accountId) {
-        let command = `${cliBin} configure`;
-        if (clientId) {
-          command += `\u0020-i ${clientId}`;
+      const command = `${cliBin} configuration create -n ${configuration.name} -i ${configuration.client_id} -s ${configuration.client_secret} -a ${configuration.account_id} -e ${configuration.account_environment_id}`;
+      const output = await this.exec(command, {});
+      console.log(output);
+
+      if (output.stderr) {
+        vscode.window.showErrorMessage(output.stderr);
+        return false;
+      }
+      if (output.stdout.includes('exists')) {
+        vscode.window.showErrorMessage(output.stdout);
+        return false;
+      }
+      return true;
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return false;
+    }
+  }
+
+  async EditConfiguration(name: string, newConfiguration: Configuration): Promise<boolean> {
+    try {
+      const cliBin = await this.CliBin();
+      if (!cliBin) {
+        return false;
+      }
+      if (
+        newConfiguration.client_id ||
+        newConfiguration.client_secret ||
+        newConfiguration.account_environment_id ||
+        newConfiguration.account_id
+      ) {
+        let command = `${cliBin} configuration edit -n ${name}`;
+
+        if (newConfiguration.client_id) {
+          command += `\u0020-i ${newConfiguration.client_id}`;
         }
-        if (clientSecret) {
-          command += `\u0020-s ${clientSecret}`;
+        if (newConfiguration.client_secret) {
+          command += `\u0020-s ${newConfiguration.client_secret}`;
         }
-        if (accountId) {
-          command += `\u0020-a ${accountId}`;
+        if (newConfiguration.account_id) {
+          command += `\u0020-a ${newConfiguration.account_id}`;
         }
-        if (accountEnvironmentId) {
-          command += `\u0020-e ${accountEnvironmentId}`;
+        if (newConfiguration.account_environment_id) {
+          command += `\u0020-e ${newConfiguration.account_environment_id}`;
         }
+
         const output = await this.exec(command, {});
         console.log(output);
         if (output.stderr) {
@@ -108,14 +136,32 @@ export class Cli {
     }
   }
 
-  async Authenticate(): Promise<boolean> {
+  async DeleteConfiguration(name: string): Promise<boolean> {
     try {
       const cliBin = await this.CliBin();
       if (!cliBin) {
         return false;
       }
 
-      let command = `${cliBin} authenticate`;
+      let command = `${cliBin} configuration delete -n ${name}`;
+      const output = await this.exec(command, {});
+      console.log(output);
+      return true;
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return false;
+    }
+  }
+
+  async UseConfiguration(name: string): Promise<boolean> {
+    try {
+      const cliBin = await this.CliBin();
+      if (!cliBin) {
+        return false;
+      }
+
+      let command = `${cliBin} configuration use -n ${name}`;
       const output = await this.exec(command, {});
       console.log(output);
       if (output.stderr) {
@@ -127,6 +173,46 @@ export class Cli {
       vscode.window.showErrorMessage(err.error);
       console.error(err);
       return false;
+    }
+  }
+
+  async ListConfiguration(): Promise<Configuration[]> {
+    try {
+      const cliBin = await this.CliBin();
+      if (!cliBin) {
+        return [];
+      }
+      const command = `${cliBin} configuration list --output-format json`;
+      const output = await this.exec(command, {});
+      if (output.stderr) {
+        vscode.window.showErrorMessage(output.stderr);
+        return [];
+      }
+      return JSON.parse(output.stdout);
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return [];
+    }
+  }
+
+  async CurrentConfiguration(): Promise<Configuration> {
+    try {
+      const cliBin = await this.CliBin();
+      if (!cliBin) {
+        return {} as Configuration;
+      }
+      const command = `${cliBin} configuration current --output-format json`;
+      const output = await this.exec(command, {});
+      if (output.stderr) {
+        vscode.window.showErrorMessage(output.stderr);
+        return {} as Configuration;
+      }
+      return JSON.parse(output.stdout);
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return {} as Configuration;
     }
   }
 
@@ -208,7 +294,6 @@ export class Cli {
         vscode.window.showErrorMessage(output.stderr);
         return [];
       }
-      console.log('refresh project triggered');
       return JSON.parse(output.stdout);
     } catch (err: any) {
       vscode.window.showErrorMessage(err.error);
@@ -217,7 +302,7 @@ export class Cli {
     }
   }
 
-  async switchProject(id: string, status: string): Promise<boolean> {
+  async SwitchProject(id: string, status: string): Promise<boolean> {
     try {
       const cliBin = await this.CliBin();
       if (!cliBin) {
@@ -341,7 +426,6 @@ export class Cli {
         vscode.window.showErrorMessage(output.stderr);
         return [];
       }
-      console.log('refresh goal triggered');
       return JSON.parse(output.stdout);
     } catch (err: any) {
       vscode.window.showErrorMessage(err.error);
@@ -438,7 +522,6 @@ export class Cli {
         vscode.window.showErrorMessage(output.stderr);
         return [];
       }
-      console.log('refresh targeting key triggered');
       return JSON.parse(output.stdout);
     } catch (err: any) {
       vscode.window.showErrorMessage(err.error);
@@ -556,7 +639,6 @@ export class Cli {
         vscode.window.showErrorMessage(output.stderr);
         return [];
       }
-      console.log('refresh flag triggered');
       return JSON.parse(output.stdout);
     } catch (err: any) {
       vscode.window.showErrorMessage(err.error);
@@ -648,7 +730,6 @@ export class Cli {
         vscode.window.showErrorMessage(output.stderr);
         return [];
       }
-      console.log('refresh campaign triggered');
       return JSON.parse(output.stdout);
     } catch (err: any) {
       vscode.window.showErrorMessage(err.error);
@@ -657,7 +738,7 @@ export class Cli {
     }
   }
 
-  async switchCampaign(id: string, status: string): Promise<boolean> {
+  async SwitchCampaign(id: string, status: string): Promise<boolean> {
     try {
       const cliBin = await this.CliBin();
       if (!cliBin) {

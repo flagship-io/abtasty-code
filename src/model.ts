@@ -8,7 +8,6 @@ export type Configuration = {
   client_secret: string;
   account_id: string;
   account_environment_id: string;
-  new_name: string | undefined;
   path: string;
   scope?: string;
 };
