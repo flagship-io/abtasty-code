@@ -112,28 +112,38 @@ export class FileAnalyzedProvider implements vscode.TreeDataProvider<vscode.Tree
   private async getFileAnalyzed(path: string, forceListFlags: boolean) {
     const OSPath =
       (process.platform.toString() === 'win32'
-        ? (forceListFlags ? path : vscode.window.activeTextEditor?.document.uri.path!.substring(1))
+        ? forceListFlags
+          ? path
+          : vscode.window.activeTextEditor?.document.uri.path!.substring(1)
         : forceListFlags
         ? path
         : vscode.window.activeTextEditor?.document.uri.path!) || rootPath;
     const filesAnalyzed = await this.cli.ListAnalyzedFlag(OSPath!);
-    filesAnalyzed.map(({ File, FileURL, Error, Results }) => {
-      const fileClass = new FileAnalyzed(File, FileURL, Error, File.split(process.platform.toString() === 'win32'? '\\':'/').slice(-1)[0], Results?.length);
-      Results?.map((result) => {
-        if (result.FlagKey) {
-          const flagAnalyzed = new FlagAnalyzed(
-            result.FlagKey,
-            result.FlagType,
-            result.FlagDefaultValue,
-            result.LineNumber,
-            result.FlagKey,
-            fileClass.file!,
-          );
-          fileClass.add_child(flagAnalyzed);
-        }
-      });
+    if (filesAnalyzed) {
+      filesAnalyzed.map(({ File, FileURL, Error, Results }) => {
+        const fileClass = new FileAnalyzed(
+          File,
+          FileURL,
+          Error,
+          File.split(process.platform.toString() === 'win32' ? '\\' : '/').slice(-1)[0],
+          Results?.length,
+        );
+        Results?.map((result) => {
+          if (result.FlagKey) {
+            const flagAnalyzed = new FlagAnalyzed(
+              result.FlagKey,
+              result.FlagType,
+              result.FlagDefaultValue,
+              result.LineNumber,
+              result.FlagKey,
+              fileClass.file!,
+            );
+            fileClass.add_child(flagAnalyzed);
+          }
+        });
 
-      this.fileAnalyzed.push(fileClass);
-    });
+        this.fileAnalyzed.push(fileClass);
+      });
+    }
   }
 }

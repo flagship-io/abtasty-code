@@ -1,20 +1,10 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import * as vscode from 'vscode';
 import * as fs from 'fs';
+import * as vscode from 'vscode';
 import { CliDownloader, CliVersion } from './cli/cliDownloader';
-import { Configuration } from './configuration';
+import { FLAG_IN_FILE_REFRESH } from './commands/const';
+import { StateConfiguration } from './stateConfiguration';
 import { register as registerCommands } from './register';
-import {
-  FLAG_IN_FILE_REFRESH,
-  FLAG_LIST_REFRESH,
-  GOAL_LIST_REFRESH,
-  PROJECT_LIST_REFRESH,
-  QUICK_ACCESS_REFRESH,
-  TARGETING_KEY_LIST_REFRESH,
-} from './commands/const';
-
-var stateTrigger: boolean = false;
-var showSurvey: boolean = true;
 
 let timer: NodeJS.Timeout | undefined;
 
@@ -36,7 +26,7 @@ async function handleActiveTextEditorChange() {
 }
 
 export async function activate(context: vscode.ExtensionContext) {
-  const config = new Configuration(context);
+  const stateConfig = new StateConfiguration(context);
 
   const binaryDir = `${context.asAbsolutePath('flagship')}/${CliVersion}`;
 
@@ -49,43 +39,8 @@ export async function activate(context: vscode.ExtensionContext) {
 
   vscode.window.onDidChangeActiveTextEditor(handleActiveTextEditorChange);
 
-  vscode.window.onDidChangeWindowState(async (p: any) => {
-    if (stateTrigger !== p.active) {
-      stateTrigger = p.active;
-      if (stateTrigger) {
-        await Promise.all([
-          vscode.commands.executeCommand(FLAG_LIST_REFRESH),
-          vscode.commands.executeCommand(FLAG_IN_FILE_REFRESH),
-          vscode.commands.executeCommand(GOAL_LIST_REFRESH),
-          vscode.commands.executeCommand(TARGETING_KEY_LIST_REFRESH),
-          vscode.commands.executeCommand(PROJECT_LIST_REFRESH),
-          vscode.commands.executeCommand(QUICK_ACCESS_REFRESH),
-        ]);
-      }
-    }
-  });
-
-  const showWarningNotificationWithActions = vscode.commands.registerCommand('flagship.showSurvey', async () => {
-    const selection = await vscode.window.showInformationMessage('Please give us your feedback 🙏', 'Open survey');
-
-    if (selection !== undefined) {
-      vscode.env.openExternal(vscode.Uri.parse('https://abtasty.typeform.com/to/EzrJXwRY'));
-    }
-  });
-
-  context.subscriptions.push(showWarningNotificationWithActions);
-
-  if (showSurvey) {
-    // Show survey after 2 hours
-    setTimeout(async () => {
-      await vscode.commands.executeCommand('flagship.showSurvey');
-    }, 7200000);
-
-    showSurvey = false;
-  }
-
   try {
-    await registerCommands(context, config);
+    await registerCommands(context, stateConfig);
   } catch (err) {
     console.error(err);
   }

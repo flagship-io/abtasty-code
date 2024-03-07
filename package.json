@@ -5,7 +5,7 @@
   "publisher": "ABTasty",
   "license": "SEE LICENSE IN LICENSE.md",
   "repository": "https://github.com/flagship-io/flagship-code",
-  "version": "0.1.11",
+  "version": "0.2.0",
   "engines": {
     "vscode": "^1.72.0"
   },
@@ -37,12 +37,12 @@
           "description": "Flagship Flags in File"
         },
         "flagship.configurationList": {
-          "type": "CredentialStore[]",
+          "type": "Configuration[]",
           "default": [],
           "description": "List of configuration stored"
         },
         "flagship.currentConfiguration": {
-          "type": "CredentialStore",
+          "type": "Configuration",
           "default": {},
           "description": "current running configuration"
         }

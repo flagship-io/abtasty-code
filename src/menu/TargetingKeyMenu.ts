@@ -1,7 +1,8 @@
 import * as vscode from 'vscode';
 import { MultiStepInput } from '../multipleStepInput';
-import { Cli } from '../providers/Cli';
 import { TargetingKeyItem } from '../providers/TargetingKeyList';
+import { TargetingKeyStore } from '../store/TargetingKeyStore';
+import { TargetingKey } from '../model';
 
 interface TargetingKeySchema {
   name: string;
@@ -13,12 +14,13 @@ const targetingKeyTypes: vscode.QuickPickItem[] = ['string', 'boolean', 'number'
   label,
 }));
 
-export async function targetingKeyInputBox(context: vscode.ExtensionContext, targetingKey: TargetingKeyItem, cli: Cli) {
+export async function targetingKeyInputBox(targetingKey: TargetingKeyItem, targetingKeyStore: TargetingKeyStore) {
   const targetingKeyData = {} as Partial<TargetingKeySchema>;
 
-  const title = 'Create Targeting key';
+  let title = 'Create Targeting key';
 
   if (targetingKey.id) {
+    title = 'Edit Targeting key';
     targetingKeyData.name = targetingKey.name;
     targetingKeyData.description = targetingKey.targetingKeydescription;
   }
@@ -92,38 +94,42 @@ export async function targetingKeyInputBox(context: vscode.ExtensionContext, tar
 
   if (name && type && description) {
     if (targetingKey.id) {
-      const targetingKeyEdited = await cli.EditTargetingKey(targetingKey.id, name, type.label, description);
-      if (targetingKeyEdited.id) {
-        vscode.window.showInformationMessage(`[Flagship] Targeting Key edited successfully`);
+      const targetingKeyEdited = await targetingKeyStore.editTargetingKey(targetingKey.id!, {
+        name,
+        type: type.label,
+        description,
+      } as TargetingKey);
+
+      if (!targetingKeyEdited.id) {
+        vscode.window.showErrorMessage(`[Flagship] Targeting Key not edited`);
         return;
       }
-      vscode.window.showErrorMessage(`[Flagship] Targeting Key not edited`);
       return;
     }
-    const targetingKeyCreated = await cli.CreateTargetingKey(name, type.label, description);
-    if (targetingKeyCreated.id) {
-      vscode.window.showInformationMessage(`[Flagship] Targeting key created successfully`);
+
+    const targetingKeyCreated = await targetingKeyStore.saveTargetingKey({
+      name,
+      type: type.label,
+      description,
+    } as TargetingKey);
+
+    if (!targetingKeyCreated.id) {
+      vscode.window.showErrorMessage(`[Flagship] Targeting key not created`);
       return;
     }
-    vscode.window.showErrorMessage(`[Flagship] Targeting key not created`);
     return;
   }
-  vscode.window.showInformationMessage(`[Flagship] Targeting key not created`);
+  vscode.window.showErrorMessage(`[Flagship] Targeting key not created`);
 }
 
-export async function deleteTargetingKeyBox(
-  context: vscode.ExtensionContext,
-  targetingKey: TargetingKeyItem,
-  cli: Cli,
-) {
+export async function deleteTargetingKeyInputBox(targetingKey: TargetingKeyItem, targetingKeyStore: TargetingKeyStore) {
   const picked = await vscode.window.showQuickPick(['yes', 'no'], {
     title: `Delete the targeting key ${targetingKey.name}`,
     placeHolder: 'Do you confirm ?',
     ignoreFocusOut: true,
   });
   if (picked === 'yes') {
-    await cli.DeleteTargetingKey(targetingKey.id!);
-    vscode.window.showInformationMessage(`[Flagship] Targeting key ${targetingKey.name} deleted successfully.`);
+    await targetingKeyStore.deleteTargetingKey(targetingKey.id!);
     return;
   }
   return;

@@ -2,9 +2,20 @@
 import * as vscode from 'vscode';
 import { CIRCLE_FILLED } from './icons';
 
+export type Configuration = {
+  name: string;
+  client_id: string;
+  client_secret: string;
+  account_id: string;
+  account_environment_id: string;
+  path: string;
+  scope?: string;
+};
+
 export type Project = {
   id: string;
   name: string;
+  campaigns?: Campaign[];
 };
 
 export type Campaign = {
@@ -114,16 +125,6 @@ export type SecretCredentials = {
   client_id: string;
   client_secret: string;
 };
-
-export interface CredentialStore {
-  name: string;
-  clientId: string;
-  clientSecret: string;
-  accountId: string;
-  accountEnvId: string;
-  path: string;
-  scope?: string;
-}
 
 export class ItemResource extends vscode.TreeItem {
   public readonly label!: string;

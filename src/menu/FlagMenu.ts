@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import * as vscode from 'vscode';
 import { MultiStepInput } from '../multipleStepInput';
-import { Cli } from '../providers/Cli';
 import { FlagItem } from '../providers/FlagList';
+import { FlagStore } from '../store/FlagStore';
+import { Flag } from '../model';
 
 interface FlagSchema {
   name: string;
@@ -15,16 +16,17 @@ const flagTypes: vscode.QuickPickItem[] = ['string', 'boolean', 'number', 'array
   label,
 }));
 
-export async function flagInputBox(context: vscode.ExtensionContext, flag: FlagItem, cli: Cli) {
+export async function flagInputBox(flag: FlagItem, flagStore: FlagStore) {
   let flagData = {} as Partial<FlagSchema>;
 
-  const title = 'Create Flag';
+  let title = 'Create Flag';
 
   if (flag.key && flag.key !== '[object Object]') {
     flagData.name = flag.key;
   }
 
   if (flag.id) {
+    title = 'Edit Flag';
     flagData.name = flag.key;
     flagData.description = flag.flagDescription;
     flagData.defaultValue = flag.defaultValue;
@@ -146,34 +148,44 @@ export async function flagInputBox(context: vscode.ExtensionContext, flag: FlagI
 
   if (name && description && defaultValue) {
     if (flag.id) {
-      const flagEdited = await cli.EditFlag(flag.id, name, flag.type!, description, defaultValue);
-      if (flagEdited.id) {
-        vscode.window.showInformationMessage(`[Flagship] Flag edit successfully`);
+      const flagEdited = await flagStore.editFlag(flag.id!, {
+        name,
+        description,
+        type: flag.type!,
+        default_value: defaultValue,
+      } as Flag);
+
+      if (!flagEdited.id) {
+        vscode.window.showErrorMessage(`[Flagship] Flag not edited`);
         return;
       }
-      vscode.window.showErrorMessage(`[Flagship] Flag not edited`);
       return;
     }
-    const flagCreated = await cli.CreateFlag(name, type!.label, description, defaultValue);
-    if (flagCreated.id) {
-      vscode.window.showInformationMessage(`[Flagship] Flag created successfully`);
+
+    const flagCreated = await flagStore.saveFlag({
+      name,
+      type: type!.label,
+      description,
+      default_value: defaultValue,
+    } as Flag);
+
+    if (!flagCreated.id) {
+      vscode.window.showErrorMessage(`[Flagship] Flag not created`);
       return;
     }
-    vscode.window.showErrorMessage(`[Flagship] Flag not created`);
     return;
   }
   vscode.window.showErrorMessage(`[Flagship] Flag not created`);
 }
 
-export async function deleteFlagBox(context: vscode.ExtensionContext, flag: FlagItem, cli: Cli) {
+export async function deleteFlagInputBox(flag: FlagItem, flagStore: FlagStore) {
   const picked = await vscode.window.showQuickPick(['yes', 'no'], {
     title: `Delete the flag ${flag.key}`,
     placeHolder: 'Do you confirm ?',
     ignoreFocusOut: true,
   });
   if (picked === 'yes') {
-    await cli.DeleteFlag(flag.id!);
-    vscode.window.showInformationMessage(`[Flagship] Flag ${flag.key} deleted successfully.`);
+    await flagStore.deleteFlag(flag.id!);
     return;
   }
   return;

@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { Configuration } from '../configuration';
+import { StateConfiguration } from '../stateConfiguration';
 import { DOCUMENT_URI } from '../const';
 import {
   FLAGSHIP_CREATE_FLAG,
@@ -13,12 +13,12 @@ import {
 
 const NON_COLLAPSED = vscode.TreeItemCollapsibleState.None;
 export class QuickAccessListProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
-  private readonly config: Configuration;
+  private readonly stateConfig: StateConfiguration;
   private items: LinkItem[] = [];
 
-  constructor(config: Configuration) {
+  constructor(stateConfig: StateConfiguration) {
     vscode.commands.registerCommand(QUICK_ACCESS_REFRESH, async () => await this.refresh());
-    this.config = config;
+    this.stateConfig = stateConfig;
   }
 
   private _onDidChangeTreeData: vscode.EventEmitter<vscode.TreeItem | null | void> =

@@ -1,29 +1,41 @@
 import * as vscode from 'vscode';
-import { GOAL_LIST_REFRESH } from '../commands/const';
-import { CURRENT_CONFIGURATION, PERMISSION_DENIED_PANEL } from '../const';
+import { GOAL_LIST_LOAD, GOAL_LIST_REFRESH } from '../commands/const';
+import { PERMISSION_DENIED_PANEL } from '../const';
 import { ROCKET } from '../icons';
-import { CredentialStore, ItemResource } from '../model';
-import { Cli } from './Cli';
+import { Configuration, ItemResource } from '../model';
+import { GoalStore } from '../store/GoalStore';
+import { GLOBAL_CURRENT_CONFIGURATION } from '../services/const';
 
 export class GoalListProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
   private _goals: GoalItem[] = [];
-  private cli: Cli;
+  private goalStore: GoalStore;
 
   private _onDidChangeTreeData: vscode.EventEmitter<vscode.TreeItem | undefined | void> = new vscode.EventEmitter<
     vscode.TreeItem | undefined | void
   >();
   readonly onDidChangeTreeData: vscode.Event<vscode.TreeItem | undefined | void> = this._onDidChangeTreeData.event;
 
-  public constructor(private context: vscode.ExtensionContext, cli: Cli) {
+  public constructor(private context: vscode.ExtensionContext, goalStore: GoalStore) {
+    this.goalStore = goalStore;
+
     vscode.commands.registerCommand(GOAL_LIST_REFRESH, async () => await this.refresh());
-    this.cli = cli;
+    vscode.commands.registerCommand(GOAL_LIST_LOAD, () => this.load());
   }
 
   async refresh() {
     this._goals = [];
-    const { scope } = this.context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+    const { scope } = this.context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
     if (scope?.includes('goal.list')) {
-      await this.getGoals();
+      await this.getRefreshedGoals();
+    }
+    this._onDidChangeTreeData.fire();
+  }
+
+  async load() {
+    this._goals = [];
+    const { scope } = this.context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
+    if (scope?.includes('goal.list')) {
+      this.getLoadedGoals();
     }
     this._onDidChangeTreeData.fire();
   }
@@ -34,7 +46,7 @@ export class GoalListProvider implements vscode.TreeDataProvider<vscode.TreeItem
 
   getChildren(element?: vscode.TreeItem): vscode.ProviderResult<vscode.TreeItem[]> {
     const items: vscode.TreeItem[] = [];
-    const { scope } = this.context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+    const { scope } = this.context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
     if (!scope?.includes('goal.list')) {
       return [new vscode.TreeItem(PERMISSION_DENIED_PANEL)];
     }
@@ -59,8 +71,16 @@ export class GoalListProvider implements vscode.TreeDataProvider<vscode.TreeItem
     return items;
   }
 
-  private async getGoals() {
-    const goalList = await this.cli.ListGoal();
+  private async getRefreshedGoals() {
+    const goalList = await this.goalStore.refreshGoal();
+    goalList.map((g) => {
+      const goal = new GoalItem(g.id, g.label, g.type, g.operator, g.value, vscode.TreeItemCollapsibleState.Collapsed);
+      this._goals.push(goal);
+    });
+  }
+
+  private getLoadedGoals() {
+    const goalList = this.goalStore.loadGoal();
     goalList.map((g) => {
       const goal = new GoalItem(g.id, g.label, g.type, g.operator, g.value, vscode.TreeItemCollapsibleState.Collapsed);
       this._goals.push(goal);

@@ -3,7 +3,7 @@
 import * as vscode from 'vscode';
 import { exec, ExecOptions } from 'child_process';
 import { join } from 'path';
-import { Campaign, FileAnalyzedType, Flag, Goal, Project, TargetingKey, TokenInfo } from '../model';
+import { Campaign, Configuration, FileAnalyzedType, Flag, Goal, Project, TargetingKey, TokenInfo } from '../model';
 import { CliVersion } from '../cli/cliDownloader';
 import * as fs from 'fs';
 export class Cli {
@@ -17,12 +17,16 @@ export class Cli {
 
   exec(command: string, options: ExecOptions): Promise<{ stdout: string; stderr: string }> {
     return new Promise<{ stdout: string; stderr: string }>((resolve, reject) => {
-      exec(command + ' --user-agent=flagship-ext-vscode/v' + this.extensionVersion, options, (error, stdout, stderr) => {
-        if (error) {
-          reject({ error, stdout, stderr });
-        }
-        resolve({ stdout, stderr });
-      });
+      exec(
+        command + ' --user-agent=flagship-ext-vscode/v' + this.extensionVersion,
+        options,
+        (error, stdout, stderr) => {
+          if (error) {
+            reject({ error, stdout, stderr });
+          }
+          resolve({ stdout, stderr });
+        },
+      );
     });
   }
 
@@ -63,31 +67,59 @@ export class Cli {
     }
   }
 
-  async Credentials(
-    clientId: string | undefined,
-    clientSecret: string | undefined,
-    accountId: string | undefined,
-    accountEnvironmentId: string | undefined,
-  ): Promise<boolean> {
+  async CreateConfiguration(configuration: Configuration): Promise<boolean> {
     try {
       const cliBin = await this.CliBin();
       if (!cliBin) {
         return false;
       }
-      if (clientId || clientSecret || accountEnvironmentId || accountId) {
-        let command = `${cliBin} configure`;
-        if (clientId) {
-          command += `\u0020-i ${clientId}`;
+      const command = `${cliBin} configuration create -n ${configuration.name} -i ${configuration.client_id} -s ${configuration.client_secret} -a ${configuration.account_id} -e ${configuration.account_environment_id}`;
+      const output = await this.exec(command, {});
+      console.log(output);
+
+      if (output.stderr) {
+        vscode.window.showErrorMessage(output.stderr);
+        return false;
+      }
+      if (output.stdout.includes('exists')) {
+        vscode.window.showErrorMessage(output.stdout);
+        return false;
+      }
+      return true;
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return false;
+    }
+  }
+
+  async EditConfiguration(name: string, newConfiguration: Configuration): Promise<boolean> {
+    try {
+      const cliBin = await this.CliBin();
+      if (!cliBin) {
+        return false;
+      }
+      if (
+        newConfiguration.client_id ||
+        newConfiguration.client_secret ||
+        newConfiguration.account_environment_id ||
+        newConfiguration.account_id
+      ) {
+        let command = `${cliBin} configuration edit -n ${name}`;
+
+        if (newConfiguration.client_id) {
+          command += `\u0020-i ${newConfiguration.client_id}`;
         }
-        if (clientSecret) {
-          command += `\u0020-s ${clientSecret}`;
+        if (newConfiguration.client_secret) {
+          command += `\u0020-s ${newConfiguration.client_secret}`;
         }
-        if (accountId) {
-          command += `\u0020-a ${accountId}`;
+        if (newConfiguration.account_id) {
+          command += `\u0020-a ${newConfiguration.account_id}`;
         }
-        if (accountEnvironmentId) {
-          command += `\u0020-e ${accountEnvironmentId}`;
+        if (newConfiguration.account_environment_id) {
+          command += `\u0020-e ${newConfiguration.account_environment_id}`;
         }
+
         const output = await this.exec(command, {});
         console.log(output);
         if (output.stderr) {
@@ -104,14 +136,32 @@ export class Cli {
     }
   }
 
-  async Authenticate(): Promise<boolean> {
+  async DeleteConfiguration(name: string): Promise<boolean> {
     try {
       const cliBin = await this.CliBin();
       if (!cliBin) {
         return false;
       }
 
-      let command = `${cliBin} authenticate`;
+      let command = `${cliBin} configuration delete -n ${name}`;
+      const output = await this.exec(command, {});
+      console.log(output);
+      return true;
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return false;
+    }
+  }
+
+  async UseConfiguration(name: string): Promise<boolean> {
+    try {
+      const cliBin = await this.CliBin();
+      if (!cliBin) {
+        return false;
+      }
+
+      let command = `${cliBin} configuration use -n ${name}`;
       const output = await this.exec(command, {});
       console.log(output);
       if (output.stderr) {
@@ -126,13 +176,53 @@ export class Cli {
     }
   }
 
-  async CreateProject(name: string): Promise<Project> {
+  async ListConfiguration(): Promise<Configuration[]> {
+    try {
+      const cliBin = await this.CliBin();
+      if (!cliBin) {
+        return [];
+      }
+      const command = `${cliBin} configuration list --output-format json`;
+      const output = await this.exec(command, {});
+      if (output.stderr) {
+        vscode.window.showErrorMessage(output.stderr);
+        return [];
+      }
+      return JSON.parse(output.stdout);
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return [];
+    }
+  }
+
+  async CurrentConfiguration(): Promise<Configuration> {
+    try {
+      const cliBin = await this.CliBin();
+      if (!cliBin) {
+        return {} as Configuration;
+      }
+      const command = `${cliBin} configuration current --output-format json`;
+      const output = await this.exec(command, {});
+      if (output.stderr) {
+        vscode.window.showErrorMessage(output.stderr);
+        return {} as Configuration;
+      }
+      return JSON.parse(output.stdout);
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return {} as Configuration;
+    }
+  }
+
+  async CreateProject(project: Project): Promise<Project> {
     try {
       const cliBin = await this.CliBin();
       if (!cliBin) {
         return {} as Project;
       }
-      const command = `${cliBin} project create -n "${name}"`;
+      const command = `${cliBin} project create -n "${project.name}"`;
       const output = await this.exec(command, {});
       console.log(output);
       if (output.stderr) {
@@ -143,17 +233,17 @@ export class Cli {
     } catch (err: any) {
       vscode.window.showErrorMessage(err.error);
       console.error(err);
-      return {} as Flag;
+      return {} as Project;
     }
   }
 
-  async EditProject(id: string, name: string): Promise<Project> {
+  async EditProject(id: string, project: Project): Promise<Project> {
     try {
       const cliBin = await this.CliBin();
       if (!cliBin) {
         return {} as Project;
       }
-      const command = `${cliBin} project edit -i ${id} -n "${name}"`;
+      const command = `${cliBin} project edit -i ${id} -n "${project.name}"`;
       const output = await this.exec(command, {});
       console.log(output);
       if (output.stderr) {
@@ -181,7 +271,10 @@ export class Cli {
         vscode.window.showErrorMessage(output.stderr);
         return false;
       }
-      return true;
+      if (output.stdout.includes('deleted')) {
+        return true;
+      }
+      return false;
     } catch (err: any) {
       vscode.window.showErrorMessage(err.error);
       console.error(err);
@@ -209,7 +302,7 @@ export class Cli {
     }
   }
 
-  async switchProject(id: string, status: string): Promise<boolean> {
+  async SwitchProject(id: string, status: string): Promise<boolean> {
     try {
       const cliBin = await this.CliBin();
       if (!cliBin) {
@@ -229,7 +322,7 @@ export class Cli {
     }
   }
 
-  async CreateGoal(label: string, type: string, operator?: string, value?: string): Promise<Goal> {
+  async CreateGoal(goal: Goal): Promise<Goal> {
     try {
       let command: string;
       const cliBin = await this.CliBin();
@@ -237,16 +330,16 @@ export class Cli {
         return {} as Goal;
       }
       if (process.platform.toString() === 'win32') {
-        if (operator && value) {
-          command = `${cliBin} goal create -d {\\"label\\":\\"${label}\\",\\"type\\":\\"${type}\\",\\"operator\\":\\"${operator}\\",\\"value\\":\\"${value}\\"}`;
+        if (goal.operator && goal.value) {
+          command = `${cliBin} goal create -d {\\"label\\":\\"${goal.label}\\",\\"type\\":\\"${goal.type}\\",\\"operator\\":\\"${goal.operator}\\",\\"value\\":\\"${goal.value}\\"}`;
         } else {
-          command = `${cliBin} goal create -d {\\"label\\":\\"${label}\\",\\"type\\":\\"${type}\\"}`;
+          command = `${cliBin} goal create -d {\\"label\\":\\"${goal.label}\\",\\"type\\":\\"${goal.type}\\"}`;
         }
       } else {
-        if (operator && value) {
-          command = `${cliBin} goal create -d '{"label":"${label}","type":"${type}","operator":"${operator}","value":"${value}"}'`;
+        if (goal.operator && goal.value) {
+          command = `${cliBin} goal create -d '{"label":"${goal.label}","type":"${goal.type}","operator":"${goal.operator}","value":"${goal.value}"}'`;
         } else {
-          command = `${cliBin} goal create -d '{"label":"${label}","type":"${type}"}'`;
+          command = `${cliBin} goal create -d '{"label":"${goal.label}","type":"${goal.type}"}'`;
         }
       }
       const output = await this.exec(command, {});
@@ -263,7 +356,7 @@ export class Cli {
     }
   }
 
-  async EditGoal(id: string, label: string, operator?: string, value?: string): Promise<Goal> {
+  async EditGoal(id: string, goal: Goal): Promise<Goal> {
     try {
       let command: string;
       const cliBin = await this.CliBin();
@@ -271,16 +364,16 @@ export class Cli {
         return {} as Goal;
       }
       if (process.platform.toString() === 'win32') {
-        if (operator && value) {
-          command = `${cliBin} goal edit -i ${id} -d {\\"label\\":\\"${label}\\",\\"operator\\":\\"${operator}\\",\\"value\\":\\"${value}\\"}`;
+        if (goal.operator && goal.value) {
+          command = `${cliBin} goal edit -i ${id} -d {\\"label\\":\\"${goal.label}\\",\\"operator\\":\\"${goal.operator}\\",\\"value\\":\\"${goal.value}\\"}`;
         } else {
-          command = `${cliBin} goal edit -i ${id} -d {\\"label\\":\\"${label}\\"}`;
+          command = `${cliBin} goal edit -i ${id} -d {\\"label\\":\\"${goal.label}\\"}`;
         }
       } else {
-        if (operator && value) {
-          command = `${cliBin} goal edit -i ${id} -d '{"label":"${label}","operator":"${operator}","value":"${value}"}'`;
+        if (goal.operator && goal.value) {
+          command = `${cliBin} goal edit -i ${id} -d '{"label":"${goal.label}","operator":"${goal.operator}","value":"${goal.value}"}'`;
         } else {
-          command = `${cliBin} goal edit -i ${id} -d '{"label":"${label}"}'`;
+          command = `${cliBin} goal edit -i ${id} -d '{"label":"${goal.label}"}'`;
         }
       }
       const output = await this.exec(command, {});
@@ -310,7 +403,10 @@ export class Cli {
         vscode.window.showErrorMessage(output.stderr);
         return false;
       }
-      return true;
+      if (output.stdout.includes('deleted')) {
+        return true;
+      }
+      return false;
     } catch (err: any) {
       vscode.window.showErrorMessage(err.error);
       console.error(err);
@@ -338,7 +434,7 @@ export class Cli {
     }
   }
 
-  async CreateTargetingKey(name: string, type: string, description: string): Promise<TargetingKey> {
+  async CreateTargetingKey(targetingKey: TargetingKey): Promise<TargetingKey> {
     try {
       let command: string;
       const cliBin = await this.CliBin();
@@ -346,9 +442,9 @@ export class Cli {
         return {} as TargetingKey;
       }
       if (process.platform.toString() === 'win32') {
-        command = `${cliBin} targeting-key create -d {\\"name\\":\\"${name}\\",\\"type\\":\\"${type}\\",\\"description\\":\\"${description}\\"}`;
+        command = `${cliBin} targeting-key create -d {\\"name\\":\\"${targetingKey.name}\\",\\"type\\":\\"${targetingKey.type}\\",\\"description\\":\\"${targetingKey.description}\\"}`;
       } else {
-        command = `${cliBin} targeting-key create -d '{"name":"${name}","type":"${type}","description":"${description}"}'`;
+        command = `${cliBin} targeting-key create -d '{"name":"${targetingKey.name}","type":"${targetingKey.type}","description":"${targetingKey.description}"}'`;
       }
       const output = await this.exec(command, {});
       console.log(output);
@@ -364,7 +460,7 @@ export class Cli {
     }
   }
 
-  async EditTargetingKey(id: string, name: string, type: string, description: string): Promise<TargetingKey> {
+  async EditTargetingKey(id: string, targetingKey: TargetingKey): Promise<TargetingKey> {
     try {
       let command: string;
       const cliBin = await this.CliBin();
@@ -372,9 +468,9 @@ export class Cli {
         return {} as TargetingKey;
       }
       if (process.platform.toString() === 'win32') {
-        command = `${cliBin} targeting-key edit -i ${id} -d {\\"name\\":\\"${name}\\",\\"type\\":\\"${type}\\",\\"description\\":\\"${description}\\"}`;
+        command = `${cliBin} targeting-key edit -i ${id} -d {\\"name\\":\\"${targetingKey.name}\\",\\"type\\":\\"${targetingKey.type}\\",\\"description\\":\\"${targetingKey.description}\\"}`;
       } else {
-        command = `${cliBin} targeting-key edit -i ${id} -d '{"name":"${name}","type":"${type}","description":"${description}"}'`;
+        command = `${cliBin} targeting-key edit -i ${id} -d '{"name":"${targetingKey.name}","type":"${targetingKey.type}","description":"${targetingKey.description}"}'`;
       }
       const output = await this.exec(command, {});
       console.log(output);
@@ -403,7 +499,10 @@ export class Cli {
         vscode.window.showErrorMessage(output.stderr);
         return false;
       }
-      return true;
+      if (output.stdout.includes('deleted')) {
+        return true;
+      }
+      return false;
     } catch (err: any) {
       vscode.window.showErrorMessage(err.error);
       console.error(err);
@@ -431,24 +530,24 @@ export class Cli {
     }
   }
 
-  async CreateFlag(name: string, type: string, description: string, default_value: string): Promise<Flag> {
+  async CreateFlag(flag: Flag): Promise<Flag> {
     try {
       const cliBin = await this.CliBin();
       let command: string;
       if (!cliBin) {
         return {} as Flag;
       }
-      if (type === 'boolean') {
+      if (flag.type === 'boolean') {
         if (process.platform.toString() === 'win32') {
-          command = `${cliBin} flag create -d {\\"name\\":\\"${name}\\",\\"type\\":\\"${type}\\",\\"source\\":\\"cli\\",\\"description\\":\\"${description}\\"}`;
+          command = `${cliBin} flag create -d {\\"name\\":\\"${flag.name}\\",\\"type\\":\\"${flag.type}\\",\\"source\\":\\"cli\\",\\"description\\":\\"${flag.description}\\"}`;
         } else {
-          command = `${cliBin} flag create -d '{"name":"${name}","type":"${type}","source":"cli","description":"${description}"}'`;
+          command = `${cliBin} flag create -d '{"name":"${flag.name}","type":"${flag.type}","source":"cli","description":"${flag.description}"}'`;
         }
       } else {
         if (process.platform.toString() === 'win32') {
-          command = `${cliBin} flag create -d {\\"name\\":\\"${name}\\",\\"type\\":\\"${type}\\",\\"source\\":\\"cli\\",\\"description\\":\\"${description}\\",\\"default_value\\":\\"${default_value}\\"}`;
+          command = `${cliBin} flag create -d {\\"name\\":\\"${flag.name}\\",\\"type\\":\\"${flag.type}\\",\\"source\\":\\"cli\\",\\"description\\":\\"${flag.description}\\",\\"default_value\\":\\"${flag.default_value}\\"}`;
         } else {
-          command = `${cliBin} flag create -d '{"name":"${name}","type":"${type}","source":"cli","description":"${description}","default_value":"${default_value}"}'`;
+          command = `${cliBin} flag create -d '{"name":"${flag.name}","type":"${flag.type}","source":"cli","description":"${flag.description}","default_value":"${flag.default_value}"}'`;
         }
       }
 
@@ -466,24 +565,24 @@ export class Cli {
     }
   }
 
-  async EditFlag(id: string, name: string, type: string, description: string, default_value: string): Promise<Flag> {
+  async EditFlag(id: string, flag: Flag): Promise<Flag> {
     try {
       const cliBin = await this.CliBin();
       let command: string;
       if (!cliBin) {
         return {} as Flag;
       }
-      if (type === 'boolean') {
+      if (flag.type === 'boolean') {
         if (process.platform.toString() === 'win32') {
-          command = `${cliBin} flag edit -i ${id} -d {\\"name\\":\\"${name}\\",\\"type\\":\\"${type}\\",\\"source\\":\\"cli\\",\\"description\\":\\"${description}\\"}`;
+          command = `${cliBin} flag edit -i ${id} -d {\\"name\\":\\"${flag.name}\\",\\"type\\":\\"${flag.type}\\",\\"source\\":\\"cli\\",\\"description\\":\\"${flag.description}\\"}`;
         } else {
-          command = `${cliBin} flag edit -i ${id} -d '{"name":"${name}","type":"${type}","source":"cli","description":"${description}"}'`;
+          command = `${cliBin} flag edit -i ${id} -d '{"name":"${flag.name}","type":"${flag.type}","source":"cli","description":"${flag.description}"}'`;
         }
       } else {
         if (process.platform.toString() === 'win32') {
-          command = `${cliBin} flag edit -i ${id} -d {\\"name\\":\\"${name}\\",\\"type\\":\\"${type}\\",\\"source\\":\\"cli\\",\\"description\\":\\"${description}\\",\\"default_value\\":\\"${default_value}\\"}`;
+          command = `${cliBin} flag edit -i ${id} -d {\\"name\\":\\"${flag.name}\\",\\"type\\":\\"${flag.type}\\",\\"source\\":\\"cli\\",\\"description\\":\\"${flag.description}\\",\\"default_value\\":\\"${flag.default_value}\\"}`;
         } else {
-          command = `${cliBin} flag edit -i ${id} -d '{"name":"${name}","type":"${type}","source":"cli","description":"${description}","default_value":"${default_value}"}'`;
+          command = `${cliBin} flag edit -i ${id} -d '{"name":"${flag.name}","type":"${flag.type}","source":"cli","description":"${flag.description}","default_value":"${flag.default_value}"}'`;
         }
       }
 
@@ -517,7 +616,10 @@ export class Cli {
         vscode.window.showErrorMessage(output.stderr);
         return false;
       }
-      return true;
+      if (output.stdout.includes('deleted')) {
+        return true;
+      }
+      return false;
     } catch (err: any) {
       vscode.window.showErrorMessage(err.error);
       console.error(err);
@@ -636,7 +738,7 @@ export class Cli {
     }
   }
 
-  async switchCampaign(id: string, status: string): Promise<boolean> {
+  async SwitchCampaign(id: string, status: string): Promise<boolean> {
     try {
       const cliBin = await this.CliBin();
       if (!cliBin) {

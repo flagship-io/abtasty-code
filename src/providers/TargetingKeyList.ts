@@ -1,29 +1,40 @@
 import * as vscode from 'vscode';
-import { TARGETING_KEY_LIST_REFRESH } from '../commands/const';
-import { CURRENT_CONFIGURATION, PERMISSION_DENIED_PANEL } from '../const';
+import { TARGETING_KEY_LIST_LOAD, TARGETING_KEY_LIST_REFRESH } from '../commands/const';
+import { PERMISSION_DENIED_PANEL } from '../const';
 import { KEY } from '../icons';
-import { CredentialStore, ItemResource } from '../model';
-import { Cli } from './Cli';
+import { Configuration, ItemResource } from '../model';
+import { TargetingKeyStore } from '../store/TargetingKeyStore';
+import { GLOBAL_CURRENT_CONFIGURATION } from '../services/const';
 
 export class TargetingKeyListProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
   private _targetingKeyList: TargetingKeyItem[] = [];
-  private cli: Cli;
+  private targetingKeyStore: TargetingKeyStore;
 
   private _onDidChangeTreeData: vscode.EventEmitter<vscode.TreeItem | undefined | void> = new vscode.EventEmitter<
     vscode.TreeItem | undefined | void
   >();
   readonly onDidChangeTreeData: vscode.Event<vscode.TreeItem | undefined | void> = this._onDidChangeTreeData.event;
 
-  public constructor(private context: vscode.ExtensionContext, cli: Cli) {
+  public constructor(private context: vscode.ExtensionContext, targetingKeyStore: TargetingKeyStore) {
+    vscode.commands.registerCommand(TARGETING_KEY_LIST_LOAD, () => this.load());
     vscode.commands.registerCommand(TARGETING_KEY_LIST_REFRESH, async () => await this.refresh());
-    this.cli = cli;
+    this.targetingKeyStore = targetingKeyStore;
   }
 
   async refresh() {
     this._targetingKeyList = [];
-    const { scope } = this.context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+    const { scope } = this.context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
     if (scope?.includes('targeting_key.list')) {
-      await this.getTargetingKeys();
+      await this.getRefreshedTargetingKeys();
+    }
+    this._onDidChangeTreeData.fire();
+  }
+
+  load() {
+    this._targetingKeyList = [];
+    const { scope } = this.context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
+    if (scope?.includes('targeting_key.list')) {
+      this.getLoadedTargetingKeys();
     }
     this._onDidChangeTreeData.fire();
   }
@@ -34,7 +45,7 @@ export class TargetingKeyListProvider implements vscode.TreeDataProvider<vscode.
 
   getChildren(element?: vscode.TreeItem): vscode.ProviderResult<vscode.TreeItem[]> {
     const items: vscode.TreeItem[] = [];
-    const { scope } = this.context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+    const { scope } = this.context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
 
     if (!scope?.includes('targeting_key.list')) {
       return [new vscode.TreeItem(PERMISSION_DENIED_PANEL)];
@@ -61,8 +72,22 @@ export class TargetingKeyListProvider implements vscode.TreeDataProvider<vscode.
     return items;
   }
 
-  private async getTargetingKeys() {
-    const targetingKeyList = await this.cli.ListTargetingKey();
+  private async getRefreshedTargetingKeys() {
+    const targetingKeyList = await this.targetingKeyStore.refreshTargetingKey();
+    targetingKeyList.map((tk) => {
+      const targetingKey = new TargetingKeyItem(
+        tk.id,
+        tk.name,
+        tk.type,
+        tk.description,
+        vscode.TreeItemCollapsibleState.Collapsed,
+      );
+      this._targetingKeyList.push(targetingKey);
+    });
+  }
+
+  private getLoadedTargetingKeys() {
+    const targetingKeyList = this.targetingKeyStore.loadTargetingKey();
     targetingKeyList.map((tk) => {
       const targetingKey = new TargetingKeyItem(
         tk.id,

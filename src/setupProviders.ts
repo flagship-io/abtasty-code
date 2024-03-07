@@ -1,12 +1,12 @@
 import * as vscode from 'vscode';
-import { Configuration } from './configuration';
+import { StateConfiguration } from './stateConfiguration';
 import { Cli } from './providers/Cli';
 import { QuickAccessListProvider } from './providers/QuickAccessList';
-import { deleteFlagBox, flagInputBox } from './menu/FlagMenu';
+import { deleteFlagInputBox, flagInputBox } from './menu/FlagMenu';
 import { FlagItem, FlagListProvider } from './providers/FlagList';
 import {
   deleteCampaignBox,
-  deleteProjectBox,
+  deleteProjectInputBox,
   deleteVariationBox,
   deleteVariationGroupBox,
   projectInputBox,
@@ -19,9 +19,9 @@ import {
   VariationItem,
 } from './providers/ProjectList';
 import { FileAnalyzedProvider, FlagAnalyzed } from './providers/FlagAnalyzeList';
-import { deleteTargetingKeyBox, targetingKeyInputBox } from './menu/TargetingKeyMenu';
+import { deleteTargetingKeyInputBox, targetingKeyInputBox } from './menu/TargetingKeyMenu';
 import { TargetingKeyItem, TargetingKeyListProvider } from './providers/TargetingKeyList';
-import { deleteGoalBox, goalInputBox } from './menu/GoalMenu';
+import { deleteGoalInputBox, goalInputBox } from './menu/GoalMenu';
 import { GoalItem, GoalListProvider } from './providers/GoalList';
 import FlagshipCompletionProvider from './providers/FlagshipCompletion';
 import FlagshipHoverProvider from './providers/FlagshipHover';
@@ -41,26 +41,31 @@ import {
   FLAG_LIST_COPY,
   FLAG_LIST_DELETE,
   FLAG_LIST_EDIT,
-  FLAG_LIST_REFRESH,
+  FLAG_LIST_LOAD,
   GOAL_LIST_DELETE,
   GOAL_LIST_EDIT,
-  GOAL_LIST_REFRESH,
+  GOAL_LIST_LOAD,
   LIST_FLAG_IN_WORKSPACE,
   PROJECT_LIST_COPY,
   PROJECT_LIST_DELETE,
   PROJECT_LIST_EDIT,
-  PROJECT_LIST_REFRESH,
+  PROJECT_LIST_LOAD,
   SET_CONTEXT,
   TARGETING_KEY_LIST_DELETE,
   TARGETING_KEY_LIST_EDIT,
-  TARGETING_KEY_LIST_REFRESH,
+  TARGETING_KEY_LIST_LOAD,
   VARIATION_GROUP_LIST_COPY,
   VARIATION_GROUP_LIST_DELETE,
   VARIATION_LIST_COPY,
   VARIATION_LIST_DELETE,
 } from './commands/const';
-import { CURRENT_CONFIGURATION, DEFAULT_BASE_URI, PERMISSION_DENIED } from './const';
-import { CredentialStore, Scope } from './model';
+import { DEFAULT_BASE_URI, PERMISSION_DENIED } from './const';
+import { Configuration, Scope } from './model';
+import { FlagStore } from './store/FlagStore';
+import { ProjectStore } from './store/ProjectStore';
+import { TargetingKeyStore } from './store/TargetingKeyStore';
+import { GoalStore } from './store/GoalStore';
+import { GLOBAL_CURRENT_CONFIGURATION } from './services/const';
 
 const documentSelector: vscode.DocumentSelector = [
   {
@@ -149,29 +154,34 @@ export const rootPath =
     ? vscode.workspace.workspaceFolders[0].uri.fsPath
     : undefined;
 
-export async function setupProviders(context: vscode.ExtensionContext, config: Configuration, cli: Cli) {
-  const configured = await context.workspaceState.get('FSConfigured');
+export async function setupProviders(context: vscode.ExtensionContext, stateConfig: StateConfiguration, cli: Cli) {
+  const configured = await context.globalState.get('FSConfigured');
+
+  const flagStore = new FlagStore(context, cli);
+  const projectStore = new ProjectStore(context, cli);
+  const targetingKeyStore = new TargetingKeyStore(context, cli);
+  const goalStore = new GoalStore(context, cli);
 
   if (configured === true) {
     await vscode.commands.executeCommand(SET_CONTEXT, 'flagship:enableFlagshipExplorer', true);
   }
 
-  const quickAccessView = new QuickAccessListProvider(config);
+  const quickAccessView = new QuickAccessListProvider(stateConfig);
   const quickAccessProvider = vscode.window.registerTreeDataProvider('quickAccess', quickAccessView);
 
   const fileAnalyzedProvider = new FileAnalyzedProvider(context, rootPath, cli);
   const flagFileProvider = vscode.window.registerTreeDataProvider('flagsInFile', fileAnalyzedProvider);
 
-  const projectProvider = new ProjectListProvider(context, cli);
+  const projectProvider = new ProjectListProvider(context, projectStore);
   vscode.window.registerTreeDataProvider('projectList', projectProvider);
 
-  const flagListProvider = new FlagListProvider(context, cli);
+  const flagListProvider = new FlagListProvider(context, flagStore);
   vscode.window.registerTreeDataProvider('flagList', flagListProvider);
 
-  const targetingKeyProvider = new TargetingKeyListProvider(context, cli);
+  const targetingKeyProvider = new TargetingKeyListProvider(context, targetingKeyStore);
   vscode.window.registerTreeDataProvider('targetingKeyList', targetingKeyProvider);
 
-  const goalProvider = new GoalListProvider(context, cli);
+  const goalProvider = new GoalListProvider(context, goalStore);
   vscode.window.registerTreeDataProvider('goalList', goalProvider);
 
   await Promise.all([
@@ -204,11 +214,11 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
   });
 
   const createProject = vscode.commands.registerCommand(FLAGSHIP_CREATE_PROJECT, async () => {
-    const { scope } = context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+    const { scope } = context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
     if (scope?.includes('project.create')) {
       const project = new ProjectItem();
-      await projectInputBox(context, project, cli);
-      await vscode.commands.executeCommand(PROJECT_LIST_REFRESH);
+      await projectInputBox(project, projectStore);
+      await vscode.commands.executeCommand(PROJECT_LIST_LOAD);
       return;
     }
     vscode.window.showWarningMessage(PERMISSION_DENIED);
@@ -218,18 +228,19 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
   /*   const createCampaign = vscode.commands.registerCommand(CAMPAIGN_LIST_ADD_CAMPAIGN, async (project: ProjectItem) => {
     await cli.CreateCampaign(project.id!);
     await vscode.commands.executeCommand(PROJECT_LIST_REFRESH);
-  }); */
+  }); 
+  */
 
   const createFlag = vscode.commands.registerCommand(FLAGSHIP_CREATE_FLAG, async (flagKey: string | undefined) => {
-    const { scope } = context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+    const { scope } = context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
 
     if (scope?.includes('flag.create')) {
       const flag = new FlagItem();
       if (flagKey) {
         flag.key = flagKey;
       }
-      await flagInputBox(context, flag, cli);
-      await vscode.commands.executeCommand(FLAG_LIST_REFRESH);
+      await flagInputBox(flag, flagStore);
+      await vscode.commands.executeCommand(FLAG_LIST_LOAD);
       return;
     }
     vscode.window.showWarningMessage(PERMISSION_DENIED);
@@ -237,11 +248,11 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
   });
 
   const createTargetingKey = vscode.commands.registerCommand(FLAGSHIP_CREATE_TARGETING_KEY, async () => {
-    const { scope } = context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+    const { scope } = context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
     if (scope?.includes('targeting_key.create')) {
       const targetingKey = new TargetingKeyItem();
-      await targetingKeyInputBox(context, targetingKey, cli);
-      await vscode.commands.executeCommand(TARGETING_KEY_LIST_REFRESH);
+      await targetingKeyInputBox(targetingKey, targetingKeyStore);
+      await vscode.commands.executeCommand(TARGETING_KEY_LIST_LOAD);
       return;
     }
     vscode.window.showWarningMessage(PERMISSION_DENIED);
@@ -249,11 +260,11 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
   });
 
   const createGoal = vscode.commands.registerCommand(FLAGSHIP_CREATE_GOAL, async () => {
-    const { scope } = context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+    const { scope } = context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
     if (scope?.includes('goal.create')) {
       const goal = new GoalItem();
-      await goalInputBox(context, goal, cli);
-      await vscode.commands.executeCommand(GOAL_LIST_REFRESH);
+      await goalInputBox(goal, goalStore);
+      await vscode.commands.executeCommand(GOAL_LIST_LOAD);
       return;
     }
     vscode.window.showWarningMessage(PERMISSION_DENIED);
@@ -265,11 +276,12 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
       vscode.env.clipboard.writeText(project.id!);
       vscode.window.showInformationMessage(`[Flagship] Project: ${project.name}'s ID copied to your clipboard.`);
     }),
+
     vscode.commands.registerCommand(PROJECT_LIST_EDIT, async (project: ProjectItem) => {
-      const { scope } = context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+      const { scope } = context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
       if (scope?.includes('project.update')) {
-        await projectInputBox(context, project, cli);
-        await vscode.commands.executeCommand(PROJECT_LIST_REFRESH);
+        await projectInputBox(project, projectStore);
+        await vscode.commands.executeCommand(PROJECT_LIST_LOAD);
         return;
       }
       vscode.window.showWarningMessage(PERMISSION_DENIED);
@@ -277,10 +289,10 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
     }),
 
     vscode.commands.registerCommand(PROJECT_LIST_DELETE, async (project: ProjectItem) => {
-      const { scope } = context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+      const { scope } = context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
       if (scope?.includes('project.delete')) {
-        await deleteProjectBox(context, project, cli);
-        await vscode.commands.executeCommand(PROJECT_LIST_REFRESH);
+        await deleteProjectInputBox(project, projectStore);
+        await vscode.commands.executeCommand(PROJECT_LIST_LOAD);
         return;
       }
       vscode.window.showWarningMessage(PERMISSION_DENIED);
@@ -295,15 +307,18 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
     }),
 
     vscode.commands.registerCommand(CAMPAIGN_LIST_OPEN_IN_BROWSER, async (campaign: CampaignItem) => {
-      const { accountEnvId } = (await context.workspaceState.get(CURRENT_CONFIGURATION)) as CredentialStore;
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      const { account_environment_id } = (await context.globalState.get(GLOBAL_CURRENT_CONFIGURATION)) as Configuration;
       await vscode.env.openExternal(
-        vscode.Uri.parse(`${DEFAULT_BASE_URI}/env/${accountEnvId}/report/${campaign.type}/${campaign.id}/details`),
+        vscode.Uri.parse(
+          `${DEFAULT_BASE_URI}/env/${account_environment_id}/report/${campaign.type}/${campaign.id}/details`,
+        ),
       );
     }),
 
     vscode.commands.registerCommand(CAMPAIGN_LIST_DELETE, async (campaign: CampaignItem) => {
       await deleteCampaignBox(context, campaign, cli);
-      await vscode.commands.executeCommand(PROJECT_LIST_REFRESH);
+      await vscode.commands.executeCommand(PROJECT_LIST_LOAD);
     }),
   ];
 
@@ -317,7 +332,7 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
 
     vscode.commands.registerCommand(VARIATION_GROUP_LIST_DELETE, async (variationGroup: VariationGroupItem) => {
       await deleteVariationGroupBox(context, variationGroup, cli);
-      await vscode.commands.executeCommand(PROJECT_LIST_REFRESH);
+      await vscode.commands.executeCommand(PROJECT_LIST_LOAD);
     }),
   ];
 
@@ -329,7 +344,7 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
 
     vscode.commands.registerCommand(VARIATION_LIST_DELETE, async (variation: VariationItem) => {
       await deleteVariationBox(context, variation, cli);
-      await vscode.commands.executeCommand(PROJECT_LIST_REFRESH);
+      await vscode.commands.executeCommand(PROJECT_LIST_LOAD);
     }),
   ];
 
@@ -338,26 +353,29 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
       vscode.env.clipboard.writeText(flag.key!);
       vscode.window.showInformationMessage(`[Flagship] Flag: ${flag.key} copied to your clipboard.`);
     }),
+
     vscode.commands.registerCommand(FLAG_LIST_EDIT, async (flag: FlagItem) => {
-      const { scope } = context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+      const { scope } = context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
       if (scope?.includes('flag.update')) {
-        await flagInputBox(context, flag, cli);
-        await vscode.commands.executeCommand(FLAG_LIST_REFRESH);
+        await flagInputBox(flag, flagStore);
+        await vscode.commands.executeCommand(FLAG_LIST_LOAD);
         return;
       }
       vscode.window.showWarningMessage(PERMISSION_DENIED);
       return;
     }),
+
     vscode.commands.registerCommand(FLAG_LIST_DELETE, async (flag: FlagItem) => {
-      const { scope } = context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+      const { scope } = context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
       if (scope?.includes('flag.delete')) {
-        await deleteFlagBox(context, flag, cli);
-        await vscode.commands.executeCommand(FLAG_LIST_REFRESH);
+        await deleteFlagInputBox(flag, flagStore);
+        await vscode.commands.executeCommand(FLAG_LIST_LOAD);
         return;
       }
       vscode.window.showWarningMessage(PERMISSION_DENIED);
       return;
     }),
+
     vscode.commands.registerCommand(FIND_IN_FILE, async (flagInFile: FlagAnalyzed) => {
       vscode.workspace
         .openTextDocument(flagInFile.file)
@@ -369,18 +387,20 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
           activeEditor!.revealRange(range);
         });
     }),
+
     vscode.commands.registerCommand(ADD_FLAG, async (flagInFile: FlagAnalyzed) => {
-      const { scope } = context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+      const { scope } = context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
       if (scope?.includes('flag.create')) {
         const flag = new FlagItem();
         flag.key = flagInFile.flagKey;
-        await flagInputBox(context, flag, cli);
-        await vscode.commands.executeCommand(FLAG_LIST_REFRESH);
+        await flagInputBox(flag, flagStore);
+        await vscode.commands.executeCommand(FLAG_LIST_LOAD);
         return;
       }
       vscode.window.showWarningMessage(PERMISSION_DENIED);
       return;
     }),
+
     vscode.commands.registerCommand(LIST_FLAG_IN_WORKSPACE, async () => {
       await vscode.commands.executeCommand(FLAG_IN_FILE_REFRESH, rootPath, true);
     }),
@@ -388,20 +408,21 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
 
   const targetingKeyDisposables = [
     vscode.commands.registerCommand(TARGETING_KEY_LIST_EDIT, async (targetingKey: TargetingKeyItem) => {
-      const { scope } = context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
-      if (scope?.includes('targetong_key.update')) {
-        await targetingKeyInputBox(context, targetingKey, cli);
-        await vscode.commands.executeCommand(TARGETING_KEY_LIST_REFRESH);
+      const { scope } = context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
+      if (scope?.includes('targeting_key.update')) {
+        await targetingKeyInputBox(targetingKey, targetingKeyStore);
+        await vscode.commands.executeCommand(TARGETING_KEY_LIST_LOAD);
         return;
       }
       vscode.window.showWarningMessage(PERMISSION_DENIED);
       return;
     }),
+
     vscode.commands.registerCommand(TARGETING_KEY_LIST_DELETE, async (targetingKey: TargetingKeyItem) => {
-      const { scope } = context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+      const { scope } = context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
       if (scope?.includes('targeting_key.delete')) {
-        await deleteTargetingKeyBox(context, targetingKey, cli);
-        await vscode.commands.executeCommand(TARGETING_KEY_LIST_REFRESH);
+        await deleteTargetingKeyInputBox(targetingKey, targetingKeyStore);
+        await vscode.commands.executeCommand(TARGETING_KEY_LIST_LOAD);
         return;
       }
       vscode.window.showWarningMessage(PERMISSION_DENIED);
@@ -411,10 +432,10 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
 
   const goalDispoables = [
     vscode.commands.registerCommand(GOAL_LIST_EDIT, async (goal: GoalItem) => {
-      const { scope } = context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+      const { scope } = context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
       if (scope?.includes('goal.update')) {
-        await goalInputBox(context, goal, cli);
-        await vscode.commands.executeCommand(GOAL_LIST_REFRESH);
+        await goalInputBox(goal, goalStore);
+        await vscode.commands.executeCommand(GOAL_LIST_LOAD);
         return;
       }
       vscode.window.showWarningMessage(PERMISSION_DENIED);
@@ -422,10 +443,10 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
     }),
 
     vscode.commands.registerCommand(GOAL_LIST_DELETE, async (goal: GoalItem) => {
-      const { scope } = context.workspaceState.get(CURRENT_CONFIGURATION) as CredentialStore;
+      const { scope } = context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
       if (scope?.includes('goal.delete')) {
-        await deleteGoalBox(context, goal, cli);
-        await vscode.commands.executeCommand(GOAL_LIST_REFRESH);
+        await deleteGoalInputBox(goal, goalStore);
+        await vscode.commands.executeCommand(GOAL_LIST_LOAD);
         return;
       }
       vscode.window.showWarningMessage(PERMISSION_DENIED);
@@ -439,7 +460,7 @@ export async function setupProviders(context: vscode.ExtensionContext, config: C
     "'",
     '"',
   );
-  vscode.languages.registerHoverProvider(documentSelector, new FlagshipHoverProvider(context, cli, config));
+  vscode.languages.registerHoverProvider(documentSelector, new FlagshipHoverProvider(context, cli, stateConfig));
 
   /* const codelensProvider = new CodelensProvider();
 

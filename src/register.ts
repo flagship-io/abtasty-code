@@ -1,17 +1,17 @@
 import * as vscode from 'vscode';
-import { Configuration } from './configuration';
+import { StateConfiguration } from './stateConfiguration';
 import configureFlagshipCmd from './commands/configureFlagship';
 import clearConfigCmd from './commands/clearConfig';
 import { extensionReload } from './extensionReload';
 import checkCliVersionCmd from './commands/checkCliVersion';
 import { Cli } from './providers/Cli';
 
-export async function register(context: vscode.ExtensionContext, config: Configuration): Promise<void> {
+export async function register(context: vscode.ExtensionContext, stateConfig: StateConfiguration): Promise<void> {
   const cli = new Cli(context);
   await Promise.all([
-    configureFlagshipCmd(context, config, cli),
-    clearConfigCmd(context, config),
+    configureFlagshipCmd(context, cli),
+    clearConfigCmd(context, stateConfig),
     checkCliVersionCmd(context, cli),
-    extensionReload(context, config, cli),
+    extensionReload(context, stateConfig, cli),
   ]);
 }
