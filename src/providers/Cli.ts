@@ -3,7 +3,17 @@
 import * as vscode from 'vscode';
 import { exec, ExecOptions } from 'child_process';
 import { join } from 'path';
-import { Campaign, Configuration, FileAnalyzedType, Flag, Goal, Project, TargetingKey, TokenInfo } from '../model';
+import {
+  Authentication,
+  Campaign,
+  Configuration,
+  FileAnalyzedType,
+  Flag,
+  Goal,
+  Project,
+  TargetingKey,
+  TokenInfo,
+} from '../model';
 import { CliVersion } from '../cli/cliDownloader';
 import * as fs from 'fs';
 export class Cli {
@@ -33,13 +43,13 @@ export class Cli {
   async CliBin(): Promise<string> {
     try {
       if (process.platform.toString() === 'win32') {
-        return `${this.context.asAbsolutePath('flagship')}\\${CliVersion}\\flagship.exe`;
+        return `${this.context.asAbsolutePath('abtasty-cli')}\\${CliVersion}\\abtasty-cli.exe`;
       }
       if (process.platform.toString() === 'darwin') {
-        return `${this.context.asAbsolutePath('flagship')}/${CliVersion}/flagship`;
+        return `${this.context.asAbsolutePath('abtasty-cli')}/${CliVersion}/abtasty-cli`;
       }
-      await fs.promises.access(join(this.context.asAbsolutePath('flagship'), `${CliVersion}/flagship`));
-      return `${this.context.asAbsolutePath('flagship')}/${CliVersion}/flagship`;
+      await fs.promises.access(join(this.context.asAbsolutePath('abtasty-cli'), `${CliVersion}/abtasty-cli`));
+      return `${this.context.asAbsolutePath('abtasty-cli')}/${CliVersion}/abtasty-cli`;
     } catch (err: any) {
       console.error(err);
       return err.error;
@@ -64,6 +74,52 @@ export class Cli {
       vscode.window.showErrorMessage(err.error);
       console.error(err);
       return '';
+    }
+  }
+
+  async LoginAuth(authentication: Authentication): Promise<boolean> {
+    try {
+      const cliBin = await this.CliBin();
+      if (!cliBin) {
+        return false;
+      }
+      const command = `${cliBin} feature-experimentation auth login -u ${authentication.username} -i ${authentication.client_id} -s ${authentication.client_secret} -a ${authentication.account_id}`;
+      const output = await this.exec(command, {});
+      console.log(output);
+
+      if (output.stderr) {
+        vscode.window.showErrorMessage(output.stderr);
+        return false;
+      }
+
+      if (output.stdout.includes('exists')) {
+        vscode.window.showErrorMessage(output.stdout);
+        return false;
+      }
+
+      return true;
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return false;
+    }
+  }
+
+  async DeleteAuth(username: string): Promise<boolean> {
+    try {
+      const cliBin = await this.CliBin();
+      if (!cliBin) {
+        return false;
+      }
+
+      let command = `${cliBin} feature-experimentation auth delete -n ${username}`;
+      const output = await this.exec(command, {});
+      console.log(output);
+      return true;
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return false;
     }
   }
 
@@ -105,7 +161,7 @@ export class Cli {
         newConfiguration.account_environment_id ||
         newConfiguration.account_id
       ) {
-        let command = `${cliBin} configuration edit -n ${name}`;
+        let command = `${cliBin} feature-experimentation configuration edit -n ${name}`;
 
         if (newConfiguration.client_id) {
           command += `\u0020-i ${newConfiguration.client_id}`;
@@ -143,7 +199,7 @@ export class Cli {
         return false;
       }
 
-      let command = `${cliBin} configuration delete -n ${name}`;
+      let command = `${cliBin} feature-experimentation configuration delete -n ${name}`;
       const output = await this.exec(command, {});
       console.log(output);
       return true;
@@ -161,7 +217,7 @@ export class Cli {
         return false;
       }
 
-      let command = `${cliBin} configuration use -n ${name}`;
+      let command = `${cliBin} feature-experimentation configuration use -n ${name}`;
       const output = await this.exec(command, {});
       console.log(output);
       if (output.stderr) {
@@ -182,7 +238,7 @@ export class Cli {
       if (!cliBin) {
         return [];
       }
-      const command = `${cliBin} configuration list --output-format json`;
+      const command = `${cliBin} feature-experimentation authentication list --output-format json`;
       const output = await this.exec(command, {});
       if (output.stderr) {
         vscode.window.showErrorMessage(output.stderr);
@@ -202,7 +258,7 @@ export class Cli {
       if (!cliBin) {
         return {} as Configuration;
       }
-      const command = `${cliBin} configuration current --output-format json`;
+      const command = `${cliBin} feature-experimentation authentication current --output-format json`;
       const output = await this.exec(command, {});
       if (output.stderr) {
         vscode.window.showErrorMessage(output.stderr);
@@ -222,7 +278,7 @@ export class Cli {
       if (!cliBin) {
         return {} as Project;
       }
-      const command = `${cliBin} project create -n "${project.name}"`;
+      const command = `${cliBin} feature-experimentation project create -n "${project.name}"`;
       const output = await this.exec(command, {});
       console.log(output);
       if (output.stderr) {
@@ -243,7 +299,7 @@ export class Cli {
       if (!cliBin) {
         return {} as Project;
       }
-      const command = `${cliBin} project edit -i ${id} -n "${project.name}"`;
+      const command = `${cliBin} feature-experimentation project edit -i ${id} -n "${project.name}"`;
       const output = await this.exec(command, {});
       console.log(output);
       if (output.stderr) {
@@ -264,7 +320,7 @@ export class Cli {
       if (!cliBin) {
         return false;
       }
-      const command = `${cliBin} project delete -i ${id}`;
+      const command = `${cliBin} feature-experimentation project delete -i ${id}`;
       const output = await this.exec(command, {});
       console.log(output);
       if (output.stderr) {
@@ -288,7 +344,7 @@ export class Cli {
       if (!cliBin) {
         return [];
       }
-      const command = `${cliBin} project list --output-format json`;
+      const command = `${cliBin} feature-experimentation project list --output-format json`;
       const output = await this.exec(command, {});
       if (output.stderr) {
         vscode.window.showErrorMessage(output.stderr);
@@ -308,7 +364,7 @@ export class Cli {
       if (!cliBin) {
         return false;
       }
-      const command = `${cliBin} project switch -i ${id} -s ${status}`;
+      const command = `${cliBin} feature-experimentation project switch -i ${id} -s ${status}`;
       const output = await this.exec(command, {});
       if (output.stderr) {
         vscode.window.showErrorMessage(output.stderr);
@@ -331,15 +387,15 @@ export class Cli {
       }
       if (process.platform.toString() === 'win32') {
         if (goal.operator && goal.value) {
-          command = `${cliBin} goal create -d {\\"label\\":\\"${goal.label}\\",\\"type\\":\\"${goal.type}\\",\\"operator\\":\\"${goal.operator}\\",\\"value\\":\\"${goal.value}\\"}`;
+          command = `${cliBin} feature-experimentation goal create -d {\\"label\\":\\"${goal.label}\\",\\"type\\":\\"${goal.type}\\",\\"operator\\":\\"${goal.operator}\\",\\"value\\":\\"${goal.value}\\"}`;
         } else {
-          command = `${cliBin} goal create -d {\\"label\\":\\"${goal.label}\\",\\"type\\":\\"${goal.type}\\"}`;
+          command = `${cliBin} feature-experimentation goal create -d {\\"label\\":\\"${goal.label}\\",\\"type\\":\\"${goal.type}\\"}`;
         }
       } else {
         if (goal.operator && goal.value) {
-          command = `${cliBin} goal create -d '{"label":"${goal.label}","type":"${goal.type}","operator":"${goal.operator}","value":"${goal.value}"}'`;
+          command = `${cliBin} feature-experimentation goal create -d '{"label":"${goal.label}","type":"${goal.type}","operator":"${goal.operator}","value":"${goal.value}"}'`;
         } else {
-          command = `${cliBin} goal create -d '{"label":"${goal.label}","type":"${goal.type}"}'`;
+          command = `${cliBin} feature-experimentation goal create -d '{"label":"${goal.label}","type":"${goal.type}"}'`;
         }
       }
       const output = await this.exec(command, {});
@@ -365,15 +421,15 @@ export class Cli {
       }
       if (process.platform.toString() === 'win32') {
         if (goal.operator && goal.value) {
-          command = `${cliBin} goal edit -i ${id} -d {\\"label\\":\\"${goal.label}\\",\\"operator\\":\\"${goal.operator}\\",\\"value\\":\\"${goal.value}\\"}`;
+          command = `${cliBin} feature-experimentation goal edit -i ${id} -d {\\"label\\":\\"${goal.label}\\",\\"operator\\":\\"${goal.operator}\\",\\"value\\":\\"${goal.value}\\"}`;
         } else {
-          command = `${cliBin} goal edit -i ${id} -d {\\"label\\":\\"${goal.label}\\"}`;
+          command = `${cliBin} feature-experimentation goal edit -i ${id} -d {\\"label\\":\\"${goal.label}\\"}`;
         }
       } else {
         if (goal.operator && goal.value) {
-          command = `${cliBin} goal edit -i ${id} -d '{"label":"${goal.label}","operator":"${goal.operator}","value":"${goal.value}"}'`;
+          command = `${cliBin} feature-experimentation goal edit -i ${id} -d '{"label":"${goal.label}","operator":"${goal.operator}","value":"${goal.value}"}'`;
         } else {
-          command = `${cliBin} goal edit -i ${id} -d '{"label":"${goal.label}"}'`;
+          command = `${cliBin} feature-experimentation goal edit -i ${id} -d '{"label":"${goal.label}"}'`;
         }
       }
       const output = await this.exec(command, {});
@@ -396,7 +452,7 @@ export class Cli {
       if (!cliBin) {
         return false;
       }
-      const command = `${cliBin} goal delete -i ${id}`;
+      const command = `${cliBin} feature-experimentation goal delete -i ${id}`;
       const output = await this.exec(command, {});
       console.log(output);
       if (output.stderr) {
@@ -420,7 +476,7 @@ export class Cli {
       if (!cliBin) {
         return [];
       }
-      const command = `${cliBin} goal list --output-format json`;
+      const command = `${cliBin} feature-experimentation goal list --output-format json`;
       const output = await this.exec(command, {});
       if (output.stderr) {
         vscode.window.showErrorMessage(output.stderr);
@@ -442,9 +498,9 @@ export class Cli {
         return {} as TargetingKey;
       }
       if (process.platform.toString() === 'win32') {
-        command = `${cliBin} targeting-key create -d {\\"name\\":\\"${targetingKey.name}\\",\\"type\\":\\"${targetingKey.type}\\",\\"description\\":\\"${targetingKey.description}\\"}`;
+        command = `${cliBin} feature-experimentation targeting-key create -d {\\"name\\":\\"${targetingKey.name}\\",\\"type\\":\\"${targetingKey.type}\\",\\"description\\":\\"${targetingKey.description}\\"}`;
       } else {
-        command = `${cliBin} targeting-key create -d '{"name":"${targetingKey.name}","type":"${targetingKey.type}","description":"${targetingKey.description}"}'`;
+        command = `${cliBin} feature-experimentation targeting-key create -d '{"name":"${targetingKey.name}","type":"${targetingKey.type}","description":"${targetingKey.description}"}'`;
       }
       const output = await this.exec(command, {});
       console.log(output);
@@ -468,9 +524,9 @@ export class Cli {
         return {} as TargetingKey;
       }
       if (process.platform.toString() === 'win32') {
-        command = `${cliBin} targeting-key edit -i ${id} -d {\\"name\\":\\"${targetingKey.name}\\",\\"type\\":\\"${targetingKey.type}\\",\\"description\\":\\"${targetingKey.description}\\"}`;
+        command = `${cliBin} feature-experimentation targeting-key edit -i ${id} -d {\\"name\\":\\"${targetingKey.name}\\",\\"type\\":\\"${targetingKey.type}\\",\\"description\\":\\"${targetingKey.description}\\"}`;
       } else {
-        command = `${cliBin} targeting-key edit -i ${id} -d '{"name":"${targetingKey.name}","type":"${targetingKey.type}","description":"${targetingKey.description}"}'`;
+        command = `${cliBin} feature-experimentation targeting-key edit -i ${id} -d '{"name":"${targetingKey.name}","type":"${targetingKey.type}","description":"${targetingKey.description}"}'`;
       }
       const output = await this.exec(command, {});
       console.log(output);
@@ -492,7 +548,7 @@ export class Cli {
       if (!cliBin) {
         return false;
       }
-      const command = `${cliBin} targeting-key delete -i ${id}`;
+      const command = `${cliBin} feature-experimentation targeting-key delete -i ${id}`;
       const output = await this.exec(command, {});
       console.log(output);
       if (output.stderr) {
@@ -516,7 +572,7 @@ export class Cli {
       if (!cliBin) {
         return [];
       }
-      const command = `${cliBin} targeting-key list --output-format json`;
+      const command = `${cliBin} feature-experimentation targeting-key list --output-format json`;
       const output = await this.exec(command, {});
       if (output.stderr) {
         vscode.window.showErrorMessage(output.stderr);
@@ -539,15 +595,15 @@ export class Cli {
       }
       if (flag.type === 'boolean') {
         if (process.platform.toString() === 'win32') {
-          command = `${cliBin} flag create -d {\\"name\\":\\"${flag.name}\\",\\"type\\":\\"${flag.type}\\",\\"source\\":\\"cli\\",\\"description\\":\\"${flag.description}\\"}`;
+          command = `${cliBin} feature-experimentation flag create -d {\\"name\\":\\"${flag.name}\\",\\"type\\":\\"${flag.type}\\",\\"source\\":\\"cli\\",\\"description\\":\\"${flag.description}\\"}`;
         } else {
-          command = `${cliBin} flag create -d '{"name":"${flag.name}","type":"${flag.type}","source":"cli","description":"${flag.description}"}'`;
+          command = `${cliBin} feature-experimentation flag create -d '{"name":"${flag.name}","type":"${flag.type}","source":"cli","description":"${flag.description}"}'`;
         }
       } else {
         if (process.platform.toString() === 'win32') {
-          command = `${cliBin} flag create -d {\\"name\\":\\"${flag.name}\\",\\"type\\":\\"${flag.type}\\",\\"source\\":\\"cli\\",\\"description\\":\\"${flag.description}\\",\\"default_value\\":\\"${flag.default_value}\\"}`;
+          command = `${cliBin} feature-experimentation flag create -d {\\"name\\":\\"${flag.name}\\",\\"type\\":\\"${flag.type}\\",\\"source\\":\\"cli\\",\\"description\\":\\"${flag.description}\\",\\"default_value\\":\\"${flag.default_value}\\"}`;
         } else {
-          command = `${cliBin} flag create -d '{"name":"${flag.name}","type":"${flag.type}","source":"cli","description":"${flag.description}","default_value":"${flag.default_value}"}'`;
+          command = `${cliBin} feature-experimentation flag create -d '{"name":"${flag.name}","type":"${flag.type}","source":"cli","description":"${flag.description}","default_value":"${flag.default_value}"}'`;
         }
       }
 
@@ -574,15 +630,15 @@ export class Cli {
       }
       if (flag.type === 'boolean') {
         if (process.platform.toString() === 'win32') {
-          command = `${cliBin} flag edit -i ${id} -d {\\"name\\":\\"${flag.name}\\",\\"type\\":\\"${flag.type}\\",\\"source\\":\\"cli\\",\\"description\\":\\"${flag.description}\\"}`;
+          command = `${cliBin} feature-experimentation flag edit -i ${id} -d {\\"name\\":\\"${flag.name}\\",\\"type\\":\\"${flag.type}\\",\\"source\\":\\"cli\\",\\"description\\":\\"${flag.description}\\"}`;
         } else {
-          command = `${cliBin} flag edit -i ${id} -d '{"name":"${flag.name}","type":"${flag.type}","source":"cli","description":"${flag.description}"}'`;
+          command = `${cliBin} feature-experimentation flag edit -i ${id} -d '{"name":"${flag.name}","type":"${flag.type}","source":"cli","description":"${flag.description}"}'`;
         }
       } else {
         if (process.platform.toString() === 'win32') {
-          command = `${cliBin} flag edit -i ${id} -d {\\"name\\":\\"${flag.name}\\",\\"type\\":\\"${flag.type}\\",\\"source\\":\\"cli\\",\\"description\\":\\"${flag.description}\\",\\"default_value\\":\\"${flag.default_value}\\"}`;
+          command = `${cliBin} feature-experimentation flag edit -i ${id} -d {\\"name\\":\\"${flag.name}\\",\\"type\\":\\"${flag.type}\\",\\"source\\":\\"cli\\",\\"description\\":\\"${flag.description}\\",\\"default_value\\":\\"${flag.default_value}\\"}`;
         } else {
-          command = `${cliBin} flag edit -i ${id} -d '{"name":"${flag.name}","type":"${flag.type}","source":"cli","description":"${flag.description}","default_value":"${flag.default_value}"}'`;
+          command = `${cliBin} feature-experimentation flag edit -i ${id} -d '{"name":"${flag.name}","type":"${flag.type}","source":"cli","description":"${flag.description}","default_value":"${flag.default_value}"}'`;
         }
       }
 
@@ -608,7 +664,7 @@ export class Cli {
         return false;
       }
 
-      command = `${cliBin} flag delete -i ${id}`;
+      command = `${cliBin} feature-experimentation flag delete -i ${id}`;
 
       const output = await this.exec(command, {});
       console.log(output);
@@ -633,7 +689,7 @@ export class Cli {
       if (!cliBin) {
         return [];
       }
-      const command = `${cliBin} flag list --output-format json`;
+      const command = `${cliBin} feature-experimentation flag list --output-format json`;
       const output = await this.exec(command, {});
       if (output.stderr) {
         vscode.window.showErrorMessage(output.stderr);
@@ -657,7 +713,7 @@ export class Cli {
       if (process.platform.toString() === 'win32') {
         path = path.replaceAll('/', '\\');
       }
-      const command = `${cliBin} analyze flag list --output-format json --directory ${path}`;
+      const command = `${cliBin} feature-experimentation analyze flag list --output-format json --directory ${path}`;
       const output = await this.exec(command, {});
       if (output.stderr) {
         vscode.window.showErrorMessage(output.stderr);
@@ -679,7 +735,7 @@ export class Cli {
       if (!cliBin) {
         return {} as Campaign;
       }
-      command = `${cliBin} campaign create -d '{"project_id":"${projectID}","name":"test_campaign","description":"DESCRIPTION","type":"ab","variation_groups":[{"variations":[{"name":"VARIATION_NAME","allocation":50,"reference":true}]}]}'`;
+      command = `${cliBin} feature-experimentation campaign create -d '{"project_id":"${projectID}","name":"test_campaign","description":"DESCRIPTION","type":"ab","variation_groups":[{"variations":[{"name":"VARIATION_NAME","allocation":50,"reference":true}]}]}'`;
       const output = await this.exec(command, {});
       console.log(output);
       if (output.stderr) {
@@ -702,7 +758,7 @@ export class Cli {
         return false;
       }
 
-      command = `${cliBin} campaign delete -i ${id}`;
+      command = `${cliBin} feature-experimentation campaign delete -i ${id}`;
 
       const output = await this.exec(command, {});
       console.log(output);
@@ -724,7 +780,7 @@ export class Cli {
       if (!cliBin) {
         return [];
       }
-      const command = `${cliBin} campaign list --output-format json`;
+      const command = `${cliBin} feature-experimentation campaign list --output-format json`;
       const output = await this.exec(command, {});
       if (output.stderr) {
         vscode.window.showErrorMessage(output.stderr);
@@ -744,7 +800,7 @@ export class Cli {
       if (!cliBin) {
         return false;
       }
-      const command = `${cliBin} campaign switch -i ${id} -s ${status}`;
+      const command = `${cliBin} feature-experimentation campaign switch -i ${id} -s ${status}`;
       const output = await this.exec(command, {});
       if (output.stderr) {
         vscode.window.showErrorMessage(output.stderr);
@@ -766,7 +822,7 @@ export class Cli {
         return false;
       }
 
-      command = `${cliBin} variation-group delete --campaign-id ${campaignID} -i ${id}`;
+      command = `${cliBin} feature-experimentation variation-group delete --campaign-id ${campaignID} -i ${id}`;
 
       const output = await this.exec(command, {});
       console.log(output);
@@ -790,7 +846,7 @@ export class Cli {
         return false;
       }
 
-      command = `${cliBin} variation delete --campaign-id ${campaignID} --variation-group-id ${variationGroupID} -i ${id}`;
+      command = `${cliBin} feature-experimentation variation delete --campaign-id ${campaignID} --variation-group-id ${variationGroupID} -i ${id}`;
 
       const output = await this.exec(command, {});
       console.log(output);
@@ -812,7 +868,7 @@ export class Cli {
       if (!cliBin) {
         return {} as TokenInfo;
       }
-      const command = `${cliBin} token info --output-format json`;
+      const command = `${cliBin} feature-experimentation token info --output-format json`;
       const output = await this.exec(command, {});
       if (output.stderr) {
         vscode.window.showErrorMessage(output.stderr);
