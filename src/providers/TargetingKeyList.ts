@@ -61,8 +61,8 @@ export class TargetingKeyListProvider implements vscode.TreeDataProvider<vscode.
     }
 
     Object.entries(this._targetingKeyList.find((f) => f === element)!).forEach(([k, v]) => {
-      if (k === 'id' || k === 'name' || k === 'type' || k === 'targetingKeydescription') {
-        if (k === 'targetingKeydescription') {
+      if (k === 'id' || k === 'name' || k === 'type' || k === 'targetingKeyDescription') {
+        if (k === 'targetingKeyDescription') {
           k = 'description';
         }
         items.push(this.getTargetingKeyInfo(k, v));
@@ -110,7 +110,7 @@ export class TargetingKeyItem extends vscode.TreeItem {
     public readonly id?: string,
     public readonly name?: string,
     public readonly type?: string,
-    public readonly targetingKeydescription?: string,
+    public readonly targetingKeyDescription?: string,
     public readonly collapsibleState?: vscode.TreeItemCollapsibleState,
   ) {
     super(name!, collapsibleState);

@@ -157,7 +157,7 @@ export class ProjectListProvider implements vscode.TreeDataProvider<vscode.TreeI
         const abCampaign = new ProjectTreeItem(`AB Test - ${abCampaigns.length} campaign(s)`, abCampaigns);
         const toggleCampaign = new ProjectTreeItem(`Toggle - ${toggleCampaigns.length} campaign(s)`, toggleCampaigns);
         const persoCampaign = new ProjectTreeItem(
-          `Personalisation - ${persoCampaigns.length} campaign(s)`,
+          `Personalization - ${persoCampaigns.length} campaign(s)`,
           persoCampaigns,
         );
         const deploymentCampaign = new ProjectTreeItem(

@@ -28,7 +28,7 @@ async function handleActiveTextEditorChange() {
 export async function activate(context: vscode.ExtensionContext) {
   const stateConfig = new StateConfiguration(context);
 
-  const binaryDir = `${context.asAbsolutePath('flagship')}/${CliVersion}`;
+  const binaryDir = `${context.asAbsolutePath('abtasty-cli')}/${CliVersion}`;
 
   fs.access(binaryDir, fs.constants.F_OK, async (err) => {
     if (err) {

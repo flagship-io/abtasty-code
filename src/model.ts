@@ -12,6 +12,16 @@ export type Configuration = {
   scope?: string;
 };
 
+export type Authentication = {
+  username: string;
+  client_id: string;
+  client_secret: string;
+  account_id: string;
+  account_environment_id: string;
+  path: string;
+  scope?: string;
+};
+
 export type Project = {
   id: string;
   name: string;

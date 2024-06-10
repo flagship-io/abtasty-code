@@ -11,8 +11,8 @@ import { createGunzip } from 'zlib';
 export const CliVersion = '1.0.2';
 
 export async function CliDownloader(context: vscode.ExtensionContext, binaryDir: string) {
-  const flagshipDir = context.asAbsolutePath('flagship');
-  const cliTar = context.asAbsolutePath(`flagship/flagship-${CliVersion}.tar.gz`);
+  const flagshipDir = context.asAbsolutePath('abtasty-cli');
+  const cliTar = context.asAbsolutePath(`abtasty-cli/abtasty-cli-${CliVersion}.tar.gz`);
 
   async function installDir(): Promise<void> {
     let platform = process.platform.toString();
@@ -44,9 +44,9 @@ export async function CliDownloader(context: vscode.ExtensionContext, binaryDir:
     }
 
     if (platform === 'darwin') {
-      cliUrl = `https://github.com/flagship-io/flagship/releases/download/v${CliVersion}/flagship_${CliVersion}_darwin_all.tar.gz`;
+      cliUrl = `https://github.com/flagship-io/abtasty-cli/releases/download/v${CliVersion}/abtasty-cli_${CliVersion}_darwin_all.tar.gz`;
     } else {
-      cliUrl = `https://github.com/flagship-io/flagship/releases/download/v${CliVersion}/flagship_${CliVersion}_${platform}_${arch}.tar.gz`;
+      cliUrl = `https://github.com/flagship-io/abtasty-cli/releases/download/v${CliVersion}/abtasty-cli_${CliVersion}_${platform}_${arch}.tar.gz`;
     }
 
     try {

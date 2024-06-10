@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import * as vscode from 'vscode';
 import { MultiStepInput } from '../multipleStepInput';
-import { StateConfiguration } from '../stateConfiguration';
 import { load } from 'js-yaml';
 import { readFile } from 'fs/promises';
 import path = require('path');
@@ -200,7 +199,7 @@ export class ConfigurationMenu {
         !this.configuration.client_secret ||
         !this.configuration.account_id ||
         !this.configuration.account_environment_id ||
-        !validePathCredentials(
+        !validPathCredentials(
           this.configuration.client_id,
           this.configuration.client_secret,
           this.configuration.account_id,
@@ -343,34 +342,34 @@ export class ConfigurationMenu {
     }
   }
 
-  async validateCredentials(value: string, credentialAttribut: string) {
+  async validateCredentials(value: string, credentialAttribute: string) {
     if (
-      credentialAttribut === 'Credential name' &&
+      credentialAttribute === 'Credential name' &&
       !!this.configurationList.map((i) => i.name).find((i) => i === value)
     ) {
       return 'Configuration name already exists';
     }
 
     if (
-      (credentialAttribut === 'AccountID' || credentialAttribut === 'AccountEnvID') &&
+      (credentialAttribute === 'AccountID' || credentialAttribute === 'AccountEnvID') &&
       !value.match(/^[a-zA-Z0-9]{20}$/g)
     ) {
-      return `Invalid ${credentialAttribut}`;
+      return `Invalid ${credentialAttribute}`;
     }
 
     if (
-      credentialAttribut === 'ClientID' &&
+      credentialAttribute === 'ClientID' &&
       !value.match(/^[a-zA-Z0-9]{8}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{12}$/g)
     ) {
-      return `Invalid ${credentialAttribut}`;
+      return `Invalid ${credentialAttribute}`;
     }
 
-    if (credentialAttribut === 'ClientSecret' && !value.match(/^[a-zA-Z0-9]{64}$/g)) {
-      return `Invalid ${credentialAttribut}`;
+    if (credentialAttribute === 'ClientSecret' && !value.match(/^[a-zA-Z0-9]{64}$/g)) {
+      return `Invalid ${credentialAttribute}`;
     }
 
     if (value === '' || value.match(/[^a-zA-Z\d\-]/g)) {
-      return `Invalid ${credentialAttribut}`;
+      return `Invalid ${credentialAttribute}`;
     }
   }
 
@@ -463,12 +462,7 @@ function createQuickPickOperation(operation: string): vscode.QuickPickItem {
   };
 }
 
-function validePathCredentials(
-  clientId: string,
-  clientSecret: string,
-  accountId: string,
-  accountEnvironmentId: string,
-) {
+function validPathCredentials(clientId: string, clientSecret: string, accountId: string, accountEnvironmentId: string) {
   return (
     accountId.match(/^[a-zA-Z0-9]{20}$/g) &&
     accountEnvironmentId.match(/^[a-zA-Z0-9]{20}$/g) &&

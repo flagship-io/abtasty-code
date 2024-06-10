@@ -430,7 +430,7 @@ export async function setupProviders(context: vscode.ExtensionContext, stateConf
     }),
   ];
 
-  const goalDispoables = [
+  const goalDisposables = [
     vscode.commands.registerCommand(GOAL_LIST_EDIT, async (goal: GoalItem) => {
       const { scope } = context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
       if (scope?.includes('goal.update')) {
@@ -480,6 +480,6 @@ export async function setupProviders(context: vscode.ExtensionContext, stateConf
     ...variationDisposables,
     ...flagDisposables,
     ...targetingKeyDisposables,
-    ...goalDispoables,
+    ...goalDisposables,
   );
 }

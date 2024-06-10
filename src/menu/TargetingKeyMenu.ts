@@ -22,7 +22,7 @@ export async function targetingKeyInputBox(targetingKey: TargetingKeyItem, targe
   if (targetingKey.id) {
     title = 'Edit Targeting key';
     targetingKeyData.name = targetingKey.name;
-    targetingKeyData.description = targetingKey.targetingKeydescription;
+    targetingKeyData.description = targetingKey.targetingKeyDescription;
   }
 
   async function collectInputs() {
