@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { GOAL_LIST_LOAD, GOAL_LIST_REFRESH } from '../commands/const';
+import { FEATURE_EXPERIMENTATION_GOAL_LIST_LOAD, FEATURE_EXPERIMENTATION_GOAL_LIST_REFRESH } from '../commands/const';
 import { PERMISSION_DENIED_PANEL } from '../const';
 import { ROCKET } from '../icons';
 import { Configuration, ItemResource } from '../model';
@@ -18,8 +18,8 @@ export class GoalListProvider implements vscode.TreeDataProvider<vscode.TreeItem
   public constructor(private context: vscode.ExtensionContext, goalStore: GoalStore) {
     this.goalStore = goalStore;
 
-    vscode.commands.registerCommand(GOAL_LIST_REFRESH, async () => await this.refresh());
-    vscode.commands.registerCommand(GOAL_LIST_LOAD, () => this.load());
+    vscode.commands.registerCommand(FEATURE_EXPERIMENTATION_GOAL_LIST_REFRESH, async () => await this.refresh());
+    vscode.commands.registerCommand(FEATURE_EXPERIMENTATION_GOAL_LIST_LOAD, () => this.load());
   }
 
   async refresh() {

@@ -3,7 +3,7 @@ import { FlagItem } from './FlagList';
 import { Cli } from './Cli';
 import { Flag } from '../model';
 import { isGetFlagFunction } from '../setupProviders';
-import { TRIGGER_FLAG_COMPLETION } from '../commands/const';
+import { FEATURE_EXPERIMENTATION_TRIGGER_FLAG_COMPLETION } from '../commands/const';
 
 var triggerFlagCompletion = false;
 
@@ -15,7 +15,7 @@ export default class FlagshipCompletionProvider implements vscode.CompletionItem
     this.context = context;
     this.cli = cli;
 
-    vscode.commands.registerCommand(TRIGGER_FLAG_COMPLETION, async () => {
+    vscode.commands.registerCommand(FEATURE_EXPERIMENTATION_TRIGGER_FLAG_COMPLETION, async () => {
       triggerFlagCompletion = true;
       vscode.commands.executeCommand('editor.action.triggerSuggest');
     });

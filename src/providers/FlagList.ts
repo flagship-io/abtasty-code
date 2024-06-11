@@ -3,7 +3,12 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { Configuration, ItemResource } from '../model';
 import { DEFAULT_BASE_URI, PERMISSION_DENIED_PANEL } from '../const';
-import { FLAGSHIP_OPEN_BROWSER, FLAG_LIST_LOAD, FLAG_LIST_OPEN_IN_BROWSER, FLAG_LIST_REFRESH } from '../commands/const';
+import {
+  FEATURE_EXPERIMENTATION_OPEN_BROWSER,
+  FEATURE_EXPERIMENTATION_FLAG_LIST_LOAD,
+  FEATURE_EXPERIMENTATION_FLAG_LIST_OPEN_IN_BROWSER,
+  FEATURE_EXPERIMENTATION_FLAG_LIST_REFRESH,
+} from '../commands/const';
 import { FlagStore } from '../store/FlagStore';
 import { GLOBAL_CURRENT_CONFIGURATION } from '../services/const';
 
@@ -20,14 +25,17 @@ export class FlagListProvider implements vscode.TreeDataProvider<vscode.TreeItem
     //commands.registerCommand('flagList.on_item_clicked', (item) => this.on_item_clicked(item));
     this.flagStore = flagStore;
 
-    vscode.commands.registerCommand(FLAG_LIST_LOAD, () => this.load());
-    vscode.commands.registerCommand(FLAG_LIST_REFRESH, async () => await this.refresh());
-    vscode.commands.registerCommand(FLAG_LIST_OPEN_IN_BROWSER, async () => {
+    vscode.commands.registerCommand(FEATURE_EXPERIMENTATION_FLAG_LIST_LOAD, () => this.load());
+    vscode.commands.registerCommand(FEATURE_EXPERIMENTATION_FLAG_LIST_REFRESH, async () => await this.refresh());
+    vscode.commands.registerCommand(FEATURE_EXPERIMENTATION_FLAG_LIST_OPEN_IN_BROWSER, async () => {
       const baseUrl = `${DEFAULT_BASE_URI}/env`;
       const { account_environment_id } = (await this.context.globalState.get(
         GLOBAL_CURRENT_CONFIGURATION,
       )) as Configuration;
-      await vscode.commands.executeCommand(FLAGSHIP_OPEN_BROWSER, `${baseUrl}/${account_environment_id}/flags-list`);
+      await vscode.commands.executeCommand(
+        FEATURE_EXPERIMENTATION_OPEN_BROWSER,
+        `${baseUrl}/${account_environment_id}/flags-list`,
+      );
     });
   }
 

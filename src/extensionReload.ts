@@ -9,11 +9,11 @@ export async function extensionReload(context: vscode.ExtensionContext, stateCon
 
   if (await stateConfig.isGlobalConfigured()) {
     await context.globalState.update('FSConfigured', true);
-    await vscode.commands.executeCommand(SET_CONTEXT, 'flagship:enableFlagshipExplorer', true);
+    await vscode.commands.executeCommand(SET_CONTEXT, 'abtasty:explorer', 'featureExperimentation');
     return;
   }
 
   await context.globalState.update('FSConfigured', false);
-  await vscode.commands.executeCommand(SET_CONTEXT, 'flagship:enableFlagshipExplorer', false);
+  await vscode.commands.executeCommand(SET_CONTEXT, 'abtasty:explorer', 'welcomePage');
   return;
 }

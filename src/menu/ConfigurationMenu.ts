@@ -6,7 +6,7 @@ import { readFile } from 'fs/promises';
 import path = require('path');
 import { CONFIG_ADD_ICON, CONFIG_CLEAR_ALL_ICON } from '../icons';
 import { Configuration } from '../model';
-import { CLEAR_CONFIG } from '../commands/const';
+import { FEATURE_EXPERIMENTATION_CLEAR_CONFIG } from '../commands/const';
 import { ConfigurationStore } from '../store/ConfigurationStore';
 
 const configMethods = ['Insert credentials', 'Import credentials from file'];
@@ -276,7 +276,7 @@ export class ConfigurationMenu {
     });
     if (picked === 'yes') {
       this.deletingMode = true;
-      vscode.commands.executeCommand(CLEAR_CONFIG);
+      vscode.commands.executeCommand(FEATURE_EXPERIMENTATION_CLEAR_CONFIG);
       vscode.window.showInformationMessage('[Flagship] All configurations cleared');
       return;
     }
@@ -300,7 +300,7 @@ export class ConfigurationMenu {
       this.configurationList = [...newList];
 
       if (newList.length === 0) {
-        vscode.commands.executeCommand(CLEAR_CONFIG);
+        vscode.commands.executeCommand(FEATURE_EXPERIMENTATION_CLEAR_CONFIG);
         vscode.window.showInformationMessage('[Flagship] All configurations cleared');
         return;
       }

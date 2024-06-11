@@ -3,7 +3,7 @@
 import * as vscode from 'vscode';
 import { Cli } from './Cli';
 import { FlagAnalyzedType } from '../model';
-import { FIND_IN_FILE, FLAG_IN_FILE_REFRESH } from '../commands/const';
+import { FEATURE_EXPERIMENTATION_FIND_IN_FILE, FEATURE_EXPERIMENTATION_FLAG_IN_FILE_REFRESH } from '../commands/const';
 import { rootPath } from '../setupProviders';
 
 export class FileAnalyzed extends vscode.TreeItem {
@@ -74,12 +74,15 @@ export class FileAnalyzedProvider implements vscode.TreeDataProvider<vscode.Tree
     this.path = path;
     this.cli = cli;
 
-    vscode.commands.registerCommand(FLAG_IN_FILE_REFRESH, async (path: string, forceListFlags: boolean) => {
-      if (path) {
-        return await this.refresh(path, forceListFlags);
-      }
-      return await this.refresh(rootPath, forceListFlags);
-    });
+    vscode.commands.registerCommand(
+      FEATURE_EXPERIMENTATION_FLAG_IN_FILE_REFRESH,
+      async (path: string, forceListFlags: boolean) => {
+        if (path) {
+          return await this.refresh(path, forceListFlags);
+        }
+        return await this.refresh(rootPath, forceListFlags);
+      },
+    );
   }
 
   public getTreeItem(item: vscode.TreeItem): vscode.TreeItem | Thenable<vscode.TreeItem> {

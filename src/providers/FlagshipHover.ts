@@ -3,7 +3,7 @@ import { Cli } from './Cli';
 import { Configuration, Flag } from '../model';
 import { StateConfiguration } from '../stateConfiguration';
 import { DEFAULT_BASE_URI } from '../const';
-import { FLAGSHIP_CREATE_FLAG, FLAGSHIP_OPEN_BROWSER } from '../commands/const';
+import { FEATURE_EXPERIMENTATION_CREATE_FLAG, FEATURE_EXPERIMENTATION_OPEN_BROWSER } from '../commands/const';
 import { isGetFlagFunction } from '../setupProviders';
 import { GLOBAL_CURRENT_CONFIGURATION } from '../services/const';
 
@@ -62,7 +62,7 @@ export default class FlagshipHoverProvider implements vscode.HoverProvider {
         mark.appendMarkdown(`<p>Default value: ${flag.default_value}</p>\n`);
         mark.appendMarkdown(`\n`);
         const openPlatformCommandUri = vscode.Uri.parse(
-          `command:${FLAGSHIP_OPEN_BROWSER}?${encodeURIComponent(
+          `command:${FEATURE_EXPERIMENTATION_OPEN_BROWSER}?${encodeURIComponent(
             JSON.stringify(`${baseUrl}/${account_environment_id}/flags-list`),
           )}`,
         );
@@ -72,7 +72,7 @@ export default class FlagshipHoverProvider implements vscode.HoverProvider {
       mark.value = `Flag ${candidate} not found\n`;
       mark.appendMarkdown('\n');
       const createFlagCommandUri = vscode.Uri.parse(
-        `command:${FLAGSHIP_CREATE_FLAG}?${encodeURIComponent(JSON.stringify(candidate))}`,
+        `command:${FEATURE_EXPERIMENTATION_CREATE_FLAG}?${encodeURIComponent(JSON.stringify(candidate))}`,
       );
       mark.appendMarkdown(`[Create this flag: ${candidate}](${createFlagCommandUri})`);
       return new vscode.Hover(mark);

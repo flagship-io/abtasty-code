@@ -1,10 +1,10 @@
 {
-  "name": "flagship-code",
-  "displayName": "Flagship",
-  "description": "Extension to manage flagship from vscode",
+  "name": "abtasty-code",
+  "displayName": "AB Tasty",
+  "description": "Extension to manage abtasty from vscode",
   "publisher": "ABTasty",
   "license": "SEE LICENSE IN LICENSE.md",
-  "repository": "https://github.com/flagship-io/flagship-code",
+  "repository": "https://github.com/flagship-io/abtasty-code",
   "version": "0.2.0",
   "engines": {
     "vscode": "^1.72.0"
@@ -22,26 +22,26 @@
       "type": "object",
       "title": "Flagship",
       "properties": {
-        "flagship.baseUri": {
+        "abtasty.baseUri": {
           "type": "string",
-          "default": "https://app.flagship.io"
+          "default": "https://abtasty.com"
         },
-        "flagship.enableFlagshipExplorer": {
-          "type": "boolean",
-          "default": false,
+        "abtasty.explorer": {
+          "type": "string",
+          "default": "welcomePage",
           "description": "Enable feature flag explorer in your sidebar"
         },
-        "flagship.flagsInFile": {
+        "abtasty.featureExperimentation.flagsInFile": {
           "type": "boolean",
           "default": "",
           "description": "Flagship Flags in File"
         },
-        "flagship.configurationList": {
+        "abtasty.featureExperimentation.configurationList": {
           "type": "Configuration[]",
           "default": [],
           "description": "List of configuration stored"
         },
-        "flagship.currentConfiguration": {
+        "abtasty.featureExperimentation.currentConfiguration": {
           "type": "Configuration",
           "default": {},
           "description": "current running configuration"
@@ -51,363 +51,384 @@
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "flagship",
-          "title": "Flagship",
+          "id": "abtasty",
+          "title": "AB Tasty",
           "icon": "resources/logo.svg"
         }
       ]
     },
     "views": {
-      "flagship": [
+      "abtasty": [
         {
           "id": "configWelcome",
           "name": "Configure your extension",
-          "when": "!flagship:enableFlagshipExplorer"
+          "when": "abtasty:explorer == welcomePage"
         },
         {
-          "id": "quickAccess",
+          "id": "featureExperimentation.quickAccess",
           "name": "Quick Access",
-          "contextualTitle": "Flagship",
-          "when": "flagship:enableFlagshipExplorer"
+          "contextualTitle": "AB Tasty",
+          "when": "abtasty:explorer == featureExperimentation"
         },
         {
-          "id": "flagsInFile",
+          "id": "featureExperimentation.flagsInFile",
           "name": "Flags in file",
-          "when": "flagship:enableFlagshipExplorer"
+          "when": "abtasty:explorer == featureExperimentation"
         },
         {
-          "id": "projectList",
+          "id": "featureExperimentation.projectList",
           "name": "Project",
-          "when": "flagship:enableFlagshipExplorer"
+          "when": "abtasty:explorer == featureExperimentation"
         },
         {
-          "id": "flagList",
+          "id": "featureExperimentation.flagList",
           "name": "Feature Flags",
-          "when": "flagship:enableFlagshipExplorer"
+          "when": "abtasty:explorer == featureExperimentation"
         },
         {
-          "id": "targetingKeyList",
+          "id": "featureExperimentation.targetingKeyList",
           "name": "Targeting Key",
-          "when": "flagship:enableFlagshipExplorer"
+          "when": "abtasty:explorer == featureExperimentation"
         },
         {
-          "id": "goalList",
+          "id": "featureExperimentation.goalList",
           "name": "Goal",
-          "when": "flagship:enableFlagshipExplorer"
+          "when": "abtasty:explorer == featureExperimentation"
+        },
+        {
+          "id": "webExperimentation.quickAccess",
+          "name": "Quick Access",
+          "contextualTitle": "AB Tasty",
+          "when": "abtasty:explorer == webExperimentation"
+        },
+        {
+          "id": "webExperimentation.campaignList",
+          "name": "Campaign Test",
+          "when": "abtasty:explorer == webExperimentation"
+        },
+        {
+          "id": "webExperimentation.modificationList",
+          "name": "Modification",
+          "when": "abtasty:explorer == webExperimentation"
+        },
+        {
+          "id": "webExperimentation.variationList",
+          "name": "Variation",
+          "when": "abtasty:explorer == webExperimentation"
         }
       ]
     },
     "viewsWelcome": [
       {
         "view": "configWelcome",
-        "contents": "Welcome to Flagship !\n Here are your first steps into our extension which will help you work with us.\nFirst, you have to set your credentials to connect your account \n[Configure](command:flagship.setCredentials)\n[Read our docs](https://docs.developers.flagship.io/docs/flagship-code) to learn more about how to use the Flagship extension.\nIf you need some help to understand how to retrieve your IDs [here are all the informations you need](https://flagship.zendesk.com/hc/en-us/articles/4499017687708--Acting-on-your-account-remotely).\n If you need some help to setup a JSON file to store your credentials [here are all the informations you need](https://docs.developers.flagship.io/docs/cli-configure)."
+        "contents": "Welcome to AB Tasty !\n Here are your first steps into our extension which will help you work with us.\nFor Feature experimentation, you have to set your credentials to connect your account\n[Configure Feature Exp](command:featureExperimentation.setCredentials)\n [Read our docs](https://docs.developers.flagship.io/docs/flagship-code) to learn more about how to use the Flagship extension.\nIf you need some help to understand how to retrieve your IDs [here are all the information you need](https://flagship.zendesk.com/hc/en-us/articles/4499017687708--Acting-on-your-account-remotely).\n If you need some help to setup a JSON file to store your credentials [here are all the information you need](https://docs.developers.flagship.io/docs/cli-configure).\nFor Web experimentation, you have to sign on\n[Configure Web Exp](command:abtasty.setCredentialsWE)\n [Read our docs](https://docs.developers.flagship.io/docs/flagship-code) to learn more about how to use the Flagship extension."
       }
     ],
     "commands": [
       {
-        "command": "flagship.clearConfig",
-        "title": "Flagship: Clear all configurations"
+        "command": "featureExperimentation.clearConfig",
+        "title": "Feature Experimentation: Clear all configurations"
       },
       {
-        "command": "flagship.checkCliVersion",
-        "title": "Flagship: Check CLI version"
+        "command": "abtasty.checkCliVersion",
+        "title": "Feature Experimentation: Check CLI version"
       },
       {
-        "command": "flagship.openBrowser",
-        "title": "Flagship: Open in browser"
+        "command": "featureExperimentation.openBrowser",
+        "title": "Feature Experimentation: Open in browser"
       },
       {
-        "command": "flagship.getTokenScope",
-        "title": "Flagship: Get token scope"
+        "command": "featureExperimentation.getTokenScope",
+        "title": "Feature Experimentation: Get token scope"
       },
       {
-        "command": "flagship.triggerFlagCompletion",
-        "title": "Flagship: Trigger flag autocompletion"
+        "command": "featureExperimentation.triggerFlagCompletion",
+        "title": "Feature Experimentation: Trigger flag autocompletion"
       },
       {
-        "command": "flagship.showSurvey",
-        "title": "Flagship: Show survey"
+        "command": "abtasty.showSurvey",
+        "title": "AB Tasty: Show survey"
       },
       {
-        "command": "flagsInFile.refresh",
-        "title": "Flagship: Refresh flags in file panel",
+        "command": "featureExperimentation.flagsInFile.refresh",
+        "title": "Feature Experimentation: Refresh flags in file panel",
         "icon": "$(refresh)"
       },
       {
-        "command": "flagsInFile.listFlagInWorkspace",
-        "title": "Flagship: List flags in the workspace",
+        "command": "featureExperimentation.flagsInFile.listFlagInWorkspace",
+        "title": "abtasty: List flags in the workspace",
         "icon": "$(list-flat)"
       },
       {
-        "command": "flagship.createFlag",
-        "title": "Flagship: Create a flag",
+        "command": "featureExperimentation.createFlag",
+        "title": "Feature Experimentation: Create a flag",
         "icon": "$(add)"
       },
       {
-        "command": "flagList.refresh",
-        "title": "Flagship: Refresh flag panel",
+        "command": "featureExperimentation.flagList.refresh",
+        "title": "Feature Experimentation: Refresh flag panel",
         "icon": "$(refresh)"
       },
       {
-        "command": "flagList.openInBrowser",
-        "title": "Flagship: Open the flag list in browser",
+        "command": "featureExperimentation.flagList.openInBrowser",
+        "title": "Feature Experimentation: Open the flag list in browser",
         "icon": "$(globe)"
       },
       {
-        "command": "flagList.copyFlag",
-        "title": "Flagship: Copy the flag in clipboard",
+        "command": "featureExperimentation.flagList.copyFlag",
+        "title": "Feature Experimentation: Copy the flag in clipboard",
         "icon": "$(clippy)"
       },
       {
-        "command": "flagList.editFlag",
-        "title": "Flagship: Edit the flag",
+        "command": "featureExperimentation.flagList.editFlag",
+        "title": "Feature Experimentation: Edit the flag",
         "icon": "$(pencil)"
       },
       {
-        "command": "flagList.deleteFlag",
-        "title": "Flagship: Remove the flag",
+        "command": "featureExperimentation.flagList.deleteFlag",
+        "title": "Feature Experimentation: Remove the flag",
         "icon": "$(trash)"
       },
       {
-        "command": "flagship.createProject",
-        "title": "Flagship: Create a project",
+        "command": "featureExperimentation.createProject",
+        "title": "Feature Experimentation: Create a project",
         "icon": "$(add)"
       },
       {
-        "command": "projectList.copyProject",
-        "title": "Flagship: Copy the project id",
+        "command": "featureExperimentation.projectList.copyProject",
+        "title": "Feature Experimentation: Copy the project id",
         "icon": "$(clippy)"
       },
       {
-        "command": "projectList.refresh",
-        "title": "Flagship: Refresh project panel",
+        "command": "featureExperimentation.projectList.refresh",
+        "title": "Feature Experimentation: Refresh project panel",
         "icon": "$(refresh)"
       },
       {
-        "command": "projectList.editProject",
-        "title": "Flagship: Edit the project",
+        "command": "featureExperimentation.projectList.editProject",
+        "title": "Feature Experimentation: Edit the project",
         "icon": "$(pencil)"
       },
       {
-        "command": "projectList.deleteProject",
-        "title": "Flagship: Remove the project",
+        "command": "featureExperimentation.projectList.deleteProject",
+        "title": "Feature Experimentation: Remove the project",
         "icon": "$(trash)"
       },
       {
-        "command": "campaignList.openInBrowser",
-        "title": "Flagship: Open campaign in the platform",
+        "command": "featureExperimentation.campaignList.openInBrowser",
+        "title": "Feature Experimentation: Open campaign in the platform",
         "icon": "$(link-external)"
       },
       {
-        "command": "campaignList.copyCampaign",
-        "title": "Flagship: Copy the campaign id",
+        "command": "featureExperimentation.campaignList.copyCampaign",
+        "title": "Feature Experimentation: Copy the campaign id",
         "icon": "$(clippy)"
       },
       {
-        "command": "variationGroupList.copyVariationGroup",
-        "title": "Flagship: Copy the variation group id",
+        "command": "featureExperimentation.variationGroupList.copyVariationGroup",
+        "title": "Feature Experimentation: Copy the variation group id",
         "icon": "$(clippy)"
       },
       {
-        "command": "variationList.copyVariation",
-        "title": "Flagship: Copy the variation id",
+        "command": "featureExperimentation.variationList.copyVariation",
+        "title": "Feature Experimentation: Copy the variation id",
         "icon": "$(clippy)"
       },
       {
-        "command": "flagship.createTargetingKey",
-        "title": "Flagship: Create a targeting key",
+        "command": "featureExperimentation.createTargetingKey",
+        "title": "Feature Experimentation: Create a targeting key",
         "icon": "$(add)"
       },
       {
-        "command": "targetingKeyList.refresh",
-        "title": "Flagship: Refresh targeting key panel",
+        "command": "featureExperimentation.targetingKeyList.refresh",
+        "title": "Feature Experimentation: Refresh targeting key panel",
         "icon": "$(refresh)"
       },
       {
-        "command": "targetingKeyList.editTargetingKey",
-        "title": "Flagship: Edit the targeting key",
+        "command": "featureExperimentation.targetingKeyList.editTargetingKey",
+        "title": "Feature Experimentation: Edit the targeting key",
         "icon": "$(pencil)"
       },
       {
-        "command": "targetingKeyList.deleteTargetingKey",
-        "title": "Flagship: Remove the targeting key",
+        "command": "featureExperimentation.targetingKeyList.deleteTargetingKey",
+        "title": "Feature Experimentation: Remove the targeting key",
         "icon": "$(trash)"
       },
       {
-        "command": "flagship.createGoal",
-        "title": "Flagship: Create a goal",
+        "command": "featureExperimentation.createGoal",
+        "title": "Feature Experimentation: Create a goal",
         "icon": "$(add)"
       },
       {
-        "command": "goalList.refresh",
-        "title": "Flagship: Refresh goal panel",
+        "command": "featureExperimentation.goalList.refresh",
+        "title": "Feature Experimentation: Refresh goal panel",
         "icon": "$(refresh)"
       },
       {
-        "command": "goalList.editGoal",
-        "title": "Flagship: Edit the goal",
+        "command": "featureExperimentation.goalList.editGoal",
+        "title": "Feature Experimentation: Edit the goal",
         "icon": "$(pencil)"
       },
       {
-        "command": "goalList.deleteGoal",
-        "title": "Flagship: Remove the goal",
+        "command": "featureExperimentation.goalList.deleteGoal",
+        "title": "Feature Experimentation: Remove the goal",
         "icon": "$(trash)"
       },
       {
-        "command": "flagsInFile.findInFile",
-        "title": "Flagship: Find flag in file",
+        "command": "featureExperimentation.flagsInFile.findInFile",
+        "title": "Feature Experimentation: Find flag in file",
         "icon": "$(search)"
       },
       {
-        "command": "flagsInFile.addFlag",
-        "title": "Flagship: Add Flag found in flag in file panel",
+        "command": "featureExperimentation.flagsInFile.addFlag",
+        "title": "Feature Experimentation: Add Flag found in flag in file panel",
         "icon": "$(add)"
       }
     ],
     "menus": {
       "view/title": [
         {
-          "command": "flagsInFile.refresh",
-          "when": "view == flagsInFile",
+          "command": "featureExperimentation.flagsInFile.refresh",
+          "when": "view == featureExperimentation.flagsInFile",
           "group": "navigation@0"
         },
         {
-          "command": "flagsInFile.listFlagInWorkspace",
-          "when": "view == flagsInFile",
+          "command": "featureExperimentation.flagsInFile.listFlagInWorkspace",
+          "when": "view == featureExperimentation.flagsInFile",
           "group": "navigation@0"
         },
         {
-          "command": "flagship.createProject",
-          "when": "view == projectList",
+          "command": "featureExperimentation.createProject",
+          "when": "view == featureExperimentation.projectList",
           "group": "navigation@0"
         },
         {
-          "command": "projectList.refresh",
-          "when": "view == projectList",
+          "command": "featureExperimentation.projectList.refresh",
+          "when": "view == featureExperimentation.projectList",
           "group": "navigation@0"
         },
         {
-          "command": "flagship.createTargetingKey",
-          "when": "view == targetingKeyList",
+          "command": "featureExperimentation.createTargetingKey",
+          "when": "view == featureExperimentation.targetingKeyList",
           "group": "navigation@0"
         },
         {
-          "command": "targetingKeyList.refresh",
-          "when": "view == targetingKeyList",
+          "command": "featureExperimentation.targetingKeyList.refresh",
+          "when": "view == featureExperimentation.targetingKeyList",
           "group": "navigation@0"
         },
         {
-          "command": "flagship.createGoal",
-          "when": "view == goalList",
+          "command": "featureExperimentation.createGoal",
+          "when": "view == featureExperimentation.goalList",
           "group": "navigation@0"
         },
         {
-          "command": "goalList.refresh",
-          "when": "view == goalList",
+          "command": "featureExperimentation.goalList.refresh",
+          "when": "view == featureExperimentation.goalList",
           "group": "navigation@0"
         },
         {
-          "command": "flagship.createFlag",
-          "when": "view == flagList",
+          "command": "featureExperimentation.createFlag",
+          "when": "view == featureExperimentation.flagList",
           "group": "navigation@0"
         },
         {
-          "command": "flagList.refresh",
-          "when": "view == flagList",
+          "command": "featureExperimentation.flagList.refresh",
+          "when": "view == featureExperimentation.flagList",
           "group": "navigation@0"
         },
         {
-          "command": "flagList.openInBrowser",
-          "when": "view == flagList",
+          "command": "featureExperimentation.flagList.openInBrowser",
+          "when": "view == featureExperimentation.flagList",
           "group": "navigation@0"
         }
       ],
       "view/item/context": [
         {
-          "command": "projectList.copyProject",
-          "when": "view == projectList && viewItem == projectItem",
+          "command": "featureExperimentation.projectList.copyProject",
+          "when": "view == featureExperimentation.projectList && viewItem == projectItem",
           "group": "inline"
         },
         {
-          "command": "projectList.deleteProject",
-          "when": "view == projectList && viewItem == projectItem",
+          "command": "featureExperimentation.projectList.deleteProject",
+          "when": "view == featureExperimentation.projectList && viewItem == projectItem",
           "group": "inline"
         },
         {
-          "command": "projectList.editProject",
-          "when": "view == projectList && viewItem == projectItem",
+          "command": "featureExperimentation.projectList.editProject",
+          "when": "view == featureExperimentation.projectList && viewItem == projectItem",
           "group": "inline"
         },
         {
-          "command": "campaignList.copyCampaign",
-          "when": "view == projectList && viewItem == campaignItem",
+          "command": "featureExperimentation.campaignList.copyCampaign",
+          "when": "view == featureExperimentation.projectList && viewItem == campaignItem",
           "group": "inline"
         },
         {
-          "command": "campaignList.openInBrowser",
-          "when": "view == projectList && viewItem == campaignItem",
+          "command": "featureExperimentation.campaignList.openInBrowser",
+          "when": "view == featureExperimentation.projectList && viewItem == campaignItem",
           "group": "inline"
         },
         {
-          "command": "variationGroupList.copyVariationGroup",
-          "when": "view == projectList && viewItem == variationGroupItem",
+          "command": "featureExperimentation.variationGroupList.copyVariationGroup",
+          "when": "view == featureExperimentation.projectList && viewItem == variationGroupItem",
           "group": "inline"
         },
         {
-          "command": "variationList.copyVariation",
-          "when": "view == projectList && viewItem == variationItem",
+          "command": "featureExperimentation.variationList.copyVariation",
+          "when": "view == featureExperimentation.projectList && viewItem == variationItem",
           "group": "inline"
         },
         {
-          "command": "targetingKeyList.deleteTargetingKey",
-          "when": "view == targetingKeyList && viewItem == targetingKeyItem",
+          "command": "featureExperimentation.targetingKeyList.deleteTargetingKey",
+          "when": "view == featureExperimentation.targetingKeyList && viewItem == targetingKeyItem",
           "group": "inline"
         },
         {
-          "command": "targetingKeyList.editTargetingKey",
-          "when": "view == targetingKeyList && viewItem == targetingKeyItem",
+          "command": "featureExperimentation.targetingKeyList.editTargetingKey",
+          "when": "view == featureExperimentation.targetingKeyList && viewItem == targetingKeyItem",
           "group": "inline"
         },
         {
-          "command": "goalList.deleteGoal",
-          "when": "view == goalList && viewItem == goalItem",
+          "command": "featureExperimentation.goalList.deleteGoal",
+          "when": "view == featureExperimentation.goalList && viewItem == goalItem",
           "group": "inline"
         },
         {
-          "command": "goalList.editGoal",
-          "when": "view == goalList && viewItem == goalItem",
+          "command": "featureExperimentation.goalList.editGoal",
+          "when": "view == featureExperimentation.goalList && viewItem == goalItem",
           "group": "inline"
         },
         {
-          "command": "flagList.deleteFlag",
-          "when": "view == flagList && viewItem == flagItem",
+          "command": "featureExperimentation.flagList.deleteFlag",
+          "when": "view == featureExperimentation.flagList && viewItem == flagItem",
           "group": "inline"
         },
         {
-          "command": "flagList.editFlag",
-          "when": "view == flagList && viewItem == flagItem",
+          "command": "featureExperimentation.flagList.editFlag",
+          "when": "view == featureExperimentation.flagList && viewItem == flagItem",
           "group": "inline"
         },
         {
-          "command": "flagList.copyFlag",
-          "when": "view == flagList && viewItem == flagItem",
+          "command": "featureExperimentation.flagList.copyFlag",
+          "when": "view == featureExperimentation.flagList && viewItem == flagItem",
           "group": "inline"
         },
         {
-          "command": "flagsInFile.findInFile",
-          "when": "view == flagsInFile && viewItem == flagAnalyzedItem",
+          "command": "featureExperimentation.flagsInFile.findInFile",
+          "when": "view == featureExperimentation.flagsInFile && viewItem == flagAnalyzedItem",
           "group": "inline"
         },
         {
-          "command": "flagsInFile.addFlag",
-          "when": "view == flagsInFile && viewItem == flagAnalyzedItem",
+          "command": "featureExperimentation.flagsInFile.addFlag",
+          "when": "view == featureExperimentation.flagsInFile && viewItem == flagAnalyzedItem",
           "group": "inline"
         }
       ]
     },
     "keybindings": [
       {
-        "command": "flagship.triggerFlagCompletion",
+        "command": "featureExperimentation.triggerFlagCompletion",
         "key": "ctrl+alt+g",
         "mac": "cmd+alt+g"
       }
@@ -531,9 +552,9 @@
     "color": "#343434",
     "theme": "dark"
   },
-  "homepage": "https://docs.developers.flagship.io/docs/flagship-code",
+  "homepage": "https://docs.developers.flagship.io/docs/abtasty-code",
   "bugs": {
-    "url": "https://github.com/flagship-io/flagship-code/issues"
+    "url": "https://github.com/flagship-io/abtasty-code/issues"
   },
   "scripts": {
     "vscode:prepublish": "yarn run package",

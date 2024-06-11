@@ -1,5 +1,8 @@
 import * as vscode from 'vscode';
-import { TARGETING_KEY_LIST_LOAD, TARGETING_KEY_LIST_REFRESH } from '../commands/const';
+import {
+  FEATURE_EXPERIMENTATION_TARGETING_KEY_LIST_LOAD,
+  FEATURE_EXPERIMENTATION_TARGETING_KEY_LIST_REFRESH,
+} from '../commands/const';
 import { PERMISSION_DENIED_PANEL } from '../const';
 import { KEY } from '../icons';
 import { Configuration, ItemResource } from '../model';
@@ -16,8 +19,11 @@ export class TargetingKeyListProvider implements vscode.TreeDataProvider<vscode.
   readonly onDidChangeTreeData: vscode.Event<vscode.TreeItem | undefined | void> = this._onDidChangeTreeData.event;
 
   public constructor(private context: vscode.ExtensionContext, targetingKeyStore: TargetingKeyStore) {
-    vscode.commands.registerCommand(TARGETING_KEY_LIST_LOAD, () => this.load());
-    vscode.commands.registerCommand(TARGETING_KEY_LIST_REFRESH, async () => await this.refresh());
+    vscode.commands.registerCommand(FEATURE_EXPERIMENTATION_TARGETING_KEY_LIST_LOAD, () => this.load());
+    vscode.commands.registerCommand(
+      FEATURE_EXPERIMENTATION_TARGETING_KEY_LIST_REFRESH,
+      async () => await this.refresh(),
+    );
     this.targetingKeyStore = targetingKeyStore;
   }
 

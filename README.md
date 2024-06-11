@@ -5,14 +5,12 @@
 > ⚠️ **Beta phase**
 >
 > Please note that as a beta phase, it may still contain some bugs and imperfections. Your feedback is instrumental in helping us identify and resolve any issues, so don't hesitate to report them by mail product.feedback@abtasty.com or open a ticket issue at [Github issues](https://github.com/flagship-io/flagship-code/issues)
->
 
 ## Overview
 
-[Flagship](https://www.abtasty.com/feature-experimentation) optimization platform lets you manage, release, and experiment with features across all codebases and devices to drive growth with every deployment. This extension is designed to enhance your productivity within the VSCode environment, it offers a comprehensive set of utilities that simplify the management and utilization of feature flags using Flagship and let you handle most aspects of feature flag workflows directly within VSCode, eliminating the need to switch between your coding environment and the platform.
+[Flagship](https://www.abtasty.com/feature-experimentation) optimization platform lets you manage, release, and experiment with features across all codebase and devices to drive growth with every deployment. This extension is designed to enhance your productivity within the VSCode environment, it offers a comprehensive set of utilities that simplify the management and utilization of feature flags using Flagship and let you handle most aspects of feature flag workflows directly within VSCode, eliminating the need to switch between your coding environment and the platform.
 
 ![Overview screen](./media/screen.png)
-
 
 ## Features
 
@@ -26,24 +24,24 @@
   ![Change configuration](./media/changeConfiguration.gif)
 
 - Manage your Flagship resources (Project, Feature Flags, Targeting Keys, Goals).
-  
+
   ![Manage resource feature](./media/resource.png)
 
-- Check feature flags in your files. This feature gives you informations on the flags in your current working file and retrieve the flag directly in the code.
- 
+- Check feature flags in your files. This feature gives you information on the flags in your current working file and retrieve the flag directly in the code.
+
   ![Flags in file](./media/flagsInFile.gif)
 
 - Autocomplete for feature flags.
-  
+
   ![Autocomplete feature](./media/autoCompletionFeature.gif)
 
 - Hover your feature flags.
-  
+
   ![Hover feature](./media/hoverFeature.gif)
 
 ## Documentation
 
-Check out our [documentation](https://docs.developers.flagship.io/docs/flagship-code) for further explanation. 
+Check out our [documentation](https://docs.developers.flagship.io/docs/flagship-code) for further explanation.
 
 ## Contributors
 
@@ -53,6 +51,6 @@ Check out our [documentation](https://docs.developers.flagship.io/docs/flagship-
 
 We encourage any form of contribution, whether that be issues, comments, or pull requests.
 
-## Licence
+## License
 
 [Apache License.](https://github.com/flagship-io/flagship-code/blob/main/LICENSE.md)

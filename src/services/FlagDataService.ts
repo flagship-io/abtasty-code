@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { Flag } from '../model';
-import { LIST_FLAG_IN_WORKSPACE } from '../commands/const';
+import { FEATURE_EXPERIMENTATION_LIST_FLAG_IN_WORKSPACE } from '../commands/const';
 import { GLOBAL_LIST_FLAG } from './const';
 
 export class FlagDataService {

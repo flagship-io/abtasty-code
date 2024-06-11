@@ -1,6 +1,9 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { PROJECT_LIST_LOAD, PROJECT_LIST_REFRESH } from '../commands/const';
+import {
+  FEATURE_EXPERIMENTATION_PROJECT_LIST_LOAD,
+  FEATURE_EXPERIMENTATION_PROJECT_LIST_REFRESH,
+} from '../commands/const';
 import {
   CIRCLE_FILLED,
   CIRCLE_OUTLINE,
@@ -32,8 +35,8 @@ export class ProjectListProvider implements vscode.TreeDataProvider<vscode.TreeI
 
   public constructor(private context: vscode.ExtensionContext, projectStore: ProjectStore) {
     this.projectStore = projectStore;
-    vscode.commands.registerCommand(PROJECT_LIST_LOAD, () => this.load());
-    vscode.commands.registerCommand(PROJECT_LIST_REFRESH, async () => await this.refresh());
+    vscode.commands.registerCommand(FEATURE_EXPERIMENTATION_PROJECT_LIST_LOAD, () => this.load());
+    vscode.commands.registerCommand(FEATURE_EXPERIMENTATION_PROJECT_LIST_REFRESH, async () => await this.refresh());
   }
 
   async refresh() {
