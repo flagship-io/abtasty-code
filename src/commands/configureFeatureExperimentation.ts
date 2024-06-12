@@ -1,6 +1,4 @@
 import * as vscode from 'vscode';
-import { StateConfiguration } from '../stateConfiguration';
-import { ConfigurationMenu } from '../menu/ConfigurationMenu';
 import { Cli } from '../providers/Cli';
 import {
   FEATURE_EXPERIMENTATION_FLAG_IN_FILE_REFRESH,
@@ -14,38 +12,40 @@ import {
   FEATURE_EXPERIMENTATION_TARGETING_KEY_LIST_REFRESH,
 } from './const';
 
-import { ConfigurationStore } from '../store/ConfigurationStore';
+import { AuthenticationStore } from '../store/AuthenticationStore';
+import { AuthenticationMenu } from '../menu/AuthenticationMenu';
 
 export let currentConfigurationNameStatusBar: vscode.StatusBarItem;
 
-export default async function configureFlagshipCmd(context: vscode.ExtensionContext, cli: Cli) {
-  const configurationStore: ConfigurationStore = new ConfigurationStore(context, cli);
+export default async function configureFeatureExperimentationCmd(context: vscode.ExtensionContext, cli: Cli) {
+  const authenticationStore: AuthenticationStore = new AuthenticationStore(context, cli);
   const configureExtension: vscode.Disposable = vscode.commands.registerCommand(
     FEATURE_EXPERIMENTATION_SET_CREDENTIALS,
     async () => {
       try {
-        const configurationList = (await configurationStore.refreshConfiguration()) || [];
-        const currentConfiguration = (await configurationStore.getCurrentConfiguration()) || {};
-        const sortedConfig = configurationList.sort((a, b) => {
-          if (a.name === currentConfiguration.name) {
+        const authenticationList = (await authenticationStore.refreshAuthentication()) || [];
+        const currentAuthentication = (await authenticationStore.getCurrentAuthentication()) || {};
+        const sortedAuth = authenticationList.sort((a, b) => {
+          if (a.username === currentAuthentication.username) {
             return -1;
-          } else if (b.name === currentConfiguration.name) {
+          } else if (b.username === currentAuthentication.username) {
             return 1;
           } else {
-            return a.name < b.name ? -1 : a.name > b.name ? 1 : 0;
+            return a.username < b.username ? -1 : a.username > b.username ? 1 : 0;
           }
         });
-        const configurationMenu = new ConfigurationMenu(sortedConfig, currentConfiguration, configurationStore);
 
-        const configurationAddedOrSelected = await configurationMenu.configure();
-        const cliAuthenticated = !!configurationAddedOrSelected.name;
+        const authenticationMenu = new AuthenticationMenu(sortedAuth, currentAuthentication, authenticationStore);
+
+        const configurationAddedOrSelected = await authenticationMenu.configure();
+        const cliAuthenticated = !!configurationAddedOrSelected.username;
         if (cliAuthenticated) {
-          const updatedCurrentConfiguration = await configurationStore.getCurrentConfiguration();
+          const updatedCurrentConfiguration = await authenticationStore.getCurrentAuthentication();
 
           await context.globalState.update('FSConfigured', true);
           await vscode.commands.executeCommand(SET_CONTEXT, 'abtasty:explorer', 'featureExperimentation');
 
-          updateStatusBarItem(updatedCurrentConfiguration.name);
+          updateStatusBarItem(updatedCurrentConfiguration.username);
 
           await Promise.all([
             vscode.commands.executeCommand(FEATURE_EXPERIMENTATION_FLAG_LIST_REFRESH),
@@ -58,7 +58,7 @@ export default async function configureFlagshipCmd(context: vscode.ExtensionCont
           return;
         }
 
-        if (!currentConfiguration.name) {
+        if (!currentAuthentication.username) {
           setTimeout(async () => {
             updateStatusBarItem();
             vscode.window.showErrorMessage('[Flagship] Not configured.');

@@ -8,7 +8,7 @@ export class ProjectDataService {
 
   constructor(context: vscode.ExtensionContext) {
     this.context = context;
-    this.projectList = this.context.globalState.get(GLOBAL_LIST_PROJECT)!;
+    this.projectList = this.context.globalState.get(GLOBAL_LIST_PROJECT) || [];
   }
 
   getState(): Project[] {

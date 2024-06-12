@@ -60,12 +60,12 @@ import {
   FEATURE_EXPERIMENTATION_VARIATION_LIST_DELETE,
 } from './commands/const';
 import { DEFAULT_BASE_URI, PERMISSION_DENIED } from './const';
-import { Configuration, Scope } from './model';
+import { Authentication, Configuration, Scope } from './model';
 import { FlagStore } from './store/FlagStore';
 import { ProjectStore } from './store/ProjectStore';
 import { TargetingKeyStore } from './store/TargetingKeyStore';
 import { GoalStore } from './store/GoalStore';
-import { GLOBAL_CURRENT_CONFIGURATION } from './services/const';
+import { GLOBAL_CURRENT_AUTHENTICATION } from './services/const';
 
 const documentSelector: vscode.DocumentSelector = [
   {
@@ -178,7 +178,7 @@ export async function setupProviders(context: vscode.ExtensionContext, stateConf
     fileAnalyzedProvider,
   );
 
-  const projectProvider = new ProjectListProvider(context, projectStore);
+  const projectProvider = new ProjectListProvider(context, projectStore, stateConfig);
   vscode.window.registerTreeDataProvider('featureExperimentation.projectList', projectProvider);
 
   const flagListProvider = new FlagListProvider(context, flagStore);
@@ -220,7 +220,7 @@ export async function setupProviders(context: vscode.ExtensionContext, stateConf
   });
 
   const createProject = vscode.commands.registerCommand(FEATURE_EXPERIMENTATION_CREATE_PROJECT, async () => {
-    const { scope } = context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
+    const { scope } = (context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION) as Authentication) || {};
     if (scope?.includes('project.create')) {
       const project = new ProjectItem();
       await projectInputBox(project, projectStore);
@@ -240,7 +240,7 @@ export async function setupProviders(context: vscode.ExtensionContext, stateConf
   const createFlag = vscode.commands.registerCommand(
     FEATURE_EXPERIMENTATION_CREATE_FLAG,
     async (flagKey: string | undefined) => {
-      const { scope } = context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
+      const { scope } = (context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION) as Authentication) || {};
 
       if (scope?.includes('flag.create')) {
         const flag = new FlagItem();
@@ -257,7 +257,7 @@ export async function setupProviders(context: vscode.ExtensionContext, stateConf
   );
 
   const createTargetingKey = vscode.commands.registerCommand(FEATURE_EXPERIMENTATION_CREATE_TARGETING_KEY, async () => {
-    const { scope } = context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
+    const { scope } = (context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION) as Authentication) || {};
     if (scope?.includes('targeting_key.create')) {
       const targetingKey = new TargetingKeyItem();
       await targetingKeyInputBox(targetingKey, targetingKeyStore);
@@ -269,7 +269,7 @@ export async function setupProviders(context: vscode.ExtensionContext, stateConf
   });
 
   const createGoal = vscode.commands.registerCommand(FEATURE_EXPERIMENTATION_CREATE_GOAL, async () => {
-    const { scope } = context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
+    const { scope } = (context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION) as Authentication) || {};
     if (scope?.includes('goal.create')) {
       const goal = new GoalItem();
       await goalInputBox(goal, goalStore);
@@ -287,7 +287,7 @@ export async function setupProviders(context: vscode.ExtensionContext, stateConf
     }),
 
     vscode.commands.registerCommand(FEATURE_EXPERIMENTATION_PROJECT_LIST_EDIT, async (project: ProjectItem) => {
-      const { scope } = context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
+      const { scope } = (context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION) as Authentication) || {};
       if (scope?.includes('project.update')) {
         await projectInputBox(project, projectStore);
         await vscode.commands.executeCommand(FEATURE_EXPERIMENTATION_PROJECT_LIST_LOAD);
@@ -298,7 +298,7 @@ export async function setupProviders(context: vscode.ExtensionContext, stateConf
     }),
 
     vscode.commands.registerCommand(FEATURE_EXPERIMENTATION_PROJECT_LIST_DELETE, async (project: ProjectItem) => {
-      const { scope } = context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
+      const { scope } = (context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION) as Authentication) || {};
       if (scope?.includes('project.delete')) {
         await deleteProjectInputBox(project, projectStore);
         await vscode.commands.executeCommand(FEATURE_EXPERIMENTATION_PROJECT_LIST_LOAD);
@@ -319,9 +319,8 @@ export async function setupProviders(context: vscode.ExtensionContext, stateConf
       FEATURE_EXPERIMENTATION_CAMPAIGN_LIST_OPEN_IN_BROWSER,
       async (campaign: CampaignItem) => {
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        const { account_environment_id } = (await context.globalState.get(
-          GLOBAL_CURRENT_CONFIGURATION,
-        )) as Configuration;
+        const { account_environment_id } =
+          ((await context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION)) as Authentication) || {};
         await vscode.env.openExternal(
           vscode.Uri.parse(
             `${DEFAULT_BASE_URI}/env/${account_environment_id}/report/${campaign.type}/${campaign.id}/details`,
@@ -375,7 +374,7 @@ export async function setupProviders(context: vscode.ExtensionContext, stateConf
     }),
 
     vscode.commands.registerCommand(FEATURE_EXPERIMENTATION_FLAG_LIST_EDIT, async (flag: FlagItem) => {
-      const { scope } = context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
+      const { scope } = (context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION) as Authentication) || {};
       if (scope?.includes('flag.update')) {
         await flagInputBox(flag, flagStore);
         await vscode.commands.executeCommand(FEATURE_EXPERIMENTATION_FLAG_LIST_LOAD);
@@ -386,7 +385,7 @@ export async function setupProviders(context: vscode.ExtensionContext, stateConf
     }),
 
     vscode.commands.registerCommand(FEATURE_EXPERIMENTATION_FLAG_LIST_DELETE, async (flag: FlagItem) => {
-      const { scope } = context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
+      const { scope } = (context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION) as Authentication) || {};
       if (scope?.includes('flag.delete')) {
         await deleteFlagInputBox(flag, flagStore);
         await vscode.commands.executeCommand(FEATURE_EXPERIMENTATION_FLAG_LIST_LOAD);
@@ -409,7 +408,7 @@ export async function setupProviders(context: vscode.ExtensionContext, stateConf
     }),
 
     vscode.commands.registerCommand(FEATURE_EXPERIMENTATION_ADD_FLAG, async (flagInFile: FlagAnalyzed) => {
-      const { scope } = context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
+      const { scope } = (context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION) as Authentication) || {};
       if (scope?.includes('flag.create')) {
         const flag = new FlagItem();
         flag.key = flagInFile.flagKey;
@@ -430,7 +429,7 @@ export async function setupProviders(context: vscode.ExtensionContext, stateConf
     vscode.commands.registerCommand(
       FEATURE_EXPERIMENTATION_TARGETING_KEY_LIST_EDIT,
       async (targetingKey: TargetingKeyItem) => {
-        const { scope } = context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
+        const { scope } = (context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION) as Authentication) || {};
         if (scope?.includes('targeting_key.update')) {
           await targetingKeyInputBox(targetingKey, targetingKeyStore);
           await vscode.commands.executeCommand(FEATURE_EXPERIMENTATION_TARGETING_KEY_LIST_LOAD);
@@ -444,7 +443,7 @@ export async function setupProviders(context: vscode.ExtensionContext, stateConf
     vscode.commands.registerCommand(
       FEATURE_EXPERIMENTATION_TARGETING_KEY_LIST_DELETE,
       async (targetingKey: TargetingKeyItem) => {
-        const { scope } = context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
+        const { scope } = (context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION) as Authentication) || {};
         if (scope?.includes('targeting_key.delete')) {
           await deleteTargetingKeyInputBox(targetingKey, targetingKeyStore);
           await vscode.commands.executeCommand(FEATURE_EXPERIMENTATION_TARGETING_KEY_LIST_LOAD);
@@ -458,7 +457,7 @@ export async function setupProviders(context: vscode.ExtensionContext, stateConf
 
   const goalDisposables = [
     vscode.commands.registerCommand(FEATURE_EXPERIMENTATION_GOAL_LIST_EDIT, async (goal: GoalItem) => {
-      const { scope } = context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
+      const { scope } = (context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION) as Authentication) || {};
       if (scope?.includes('goal.update')) {
         await goalInputBox(goal, goalStore);
         await vscode.commands.executeCommand(FEATURE_EXPERIMENTATION_GOAL_LIST_LOAD);
@@ -469,7 +468,7 @@ export async function setupProviders(context: vscode.ExtensionContext, stateConf
     }),
 
     vscode.commands.registerCommand(FEATURE_EXPERIMENTATION_GOAL_LIST_DELETE, async (goal: GoalItem) => {
-      const { scope } = context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
+      const { scope } = (context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION) as Authentication) || {};
       if (scope?.includes('goal.delete')) {
         await deleteGoalInputBox(goal, goalStore);
         await vscode.commands.executeCommand(FEATURE_EXPERIMENTATION_GOAL_LIST_LOAD);

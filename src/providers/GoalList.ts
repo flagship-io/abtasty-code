@@ -2,9 +2,9 @@ import * as vscode from 'vscode';
 import { FEATURE_EXPERIMENTATION_GOAL_LIST_LOAD, FEATURE_EXPERIMENTATION_GOAL_LIST_REFRESH } from '../commands/const';
 import { PERMISSION_DENIED_PANEL } from '../const';
 import { ROCKET } from '../icons';
-import { Configuration, ItemResource } from '../model';
+import { Authentication, Configuration, ItemResource } from '../model';
 import { GoalStore } from '../store/GoalStore';
-import { GLOBAL_CURRENT_CONFIGURATION } from '../services/const';
+import { GLOBAL_CURRENT_AUTHENTICATION } from '../services/const';
 
 export class GoalListProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
   private _goals: GoalItem[] = [];
@@ -24,7 +24,7 @@ export class GoalListProvider implements vscode.TreeDataProvider<vscode.TreeItem
 
   async refresh() {
     this._goals = [];
-    const { scope } = this.context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
+    const { scope } = (this.context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION) as Authentication) || {};
     if (scope?.includes('goal.list')) {
       await this.getRefreshedGoals();
     }
@@ -33,7 +33,7 @@ export class GoalListProvider implements vscode.TreeDataProvider<vscode.TreeItem
 
   async load() {
     this._goals = [];
-    const { scope } = this.context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
+    const { scope } = (this.context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION) as Authentication) || {};
     if (scope?.includes('goal.list')) {
       this.getLoadedGoals();
     }
@@ -46,7 +46,7 @@ export class GoalListProvider implements vscode.TreeDataProvider<vscode.TreeItem
 
   getChildren(element?: vscode.TreeItem): vscode.ProviderResult<vscode.TreeItem[]> {
     const items: vscode.TreeItem[] = [];
-    const { scope } = this.context.globalState.get(GLOBAL_CURRENT_CONFIGURATION) as Configuration;
+    const { scope } = (this.context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION) as Authentication) || {};
     if (!scope?.includes('goal.list')) {
       return [new vscode.TreeItem(PERMISSION_DENIED_PANEL)];
     }

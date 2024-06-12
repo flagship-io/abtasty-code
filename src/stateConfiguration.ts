@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 
 import { CONFIGURATION_LIST } from './const';
 import {
-  GLOBAL_CURRENT_CONFIGURATION,
+  GLOBAL_CURRENT_AUTHENTICATION,
   GLOBAL_LIST_FLAG,
   GLOBAL_LIST_GOAL,
   GLOBAL_LIST_PROJECT,
@@ -23,16 +23,17 @@ export class StateConfiguration {
     return;
   }
 
-  async getGlobalState(key: string): Promise<unknown> {
-    const currValue = await this.context.globalState.get(key);
+  getGlobalState(key: string): unknown {
+    const currValue = this.context.globalState.get(key);
     if (typeof currValue !== 'undefined') {
       return currValue;
     }
+    return {};
   }
 
   async clearGlobalConfig(): Promise<void> {
     await this.context.globalState.update(CONFIGURATION_LIST, undefined);
-    await this.context.globalState.update(GLOBAL_CURRENT_CONFIGURATION, undefined);
+    await this.context.globalState.update(GLOBAL_CURRENT_AUTHENTICATION, undefined);
     await this.context.globalState.update(GLOBAL_LIST_FLAG, undefined);
     await this.context.globalState.update(GLOBAL_LIST_TARGETING_KEY, undefined);
     await this.context.globalState.update(GLOBAL_LIST_PROJECT, undefined);
@@ -45,7 +46,7 @@ export class StateConfiguration {
 
   async isGlobalConfigured(): Promise<boolean> {
     return (
-      !!(await this.context.globalState.get(GLOBAL_CURRENT_CONFIGURATION)) &&
+      !!(await this.context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION)) &&
       !!(await this.context.globalState.get('FSConfigured'))
     );
   }

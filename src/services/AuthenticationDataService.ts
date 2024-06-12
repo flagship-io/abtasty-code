@@ -36,6 +36,6 @@ export class AuthenticationDataService {
   }
 
   getCurrentAuthentication(): Authentication {
-    return this.context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION) as Authentication;
+    return (this.context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION) as Authentication) || {};
   }
 }

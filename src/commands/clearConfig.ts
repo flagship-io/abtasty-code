@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { StateConfiguration } from '../stateConfiguration';
-import { currentConfigurationNameStatusBar } from './configureFlagship';
+import { currentConfigurationNameStatusBar } from './configureFeatureExperimentation';
 import { FEATURE_EXPERIMENTATION_CLEAR_CONFIG, SET_CONTEXT } from './const';
 
 export default async function clearConfigCmd(context: vscode.ExtensionContext, stateConfig: StateConfiguration) {

@@ -5,9 +5,9 @@ import { load } from 'js-yaml';
 import { readFile } from 'fs/promises';
 import path = require('path');
 import { CONFIG_ADD_ICON, CONFIG_CLEAR_ALL_ICON } from '../icons';
-import { Configuration } from '../model';
+import { Authentication } from '../model';
 import { FEATURE_EXPERIMENTATION_CLEAR_CONFIG } from '../commands/const';
-import { ConfigurationStore } from '../store/ConfigurationStore';
+import { AuthenticationStore } from '../store/AuthenticationStore';
 
 const configMethods = ['Insert credentials', 'Import credentials from file'];
 
@@ -23,94 +23,91 @@ class CustomButton implements vscode.QuickInputButton {
   ) {}
 }
 
-const ClearAllConfigurationButton = new CustomButton(CONFIG_CLEAR_ALL_ICON, 'Clear all configurations', 'clear_all');
-const CreateConfigurationButton = new CustomButton(CONFIG_ADD_ICON, 'Create new configuration', 'create');
+const ClearAllAuthenticationButton = new CustomButton(CONFIG_CLEAR_ALL_ICON, 'Clear all Authentications', 'clear_all');
+const CreateAuthenticationButton = new CustomButton(CONFIG_ADD_ICON, 'Create new configuration', 'create');
 
-export class ConfigurationMenu {
+export class AuthenticationMenu {
   private title: string;
-  private configuration!: Configuration;
-  private configurationList: Configuration[];
-  private configurationListItem: vscode.QuickPickItem[];
-  private currentConfiguration: Configuration;
-  private configurationStore: ConfigurationStore;
-  private editionMode: boolean;
+  private authentication!: Authentication;
+  private authenticationList: Authentication[];
+  private authenticationListItem: vscode.QuickPickItem[];
+  private currentAuthentication: Authentication;
+  private authenticationStore: AuthenticationStore;
   private addingMode: boolean;
   private deletingMode: boolean;
   private cancelMode: boolean;
 
   constructor(
-    configurationList: Configuration[],
-    currentConfiguration: Configuration,
-    configurationStore: ConfigurationStore,
+    authenticationList: Authentication[],
+    currentAuthentication: Authentication,
+    authenticationStore: AuthenticationStore,
   ) {
-    this.title = 'Configure Extension';
-    this.configuration = {
+    this.title = 'Configure Feature Experimentation';
+    this.authentication = {
       account_environment_id: '',
       account_id: '',
       client_id: '',
       client_secret: '',
-      name: '',
-    } as Configuration;
-    this.currentConfiguration = currentConfiguration;
-    this.configurationList = configurationList;
-    this.configurationListItem = configurationList.map((p) => ({
-      label: p.name,
+      username: '',
+    } as Authentication;
+    this.currentAuthentication = currentAuthentication;
+    this.authenticationList = authenticationList;
+    this.authenticationListItem = authenticationList.map((p) => ({
+      label: p.username,
     }));
-    this.editionMode = false;
     this.addingMode = false;
     this.deletingMode = false;
     this.cancelMode = false;
-    this.configurationStore = configurationStore;
+    this.authenticationStore = authenticationStore;
   }
 
   async collectInputs() {
-    const credential = {} as Configuration;
-    if (this.configurationList.length !== 0 || !this.currentConfiguration) {
-      await MultiStepInput.run((input) => this.manageConfiguration(input, credential));
+    const credential = {} as Authentication;
+    if (this.authenticationList.length !== 0 || !this.currentAuthentication) {
+      await MultiStepInput.run((input) => this.manageAuthentication(input, credential));
       return credential;
     }
-    await MultiStepInput.run((input) => this.inputCredentialName(input, credential));
+    await MultiStepInput.run((input) => this.inputCredentialUsername(input, credential));
     return credential;
   }
 
-  async manageConfiguration(input: MultiStepInput, credential: Configuration) {
-    return this.pickManageConfiguration(input, credential);
+  async manageAuthentication(input: MultiStepInput, credential: Authentication) {
+    return this.pickManageAuthentication(input, credential);
   }
 
-  async inputCredentialName(input: MultiStepInput, credential: Configuration) {
-    credential.name = await input.showInputBox({
+  async inputCredentialUsername(input: MultiStepInput, credential: Authentication) {
+    credential.username = await input.showInputBox({
       title: this.title,
       step: 1,
       totalSteps: 2,
-      placeholder: 'Credential configuration name',
+      placeholder: 'Authentication username',
       shouldResume: this.shouldResume,
-      value: credential.name,
+      value: credential.username,
       ignoreFocusOut: true,
-      prompt: 'Enter your credentials configuration name',
-      validate: (value) => this.validateCredentials(value, 'Credential name'),
+      prompt: 'Enter your authentication name',
+      validate: (value) => this.validateCredentials(value, 'Authentication username'),
     });
-    this.editionMode = false;
-    return (input: MultiStepInput) => this.pickConfigurationMethod(input, credential);
+    return (input: MultiStepInput) => this.pickAuthenticationMethod(input, credential);
   }
 
-  async pickConfigurationMethod(input: MultiStepInput, credential: Configuration) {
+  async pickAuthenticationMethod(input: MultiStepInput, credential: Authentication) {
     const pick = await input.showQuickPick({
       title: this.title,
       step: 2,
       totalSteps: 2,
-      placeholder: 'Pick a configuration method',
+      placeholder: 'Pick an authentication method',
       items: configurationMethod,
       ignoreFocusOut: true,
       //buttons: [createResourceGroupButton, deleteResourceGroupButton, ClearAllResourceGroupButton],
       shouldResume: this.shouldResume,
     });
     if (pick.label === 'Import credentials from file') {
-      return (input: MultiStepInput) => this.inputCredentialPath(input, credential);
+      return (input: MultiStepInput) => this.inputAuthenticationPath(input, credential);
     }
     return (input: MultiStepInput) => this.inputClientID(input, credential);
   }
 
-  async inputClientID(input: MultiStepInput, credential: Configuration) {
+  async inputClientID(input: MultiStepInput, credential: Authentication) {
     credential.client_id = await input.showInputBox({
       title: this.title,
       step: 1,
@@ -125,7 +122,7 @@ export class ConfigurationMenu {
     return (input: MultiStepInput) => this.inputClientSecret(input, credential);
   }
 
-  async inputClientSecret(input: MultiStepInput, credential: Configuration) {
+  async inputClientSecret(input: MultiStepInput, credential: Authentication) {
     credential.client_secret = await input.showInputBox({
       title: this.title,
       step: 2,
@@ -140,7 +137,7 @@ export class ConfigurationMenu {
     return (input: MultiStepInput) => this.inputAccountID(input, credential);
   }
 
-  async inputAccountID(input: MultiStepInput, credential: Configuration) {
+  async inputAccountID(input: MultiStepInput, credential: Authentication) {
     credential.account_id = await input.showInputBox({
       title: this.title,
       step: 3,
@@ -152,10 +149,11 @@ export class ConfigurationMenu {
       validate: (value) => this.validateCredentials(value, 'AccountID'),
       shouldResume: this.shouldResume,
     });
+
     return (input: MultiStepInput) => this.inputAccountEnvID(input, credential);
   }
 
-  async inputAccountEnvID(input: MultiStepInput, credential: Configuration) {
+  async inputAccountEnvID(input: MultiStepInput, credential: Authentication) {
     credential.account_environment_id = await input.showInputBox({
       title: this.title,
       step: 4,
@@ -168,10 +166,10 @@ export class ConfigurationMenu {
       shouldResume: this.shouldResume,
     });
 
-    this.configuration = credential;
+    this.authentication = credential;
   }
 
-  async inputCredentialPath(input: MultiStepInput, credential: Configuration) {
+  async inputAuthenticationPath(input: MultiStepInput, authentication: Authentication) {
     const uriFile = await vscode.window.showOpenDialog({
       defaultUri: vscode.workspace.workspaceFolders?.[0].uri,
       title: 'Select Configuration file',
@@ -191,19 +189,19 @@ export class ConfigurationMenu {
           ? path.resolve(uri!.path, uriFile![0].path).replace(/\\/g, '/').replace('C:/', '')
           : uriFile![0].path;
       const configFile = await readFile(pathConfig, 'utf8');
-      this.configuration = load(configFile) as Configuration;
+      this.authentication = load(configFile) as Authentication;
 
       if (
-        !this.configuration.name ||
-        !this.configuration.client_id ||
-        !this.configuration.client_secret ||
-        !this.configuration.account_id ||
-        !this.configuration.account_environment_id ||
+        !this.authentication.username ||
+        !this.authentication.client_id ||
+        !this.authentication.client_secret ||
+        !this.authentication.account_id ||
+        !this.authentication.account_environment_id ||
         !validPathCredentials(
-          this.configuration.client_id,
-          this.configuration.client_secret,
-          this.configuration.account_id,
-          this.configuration.account_environment_id,
+          this.authentication.client_id,
+          this.authentication.client_secret,
+          this.authentication.account_id,
+          this.authentication.account_environment_id,
         )
       ) {
         vscode.window.showErrorMessage("[Flagship] Might be an Error: can't read the credentials");
@@ -218,34 +216,34 @@ export class ConfigurationMenu {
     }
   }
 
-  async pickManageConfiguration(input: MultiStepInput, credential: Configuration) {
+  async pickManageAuthentication(input: MultiStepInput, credential: Authentication) {
     const pick = await input.showQuickPick({
       title: this.title,
       step: 1,
       totalSteps: 1,
-      placeholder: 'Pick a configuration',
-      items: this.configurationList.map((i) => createQuickPickItem(this.currentConfiguration, i)),
-      activeItem: this.configurationListItem.find((i) => i.label === credential.name),
-      buttons: [CreateConfigurationButton, ClearAllConfigurationButton],
+      placeholder: 'Pick an authentication',
+      items: this.authenticationList.map((i) => createQuickPickItem(this.currentAuthentication, i)),
+      activeItem: this.authenticationListItem.find((i) => i.label === credential.username),
+      buttons: [CreateAuthenticationButton, ClearAllAuthenticationButton],
       shouldResume: this.shouldResume,
       ignoreFocusOut: true,
     });
     if (pick instanceof CustomButton) {
       if (pick.method === 'create') {
         this.addingMode = true;
-        return (input: MultiStepInput) => this.inputCredentialName(input, credential);
+        return (input: MultiStepInput) => this.inputCredentialUsername(input, credential);
       } else if (pick.method === 'clear_all') {
         return this.pickConfirmationClearAll();
       }
     } else {
-      return (input: MultiStepInput) => this.pickOperationForConfiguration(input, pick);
+      return (input: MultiStepInput) => this.pickOperationForAuthentication(input, pick);
     }
   }
 
-  async pickOperationForConfiguration(input: MultiStepInput, pick: vscode.QuickPickItem) {
-    const choices = ['select', 'edit', 'delete'];
-    const credential = this.configurationList.find((c) =>
-      pick.label.includes('$(play)') ? '$(play)' + c.name === pick.label : c.name === pick.label,
+  async pickOperationForAuthentication(input: MultiStepInput, pick: vscode.QuickPickItem) {
+    const choices = ['select', 'delete'];
+    const credential = this.authenticationList.find((c) =>
+      pick.label.includes('$(play)') ? '$(play)' + c.username === pick.label : c.username === pick.label,
     )!;
 
     const picked = await input.showQuickPick({
@@ -259,11 +257,7 @@ export class ConfigurationMenu {
     });
 
     if (picked.label === 'select') {
-      this.editionMode = false;
-      this.configuration = credential;
-    } else if (picked.label === 'edit') {
-      this.editionMode = true;
-      return (input: MultiStepInput) => this.inputClientID(input, credential);
+      this.authentication = credential;
     } else if (picked.label === 'delete') {
       return (input: MultiStepInput) => this.pickConfirmationDelete(input, pick);
     }
@@ -289,15 +283,15 @@ export class ConfigurationMenu {
       ignoreFocusOut: true,
     });
     if (picked === 'yes') {
-      await this.configurationStore.deleteConfiguration(pick.label);
+      await this.authenticationStore.deleteAuthentication(pick.label);
 
       const newList =
-        this.configurationList.length > 1
-          ? this.configurationList.filter((i) => i.name !== pick.label)
-          : this.configurationList.filter((i) => '$(play)' + i.name !== pick.label);
+        this.authenticationList.length > 1
+          ? this.authenticationList.filter((i) => i.username !== pick.label)
+          : this.authenticationList.filter((i) => '$(play)' + i.username !== pick.label);
       //await this.stateConfig.updateGlobalState(CONFIGURATION_LIST, newList);
       this.deletingMode = true;
-      this.configurationList = [...newList];
+      this.authenticationList = [...newList];
 
       if (newList.length === 0) {
         vscode.commands.executeCommand(FEATURE_EXPERIMENTATION_CLEAR_CONFIG);
@@ -305,7 +299,7 @@ export class ConfigurationMenu {
         return;
       }
 
-      if ('$(play)' + this.currentConfiguration.name === pick.label && this.configurationList.length > 1) {
+      if ('$(play)' + this.currentAuthentication.username === pick.label && this.authenticationList.length > 1) {
         this.deletingMode = false;
         return () => this.pickConfigAfterDeletingCurrentConfig(pick);
       }
@@ -317,17 +311,17 @@ export class ConfigurationMenu {
 
   async pickConfigAfterDeletingCurrentConfig(pick: vscode.QuickPickItem) {
     const picked = await vscode.window.showQuickPick(
-      this.configurationList.filter((i) => '$(play)' + i.name !== pick.label).map((i) => i.name),
+      this.authenticationList.filter((i) => '$(play)' + i.username !== pick.label).map((i) => i.username),
       {
         placeHolder: 'Choose a config ?',
         ignoreFocusOut: true,
       },
     );
     if (picked) {
-      this.configurationList.filter((i) => '$(play)' + i.name !== pick.label);
-      await this.configurationStore.deleteConfiguration(pick.label);
+      this.authenticationList.filter((i) => '$(play)' + i.username !== pick.label);
+      await this.authenticationStore.deleteAuthentication(pick.label);
 
-      this.configuration = this.configurationList.find((i) => i.name === picked)!;
+      this.authentication = this.authenticationList.find((i) => i.username === picked)!;
     }
     return;
   }
@@ -345,9 +339,9 @@ export class ConfigurationMenu {
   async validateCredentials(value: string, credentialAttribute: string) {
     if (
       credentialAttribute === 'Credential name' &&
-      !!this.configurationList.map((i) => i.name).find((i) => i === value)
+      !!this.authenticationList.map((i) => i.username).find((i) => i === value)
     ) {
-      return 'Configuration name already exists';
+      return 'Authentication name already exists';
     }
 
     if (
@@ -373,33 +367,21 @@ export class ConfigurationMenu {
     }
   }
 
-  async configure(): Promise<Configuration> {
+  async configure(): Promise<Authentication> {
     await this.collectInputs();
 
     if (this.deletingMode || this.cancelMode) {
-      return {} as Configuration;
+      return {} as Authentication;
     }
 
     if (this.addingMode) {
-      await this.configurationStore.saveConfiguration(this.configuration);
+      await this.authenticationStore.saveAuthentication(this.authentication);
 
-      return {} as Configuration;
+      return {} as Authentication;
     }
 
-    if (this.editionMode) {
-      await this.configurationStore.editConfiguration(this.configuration.name, this.configuration);
-
-      return {} as Configuration;
-    }
-
-    //const configured = await this.configurationStore.saveConfiguration(this.configuration);
-
-    if (this.configuration.name) {
-      if (!this.configurationList.map((i) => i.name).find((i) => i === this.configuration.name)) {
-        await this.configurationStore.saveConfiguration(this.configuration);
-      }
-
-      await this.configurationStore.useConfiguration(this.configuration);
+    if (this.authentication.username) {
+      await this.authenticationStore.saveAuthentication(this.authentication);
       vscode.window.withProgress(
         {
           location: vscode.ProgressLocation.Notification,
@@ -439,17 +421,19 @@ export class ConfigurationMenu {
           return p;
         },
       );
-      return this.configuration;
+      return this.authentication;
     }
 
-    return {} as Configuration;
+    return {} as Authentication;
   }
 }
 
-function createQuickPickItem(currentConfig: Configuration, resource: Configuration): vscode.QuickPickItem {
+function createQuickPickItem(currentConfig: Authentication, resource: Authentication): vscode.QuickPickItem {
   return {
-    label: (currentConfig.name === resource.name ? '$(play)' : '') + resource.name,
-    description: `Environment ID: '${resource.account_environment_id}', Account ID: '${resource.account_id}'`,
+    label: (currentConfig.username === resource.username ? '$(play)' : '') + resource.username,
+    description: `${resource.account_environment_id ? "Environment ID: '${resource.account_environment_id}', " : ''} ${
+      resource.account_id ? "Environment ID: Account ID: '${resource.account_id}'" : ''
+    }`,
     detail: `Client ID: 'xxxx${resource.client_id.substr(
       resource.client_id.length - 6,
     )}' Client Secret: 'xxxx${resource.client_secret.substr(resource.client_secret.length - 6)}'`,

@@ -8,7 +8,7 @@ export class TargetingKeyDataService {
 
   constructor(context: vscode.ExtensionContext) {
     this.context = context;
-    this.targetingKeyList = this.context.globalState.get(GLOBAL_LIST_TARGETING_KEY)!;
+    this.targetingKeyList = this.context.globalState.get(GLOBAL_LIST_TARGETING_KEY) || [];
   }
 
   getState(): TargetingKey[] {

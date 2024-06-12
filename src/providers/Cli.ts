@@ -77,7 +77,7 @@ export class Cli {
     }
   }
 
-  async LoginAuth(authentication: Authentication): Promise<boolean> {
+  async LoginAuthentication(authentication: Authentication): Promise<boolean> {
     try {
       const cliBin = await this.CliBin();
       if (!cliBin) {
@@ -105,7 +105,63 @@ export class Cli {
     }
   }
 
-  async DeleteAuth(username: string): Promise<boolean> {
+  async UseAccount(authentication: Authentication): Promise<boolean> {
+    try {
+      const cliBin = await this.CliBin();
+      if (!cliBin) {
+        return false;
+      }
+      const command = `${cliBin} feature-experimentation account use -i  ${authentication.account_id}`;
+      const output = await this.exec(command, {});
+      console.log(output);
+
+      if (output.stderr) {
+        vscode.window.showErrorMessage(output.stderr);
+        return false;
+      }
+
+      if (output.stdout.includes('exists')) {
+        vscode.window.showErrorMessage(output.stdout);
+        return false;
+      }
+
+      return true;
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return false;
+    }
+  }
+
+  async UseAccountEnvironment(authentication: Authentication): Promise<boolean> {
+    try {
+      const cliBin = await this.CliBin();
+      if (!cliBin) {
+        return false;
+      }
+      const command = `${cliBin} feature-experimentation account-environment use -i  ${authentication.account_environment_id}`;
+      const output = await this.exec(command, {});
+      console.log(output);
+
+      if (output.stderr) {
+        vscode.window.showErrorMessage(output.stderr);
+        return false;
+      }
+
+      if (output.stdout.includes('exists')) {
+        vscode.window.showErrorMessage(output.stdout);
+        return false;
+      }
+
+      return true;
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return false;
+    }
+  }
+
+  async DeleteAuthentication(username: string): Promise<boolean> {
     try {
       const cliBin = await this.CliBin();
       if (!cliBin) {
@@ -123,116 +179,7 @@ export class Cli {
     }
   }
 
-  async CreateConfiguration(configuration: Configuration): Promise<boolean> {
-    try {
-      const cliBin = await this.CliBin();
-      if (!cliBin) {
-        return false;
-      }
-      const command = `${cliBin} configuration create -n ${configuration.name} -i ${configuration.client_id} -s ${configuration.client_secret} -a ${configuration.account_id} -e ${configuration.account_environment_id}`;
-      const output = await this.exec(command, {});
-      console.log(output);
-
-      if (output.stderr) {
-        vscode.window.showErrorMessage(output.stderr);
-        return false;
-      }
-      if (output.stdout.includes('exists')) {
-        vscode.window.showErrorMessage(output.stdout);
-        return false;
-      }
-      return true;
-    } catch (err: any) {
-      vscode.window.showErrorMessage(err.error);
-      console.error(err);
-      return false;
-    }
-  }
-
-  async EditConfiguration(name: string, newConfiguration: Configuration): Promise<boolean> {
-    try {
-      const cliBin = await this.CliBin();
-      if (!cliBin) {
-        return false;
-      }
-      if (
-        newConfiguration.client_id ||
-        newConfiguration.client_secret ||
-        newConfiguration.account_environment_id ||
-        newConfiguration.account_id
-      ) {
-        let command = `${cliBin} feature-experimentation configuration edit -n ${name}`;
-
-        if (newConfiguration.client_id) {
-          command += `\u0020-i ${newConfiguration.client_id}`;
-        }
-        if (newConfiguration.client_secret) {
-          command += `\u0020-s ${newConfiguration.client_secret}`;
-        }
-        if (newConfiguration.account_id) {
-          command += `\u0020-a ${newConfiguration.account_id}`;
-        }
-        if (newConfiguration.account_environment_id) {
-          command += `\u0020-e ${newConfiguration.account_environment_id}`;
-        }
-
-        const output = await this.exec(command, {});
-        console.log(output);
-        if (output.stderr) {
-          vscode.window.showErrorMessage(output.stderr);
-          return false;
-        }
-        return true;
-      }
-      return false;
-    } catch (err: any) {
-      vscode.window.showErrorMessage(err.error);
-      console.error(err);
-      return false;
-    }
-  }
-
-  async DeleteConfiguration(name: string): Promise<boolean> {
-    try {
-      const cliBin = await this.CliBin();
-      if (!cliBin) {
-        return false;
-      }
-
-      let command = `${cliBin} feature-experimentation configuration delete -n ${name}`;
-      const output = await this.exec(command, {});
-      console.log(output);
-      return true;
-    } catch (err: any) {
-      vscode.window.showErrorMessage(err.error);
-      console.error(err);
-      return false;
-    }
-  }
-
-  async UseConfiguration(name: string): Promise<boolean> {
-    try {
-      const cliBin = await this.CliBin();
-      if (!cliBin) {
-        return false;
-      }
-
-      let command = `${cliBin} feature-experimentation configuration use -n ${name}`;
-      const output = await this.exec(command, {});
-      console.log(output);
-      if (output.stderr) {
-        vscode.window.showErrorMessage(output.stderr);
-        return false;
-      }
-      return true;
-    } catch (err: any) {
-      vscode.window.showErrorMessage(err.error);
-      console.error(err);
-      return false;
-    }
-  }
-
-  async ListConfiguration(): Promise<Configuration[]> {
+  async ListAuthentication(): Promise<Authentication[]> {
     try {
       const cliBin = await this.CliBin();
       if (!cliBin) {
@@ -252,23 +199,25 @@ export class Cli {
     }
   }
 
-  async CurrentConfiguration(): Promise<Configuration> {
+  async CurrentAuthentication(): Promise<Authentication> {
     try {
       const cliBin = await this.CliBin();
       if (!cliBin) {
-        return {} as Configuration;
+        return {} as Authentication;
       }
+
       const command = `${cliBin} feature-experimentation authentication current --output-format json`;
       const output = await this.exec(command, {});
       if (output.stderr) {
         vscode.window.showErrorMessage(output.stderr);
-        return {} as Configuration;
+        return {} as Authentication;
       }
+
       return JSON.parse(output.stdout);
     } catch (err: any) {
       vscode.window.showErrorMessage(err.error);
       console.error(err);
-      return {} as Configuration;
+      return {} as Authentication;
     }
   }
 

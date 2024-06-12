@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
-import { Configuration, TokenInfo } from '../model';
+import { Authentication, TokenInfo } from '../model';
 import { Cli } from '../providers/Cli';
-import { ConfigurationDataService } from '../services/ConfigurationDataService';
+import { AuthenticationDataService } from '../services/AuthenticationDataService';
 
 export class AuthenticationStore {
   private cli: Cli;
@@ -9,66 +9,45 @@ export class AuthenticationStore {
 
   constructor(context: vscode.ExtensionContext, cli: Cli) {
     this.cli = cli;
-    this.authenticationService = new ConfigurationDataService(context);
+    this.authenticationService = new AuthenticationDataService(context);
   }
 
-  loadConfiguration(): Configuration[] {
+  loadAuthentication(): Authentication[] {
     return this.authenticationService.getState();
   }
 
-  async refreshConfiguration(): Promise<Configuration[]> {
-    const configurations = await this.cli.ListConfiguration();
-    if (configurations) {
-      await this.authenticationService.loadState(configurations);
+  async refreshAuthentication(): Promise<Authentication[]> {
+    const authentications = await this.cli.ListAuthentication();
+    if (authentications) {
+      await this.authenticationService.loadState(authentications);
     }
-    return configurations;
+    return authentications;
   }
 
-  async saveConfiguration(configuration: Configuration): Promise<Configuration> {
-    const cliResponse = await this.cli.CreateConfiguration(configuration);
+  async saveAuthentication(authentication: Authentication): Promise<Authentication> {
+    const cliResponse = await this.cli.LoginAuthentication(authentication);
     if (cliResponse) {
-      await this.authenticationService.saveConfiguration(configuration);
-      vscode.window.showInformationMessage(`[Flagship] Configuration created successfully !`);
+      await this.authenticationService.saveAuthentication(authentication);
+      vscode.window.showInformationMessage(`[AB Tasty] Authentication created successfully !`);
     }
-    return configuration;
+    return authentication;
   }
 
-  async editConfiguration(configurationName: string, newConfiguration: Configuration): Promise<Configuration> {
-    const cliResponse = configurationName
-      ? await this.cli.EditConfiguration(configurationName, newConfiguration)
-      : ({} as Configuration);
+  async deleteAuthentication(authenticationUsername: string): Promise<boolean> {
+    const cliResponse = authenticationUsername ? await this.cli.DeleteAuthentication(authenticationUsername) : false;
     if (cliResponse) {
-      await this.authenticationService.editConfiguration(configurationName, newConfiguration);
-      vscode.window.showInformationMessage(`[Flagship] Configuration edited successfully`);
-    }
-    return newConfiguration;
-  }
-
-  async deleteConfiguration(configurationName: string): Promise<boolean> {
-    const cliResponse = configurationName ? await this.cli.DeleteConfiguration(configurationName) : false;
-    if (cliResponse) {
-      await this.authenticationService.deleteConfiguration(configurationName);
-      vscode.window.showInformationMessage(`[Flagship] Configuration deleted successfully`);
+      await this.authenticationService.deleteAuthentication(authenticationUsername);
+      vscode.window.showInformationMessage(`[AB Tasty] Authentication deleted successfully`);
     }
     return cliResponse;
   }
 
-  async useConfiguration(configuration: Configuration) {
-    const cliResponse = await this.cli.UseConfiguration(configuration.name);
+  async getCurrentAuthentication() {
+    const cliResponse = await this.cli.CurrentAuthentication();
     const tokenScope = await this.cli.GetTokenInfo();
-    if (cliResponse) {
-      configuration.scope = tokenScope.scope;
-      await this.authenticationService.setCurrentConfiguration(configuration);
-      vscode.window.showInformationMessage(`[Flagship] Configuration ${configuration.name} selected successfully`);
-    }
-  }
-
-  async getCurrentConfiguration() {
-    const cliResponse = await this.cli.CurrentConfiguration();
-    const tokenScope = await this.cli.GetTokenInfo();
-    if (cliResponse.name) {
+    if (cliResponse.username) {
       cliResponse.scope = tokenScope.scope;
-      this.authenticationService.setCurrentConfiguration(cliResponse);
+      this.authenticationService.setCurrentAuthentication(cliResponse);
     }
     return cliResponse;
   }

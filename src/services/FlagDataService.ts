@@ -9,7 +9,7 @@ export class FlagDataService {
 
   constructor(context: vscode.ExtensionContext) {
     this.context = context;
-    this.flagList = this.context.globalState.get(GLOBAL_LIST_FLAG)!;
+    this.flagList = this.context.globalState.get(GLOBAL_LIST_FLAG) || [];
   }
 
   getState(): Flag[] {

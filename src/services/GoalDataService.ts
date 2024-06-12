@@ -8,7 +8,7 @@ export class GoalDataService {
 
   constructor(context: vscode.ExtensionContext) {
     this.context = context;
-    this.goalList = this.context.globalState.get(GLOBAL_LIST_GOAL)!;
+    this.goalList = this.context.globalState.get(GLOBAL_LIST_GOAL) || [];
   }
 
   getState(): Goal[] {
