@@ -18,8 +18,31 @@ export type Authentication = {
   client_secret: string;
   account_id: string;
   account_environment_id: string;
+  account_environment_list: FeatExpAccountEnvironment[];
   path: string;
   scope?: string;
+};
+
+export type FeatExpAccountEnvironment = {
+  id: string;
+  environment: string;
+  is_main: boolean;
+  panic: boolean;
+  single_assignment: boolean;
+};
+
+export type WebExpAccount = {
+  id: number;
+  name: string;
+  identifier: string;
+  role: string;
+  pack: string;
+};
+
+export type CurrentAuthentication = {
+  current_used_credential: string;
+  account_id: string;
+  account_environment_id: string;
 };
 
 export type Project = {

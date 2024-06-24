@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import * as vscode from 'vscode';
-
-import { CONFIGURATION_LIST } from './const';
 import {
-  GLOBAL_CURRENT_AUTHENTICATION,
+  FEATURE_EXPERIMENTATION_CONFIGURED,
+  GLOBAL_CURRENT_AUTHENTICATION_FE,
   GLOBAL_LIST_FLAG,
   GLOBAL_LIST_GOAL,
   GLOBAL_LIST_PROJECT,
   GLOBAL_LIST_TARGETING_KEY,
-} from './services/const';
+} from './services/featureExperimentation/const';
+import { GLOBAL_CURRENT_AUTHENTICATION_WE, WEB_EXPERIMENTATION_CONFIGURED } from './services/webExperimentation/const';
 
 export class StateConfiguration {
   private readonly context: vscode.ExtensionContext;
@@ -31,23 +31,31 @@ export class StateConfiguration {
     return {};
   }
 
-  async clearGlobalConfig(): Promise<void> {
-    await this.context.globalState.update(CONFIGURATION_LIST, undefined);
-    await this.context.globalState.update(GLOBAL_CURRENT_AUTHENTICATION, undefined);
+  async clearGlobalConfigFeatExp(): Promise<void> {
+    await this.context.globalState.update(GLOBAL_CURRENT_AUTHENTICATION_FE, undefined);
     await this.context.globalState.update(GLOBAL_LIST_FLAG, undefined);
     await this.context.globalState.update(GLOBAL_LIST_TARGETING_KEY, undefined);
     await this.context.globalState.update(GLOBAL_LIST_PROJECT, undefined);
     await this.context.globalState.update(GLOBAL_LIST_GOAL, undefined);
   }
 
-  async hasGlobalConfigured(): Promise<boolean> {
-    return !!(await this.context.globalState.get(CONFIGURATION_LIST));
+  async isGlobalConfiguredFeatExp(): Promise<boolean> {
+    return (
+      !!(await this.context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION_FE)) &&
+      !!(await this.context.globalState.get(FEATURE_EXPERIMENTATION_CONFIGURED))
+    );
   }
 
-  async isGlobalConfigured(): Promise<boolean> {
+  async clearGlobalConfigWebExp(): Promise<void> {
+    await this.context.globalState.update(GLOBAL_CURRENT_AUTHENTICATION_WE, undefined);
+    // TODO
+    await this.context.globalState.update(GLOBAL_LIST_FLAG, undefined);
+  }
+
+  async isGlobalConfiguredWebExp(): Promise<boolean> {
     return (
-      !!(await this.context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION)) &&
-      !!(await this.context.globalState.get('FSConfigured'))
+      !!(await this.context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION_WE)) &&
+      !!(await this.context.globalState.get(WEB_EXPERIMENTATION_CONFIGURED))
     );
   }
 }

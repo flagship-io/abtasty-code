@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
-import { StateConfiguration } from '../stateConfiguration';
-import { DOCUMENT_URI } from '../const';
+import { StateConfiguration } from '../../stateConfiguration';
+import { DOCUMENT_URI } from '../../const';
 import {
   FEATURE_EXPERIMENTATION_CREATE_FLAG,
   FEATURE_EXPERIMENTATION_CREATE_GOAL,
@@ -9,7 +9,8 @@ import {
   FEATURE_EXPERIMENTATION_OPEN_BROWSER,
   FEATURE_EXPERIMENTATION_QUICK_ACCESS_REFRESH,
   FEATURE_EXPERIMENTATION_SET_CREDENTIALS,
-} from '../commands/const';
+  WEB_EXPERIMENTATION_SET_CREDENTIALS,
+} from '../../commands/const';
 
 const NON_COLLAPSED = vscode.TreeItemCollapsibleState.None;
 export class QuickAccessListProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
@@ -44,6 +45,12 @@ export class QuickAccessListProvider implements vscode.TreeDataProvider<vscode.T
       new LinkItem(`Manage configurations`, NON_COLLAPSED, '', {
         title: 'Credentials',
         command: FEATURE_EXPERIMENTATION_SET_CREDENTIALS,
+      }),
+    );
+    this.items.push(
+      new LinkItem(`Switch to Web experimentation`, NON_COLLAPSED, '', {
+        title: 'Change product',
+        command: WEB_EXPERIMENTATION_SET_CREDENTIALS,
       }),
     );
     this.items.push(

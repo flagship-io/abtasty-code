@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { TargetingKey } from '../model';
+import { TargetingKey } from '../../model';
 import { GLOBAL_LIST_TARGETING_KEY } from './const';
 
 export class TargetingKeyDataService {

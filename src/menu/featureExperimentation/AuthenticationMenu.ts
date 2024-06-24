@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import * as vscode from 'vscode';
-import { MultiStepInput } from '../multipleStepInput';
+import { MultiStepInput } from '../../multipleStepInput';
 import { load } from 'js-yaml';
 import { readFile } from 'fs/promises';
 import path = require('path');
-import { CONFIG_ADD_ICON, CONFIG_CLEAR_ALL_ICON } from '../icons';
-import { Authentication } from '../model';
-import { FEATURE_EXPERIMENTATION_CLEAR_CONFIG } from '../commands/const';
-import { AuthenticationStore } from '../store/AuthenticationStore';
+import { CONFIG_ADD_ICON, CONFIG_CLEAR_ALL_ICON } from '../../icons';
+import { FeatExpAccountEnvironment, Authentication } from '../../model';
+import { FEATURE_EXPERIMENTATION_CLEAR_CONFIG } from '../../commands/const';
+import { AuthenticationStore } from '../../store/featureExperimentation/AuthenticationStore';
 
 const configMethods = ['Insert credentials', 'Import credentials from file'];
 
@@ -26,6 +26,9 @@ class CustomButton implements vscode.QuickInputButton {
 const ClearAllAuthenticationButton = new CustomButton(CONFIG_CLEAR_ALL_ICON, 'Clear all Authentications', 'clear_all');
 const CreateAuthenticationButton = new CustomButton(CONFIG_ADD_ICON, 'Create new configuration', 'create');
 
+// TODO later
+const CreateAccountEnvironmentButton = new CustomButton(CONFIG_ADD_ICON, 'Insert new account environment ID', 'create');
+
 export class AuthenticationMenu {
   private title: string;
   private authentication!: Authentication;
@@ -33,7 +36,6 @@ export class AuthenticationMenu {
   private authenticationListItem: vscode.QuickPickItem[];
   private currentAuthentication: Authentication;
   private authenticationStore: AuthenticationStore;
-  private addingMode: boolean;
   private deletingMode: boolean;
   private cancelMode: boolean;
 
@@ -55,7 +57,6 @@ export class AuthenticationMenu {
     this.authenticationListItem = authenticationList.map((p) => ({
       label: p.username,
     }));
-    this.addingMode = false;
     this.deletingMode = false;
     this.cancelMode = false;
     this.authenticationStore = authenticationStore;
@@ -72,7 +73,7 @@ export class AuthenticationMenu {
   }
 
   async manageAuthentication(input: MultiStepInput, credential: Authentication) {
-    return this.pickManageAuthentication(input, credential);
+    return this.pickAuthentication(input, credential);
   }
 
   async inputCredentialUsername(input: MultiStepInput, credential: Authentication) {
@@ -150,7 +151,14 @@ export class AuthenticationMenu {
       shouldResume: this.shouldResume,
     });
 
-    return (input: MultiStepInput) => this.inputAccountEnvID(input, credential);
+    this.authentication = credential;
+
+    const authSuccess = await this.authenticationStore.createAuthentication(this.authentication);
+    if (authSuccess) {
+      return (input: MultiStepInput) => this.pickAccountEnvironmentID(input, credential);
+    }
+
+    return {} as Authentication;
   }
 
   async inputAccountEnvID(input: MultiStepInput, credential: Authentication) {
@@ -204,25 +212,25 @@ export class AuthenticationMenu {
           this.authentication.account_environment_id,
         )
       ) {
-        vscode.window.showErrorMessage("[Flagship] Might be an Error: can't read the credentials");
+        vscode.window.showErrorMessage("[AB Tasty] Might be an Error: can't read the credentials");
         this.cancelMode = true;
         return;
       }
     } catch (e) {
-      vscode.window.showErrorMessage('[Flagship] No such file or directory');
-      console.error(`[Flagship] Failed configuring Flagship Extension(provider): File or directory might not exist`);
+      vscode.window.showErrorMessage('[AB Tasty] No such file or directory');
+      console.error(`[AB Tasty] Failed configuring Flagship Extension(provider): File or directory might not exist`);
       this.cancelMode = true;
       return;
     }
   }
 
-  async pickManageAuthentication(input: MultiStepInput, credential: Authentication) {
+  async pickAuthentication(input: MultiStepInput, credential: Authentication) {
     const pick = await input.showQuickPick({
       title: this.title,
       step: 1,
       totalSteps: 1,
       placeholder: 'Pick an authentication',
-      items: this.authenticationList.map((i) => createQuickPickItem(this.currentAuthentication, i)),
+      items: this.authenticationList.map((i) => quickPickAuthentication(this.currentAuthentication, i)),
       activeItem: this.authenticationListItem.find((i) => i.label === credential.username),
       buttons: [CreateAuthenticationButton, ClearAllAuthenticationButton],
       shouldResume: this.shouldResume,
@@ -230,7 +238,6 @@ export class AuthenticationMenu {
     });
     if (pick instanceof CustomButton) {
       if (pick.method === 'create') {
-        this.addingMode = true;
         return (input: MultiStepInput) => this.inputCredentialUsername(input, credential);
       } else if (pick.method === 'clear_all') {
         return this.pickConfirmationClearAll();
@@ -257,7 +264,7 @@ export class AuthenticationMenu {
     });
 
     if (picked.label === 'select') {
-      this.authentication = credential;
+      return (input: MultiStepInput) => this.inputAccountID(input, credential);
     } else if (picked.label === 'delete') {
       return (input: MultiStepInput) => this.pickConfirmationDelete(input, pick);
     }
@@ -271,10 +278,32 @@ export class AuthenticationMenu {
     if (picked === 'yes') {
       this.deletingMode = true;
       vscode.commands.executeCommand(FEATURE_EXPERIMENTATION_CLEAR_CONFIG);
-      vscode.window.showInformationMessage('[Flagship] All configurations cleared');
+      vscode.window.showInformationMessage('[AB Tasty] All configurations cleared');
       return;
     }
     return;
+  }
+
+  async pickAccountEnvironmentID(input: MultiStepInput, credential: Authentication) {
+    const accountEnvList = await this.authenticationStore.getAccountEnvironmentList();
+    const pick = await input.showQuickPick({
+      title: this.title,
+      step: 1,
+      totalSteps: 1,
+      placeholder: 'Pick an account environment',
+      items: accountEnvList.map((i) => quickPickAccountEnvironment(i)),
+      buttons: [CreateAccountEnvironmentButton],
+      shouldResume: this.shouldResume,
+      ignoreFocusOut: true,
+    });
+    if (pick instanceof CustomButton) {
+      if (pick.method === 'create') {
+        return (input: MultiStepInput) => this.inputAccountEnvID(input, credential);
+      }
+    } else {
+      credential.account_environment_id = pick.label;
+      this.authentication = credential;
+    }
   }
 
   async pickConfirmationDelete(input: MultiStepInput, pick: vscode.QuickPickItem) {
@@ -289,13 +318,12 @@ export class AuthenticationMenu {
         this.authenticationList.length > 1
           ? this.authenticationList.filter((i) => i.username !== pick.label)
           : this.authenticationList.filter((i) => '$(play)' + i.username !== pick.label);
-      //await this.stateConfig.updateGlobalState(CONFIGURATION_LIST, newList);
       this.deletingMode = true;
       this.authenticationList = [...newList];
 
       if (newList.length === 0) {
         vscode.commands.executeCommand(FEATURE_EXPERIMENTATION_CLEAR_CONFIG);
-        vscode.window.showInformationMessage('[Flagship] All configurations cleared');
+        vscode.window.showInformationMessage('[AB Tasty] All configurations cleared');
         return;
       }
 
@@ -322,6 +350,7 @@ export class AuthenticationMenu {
       await this.authenticationStore.deleteAuthentication(pick.label);
 
       this.authentication = this.authenticationList.find((i) => i.username === picked)!;
+      return (input: MultiStepInput) => this.inputAccountID(input, this.authentication);
     }
     return;
   }
@@ -374,53 +403,9 @@ export class AuthenticationMenu {
       return {} as Authentication;
     }
 
-    if (this.addingMode) {
-      await this.authenticationStore.saveAuthentication(this.authentication);
-
-      return {} as Authentication;
-    }
-
     if (this.authentication.username) {
-      await this.authenticationStore.saveAuthentication(this.authentication);
-      vscode.window.withProgress(
-        {
-          location: vscode.ProgressLocation.Notification,
-          title: 'Progress Notification',
-          cancellable: true,
-        },
-        (progress, token) => {
-          token.onCancellationRequested(() => {
-            console.error('Canceled the long running operation');
-            this.cancelMode = true;
-          });
-
-          progress.report({ increment: 0 });
-
-          setTimeout(() => {
-            progress.report({ increment: 10, message: 'Check credentials...' });
-          }, 500);
-
-          setTimeout(() => {
-            progress.report({ increment: 40, message: 'Validating credentials...' });
-          }, 1000);
-
-          setTimeout(() => {
-            progress.report({ increment: 50, message: 'Configuring the extension...' });
-          }, 1500);
-
-          setTimeout(() => {
-            progress.report({ increment: 70, message: 'Storing credentials...' });
-          }, 2000);
-
-          const p = new Promise<void>(async (resolve) => {
-            setTimeout(async () => {
-              resolve();
-            }, 2000);
-          });
-
-          return p;
-        },
-      );
+      await this.authenticationStore.selectEnvironment(this.authentication);
+      configuringExtension(this.cancelMode);
       return this.authentication;
     }
 
@@ -428,7 +413,7 @@ export class AuthenticationMenu {
   }
 }
 
-function createQuickPickItem(currentConfig: Authentication, resource: Authentication): vscode.QuickPickItem {
+function quickPickAuthentication(currentConfig: Authentication, resource: Authentication): vscode.QuickPickItem {
   return {
     label: (currentConfig.username === resource.username ? '$(play)' : '') + resource.username,
     description: `${resource.account_environment_id ? "Environment ID: '${resource.account_environment_id}', " : ''} ${
@@ -437,6 +422,13 @@ function createQuickPickItem(currentConfig: Authentication, resource: Authentica
     detail: `Client ID: 'xxxx${resource.client_id.substr(
       resource.client_id.length - 6,
     )}' Client Secret: 'xxxx${resource.client_secret.substr(resource.client_secret.length - 6)}'`,
+  };
+}
+
+function quickPickAccountEnvironment(resource: FeatExpAccountEnvironment): vscode.QuickPickItem {
+  return {
+    label: resource.id,
+    description: `Environment: '${resource.environment}'`,
   };
 }
 
@@ -452,5 +444,77 @@ function validPathCredentials(clientId: string, clientSecret: string, accountId:
     accountEnvironmentId.match(/^[a-zA-Z0-9]{20}$/g) &&
     clientId.match(/^[a-zA-Z0-9]{8}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{12}$/g) &&
     clientSecret.match(/^[a-zA-Z0-9]{64}$/g)
+  );
+}
+
+function validateCredentials(cancelMode: boolean) {
+  vscode.window.withProgress(
+    {
+      location: vscode.ProgressLocation.Notification,
+      title: 'Progress Notification',
+      cancellable: true,
+    },
+    (progress, token) => {
+      token.onCancellationRequested(() => {
+        console.error('Canceled the long running operation');
+        cancelMode = true;
+      });
+
+      progress.report({ increment: 0 });
+
+      setTimeout(() => {
+        progress.report({ increment: 10, message: 'Check credentials...' });
+      }, 500);
+
+      setTimeout(() => {
+        progress.report({ increment: 40, message: 'Validating credentials...' });
+      }, 1000);
+
+      setTimeout(() => {
+        progress.report({ increment: 50, message: 'Configuring the extension...' });
+      }, 1500);
+
+      setTimeout(() => {
+        progress.report({ increment: 70, message: 'Storing credentials...' });
+      }, 2000);
+
+      const p = new Promise<void>(async (resolve) => {
+        setTimeout(async () => {
+          resolve();
+        }, 2000);
+      });
+
+      return p;
+    },
+  );
+}
+
+function configuringExtension(cancelMode: boolean) {
+  vscode.window.withProgress(
+    {
+      location: vscode.ProgressLocation.Notification,
+      title: 'Progress Notification',
+      cancellable: true,
+    },
+    (progress, token) => {
+      token.onCancellationRequested(() => {
+        console.error('Canceled the long running operation');
+        cancelMode = true;
+      });
+
+      progress.report({ increment: 0 });
+
+      setTimeout(() => {
+        progress.report({ increment: 10, message: 'Configuring the extension...' });
+      }, 500);
+
+      const p = new Promise<void>(async (resolve) => {
+        setTimeout(async () => {
+          resolve();
+        }, 500);
+      });
+
+      return p;
+    },
   );
 }

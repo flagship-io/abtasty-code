@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
-import { Goal } from '../model';
-import { Cli } from '../providers/Cli';
-import { GoalDataService } from '../services/GoalDataService';
+import { Goal } from '../../model';
+import { Cli } from '../../providers/Cli';
+import { GoalDataService } from '../../services/featureExperimentation/GoalDataService';
 
 export class GoalStore {
   private cli: Cli;
@@ -26,7 +26,7 @@ export class GoalStore {
     const cliResponse = await this.cli.CreateGoal(goal);
     if (cliResponse.id) {
       await this.goalService.saveGoal(cliResponse);
-      vscode.window.showInformationMessage(`[Flagship] Goal created successfully !`);
+      vscode.window.showInformationMessage(`[AB Tasty] Goal created successfully !`);
     }
     return cliResponse;
   }
@@ -35,7 +35,7 @@ export class GoalStore {
     const cliResponse = goalId ? await this.cli.EditGoal(goalId, newGoal) : ({} as Goal);
     if (cliResponse.id) {
       await this.goalService.editGoal(goalId, cliResponse);
-      vscode.window.showInformationMessage(`[Flagship] Goal edited successfully`);
+      vscode.window.showInformationMessage(`[AB Tasty] Goal edited successfully`);
     }
     return cliResponse;
   }
@@ -44,7 +44,7 @@ export class GoalStore {
     const cliResponse = goalId ? await this.cli.DeleteGoal(goalId) : false;
     if (cliResponse) {
       await this.goalService.deleteGoal(goalId);
-      vscode.window.showInformationMessage(`[Flagship] Goal deleted successfully`);
+      vscode.window.showInformationMessage(`[AB Tasty] Goal deleted successfully`);
     }
     return cliResponse;
   }

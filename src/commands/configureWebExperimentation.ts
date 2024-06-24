@@ -7,23 +7,24 @@ import {
   FEATURE_EXPERIMENTATION_PROJECT_LIST_REFRESH,
   FEATURE_EXPERIMENTATION_QUICK_ACCESS_REFRESH,
   SET_CONTEXT,
-  FEATURE_EXPERIMENTATION_SET_CREDENTIALS,
   WEB_EXPERIMENTATION_SET_CREDENTIALS,
   FEATURE_EXPERIMENTATION_TARGETING_KEY_LIST_REFRESH,
 } from './const';
 
-import { AuthenticationStore } from '../store/featureExperimentation/AuthenticationStore';
-import { AuthenticationMenu } from '../menu/featureExperimentation/AuthenticationMenu';
-import { FEATURE_EXPERIMENTATION_CONFIGURED } from '../services/featureExperimentation/const';
+import { AuthenticationStore } from '../store/webExperimentation/AuthenticationStore';
+import { AuthenticationMenu } from '../menu/webExperimentation/AuthenticationMenu';
+import { WEB_EXPERIMENTATION_CONFIGURED } from '../services/webExperimentation/const';
 
 export let currentConfigurationNameStatusBar: vscode.StatusBarItem;
 
-export default async function configureFeatureExperimentationCmd(context: vscode.ExtensionContext, cli: Cli) {
+export default async function configureWebExperimentationCmd(context: vscode.ExtensionContext, cli: Cli) {
   const authenticationStore: AuthenticationStore = new AuthenticationStore(context, cli);
   const configureExtension: vscode.Disposable = vscode.commands.registerCommand(
-    FEATURE_EXPERIMENTATION_SET_CREDENTIALS,
+    WEB_EXPERIMENTATION_SET_CREDENTIALS,
     async () => {
       try {
+        await context.globalState.update(WEB_EXPERIMENTATION_CONFIGURED, true);
+        await vscode.commands.executeCommand(SET_CONTEXT, 'abtasty:explorer', 'webExperimentation');
         const authenticationList = (await authenticationStore.refreshAuthentication()) || [];
         const currentAuthentication = (await authenticationStore.getCurrentAuthentication()) || {};
         const sortedAuth = authenticationList.sort((a, b) => {
@@ -43,8 +44,8 @@ export default async function configureFeatureExperimentationCmd(context: vscode
         if (cliAuthenticated) {
           const updatedCurrentConfiguration = await authenticationStore.getCurrentAuthentication();
 
-          await context.globalState.update(FEATURE_EXPERIMENTATION_CONFIGURED, true);
-          await vscode.commands.executeCommand(SET_CONTEXT, 'abtasty:explorer', 'featureExperimentation');
+          await context.globalState.update(WEB_EXPERIMENTATION_CONFIGURED, true);
+          await vscode.commands.executeCommand(SET_CONTEXT, 'abtasty:explorer', 'webExperimentation');
 
           updateStatusBarItem(updatedCurrentConfiguration.username);
 
@@ -75,6 +76,13 @@ export default async function configureFeatureExperimentationCmd(context: vscode
     },
   );
 
+  /*   const configureExtensionWE: vscode.Disposable = vscode.commands.registerCommand(
+    WEB_EXPERIMENTATION_SET_CREDENTIALS,
+    async () => {
+      await context.globalState.update(FEATURE_EXPERIMENTATION_CONFIGURED, true);
+      await vscode.commands.executeCommand(SET_CONTEXT, 'abtasty:explorer', 'webExperimentation');
+    },
+  ); */
   currentConfigurationNameStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
   context.subscriptions.push(configureExtension, currentConfigurationNameStatusBar);
 }
@@ -82,7 +90,7 @@ export default async function configureFeatureExperimentationCmd(context: vscode
 function updateStatusBarItem(currName?: string) {
   if (currName !== undefined) {
     currentConfigurationNameStatusBar.text = `$(megaphone) Current Flagship configuration: ${currName}`;
-    currentConfigurationNameStatusBar.command = FEATURE_EXPERIMENTATION_SET_CREDENTIALS;
+    currentConfigurationNameStatusBar.command = WEB_EXPERIMENTATION_SET_CREDENTIALS;
     currentConfigurationNameStatusBar.show();
     return;
   }

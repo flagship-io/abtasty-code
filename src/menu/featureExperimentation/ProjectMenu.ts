@@ -1,8 +1,13 @@
 import * as vscode from 'vscode';
-import { Cli } from '../providers/Cli';
-import { CampaignItem, ProjectItem, VariationGroupItem, VariationItem } from '../providers/ProjectList';
-import { ProjectStore } from '../store/ProjectStore';
-import { Campaign, Project } from '../model';
+import { Cli } from '../../providers/Cli';
+import {
+  CampaignItem,
+  ProjectItem,
+  VariationGroupItem,
+  VariationItem,
+} from '../../providers/featureExperimentation/ProjectList';
+import { ProjectStore } from '../../store/featureExperimentation/ProjectStore';
+import { Campaign, Project } from '../../model';
 
 interface ProjectSchema {
   name: string;
@@ -40,7 +45,7 @@ export async function projectInputBox(project: ProjectItem, projectStore: Projec
       const projectEdited = await projectStore.editProject(project.id, { name } as Project);
 
       if (!projectEdited.id) {
-        vscode.window.showErrorMessage(`[Flagship] Project not edited`);
+        vscode.window.showErrorMessage(`[AB Tasty] Project not edited`);
         return;
       }
       return;
@@ -48,12 +53,12 @@ export async function projectInputBox(project: ProjectItem, projectStore: Projec
     const projectCreated = await projectStore.saveProject({ name, campaigns: [] as Campaign[] } as Project);
 
     if (!projectCreated.id) {
-      vscode.window.showErrorMessage(`[Flagship] Project not created`);
+      vscode.window.showErrorMessage(`[AB Tasty] Project not created`);
       return;
     }
     return;
   }
-  vscode.window.showErrorMessage(`[Flagship] Project not created`);
+  vscode.window.showErrorMessage(`[AB Tasty] Project not created`);
 }
 
 export async function deleteProjectInputBox(project: ProjectItem, projectStore: ProjectStore) {
@@ -77,7 +82,7 @@ export async function deleteCampaignBox(context: vscode.ExtensionContext, campai
   });
   if (picked === 'yes') {
     await cli.DeleteCampaign(campaign.id!);
-    vscode.window.showInformationMessage(`[Flagship] Campaign ${campaign.name} deleted successfully.`);
+    vscode.window.showInformationMessage(`[AB Tasty] Campaign ${campaign.name} deleted successfully.`);
     return;
   }
   return;
@@ -95,7 +100,7 @@ export async function deleteVariationGroupBox(
   });
   if (picked === 'yes') {
     await cli.DeleteVariationGroup(variationGroup.id!, variationGroup.parentID!);
-    vscode.window.showInformationMessage(`[Flagship] Variation group ${variationGroup.name} deleted successfully.`);
+    vscode.window.showInformationMessage(`[AB Tasty] Variation group ${variationGroup.name} deleted successfully.`);
     return;
   }
   return;
@@ -109,7 +114,7 @@ export async function deleteVariationBox(context: vscode.ExtensionContext, varia
   });
   if (picked === 'yes') {
     await cli.DeleteVariation(variation.id!, variation.campaignID!, variation.parentID!);
-    vscode.window.showInformationMessage(`[Flagship] Variation ${variation.name} deleted successfully.`);
+    vscode.window.showInformationMessage(`[AB Tasty] Variation ${variation.name} deleted successfully.`);
     return;
   }
   return;
@@ -123,17 +128,17 @@ export async function switchProjectBox(context: vscode.ExtensionContext, project
   });
   if (picked === 'active') {
     await cli.SwitchProject(project.id!, picked);
-    vscode.window.showInformationMessage(`[Flagship] Project ${project.name} set to ${picked} successfully.`);
+    vscode.window.showInformationMessage(`[AB Tasty] Project ${project.name} set to ${picked} successfully.`);
     return;
   }
   if (picked === 'paused') {
     await cli.SwitchProject(project.id!, picked);
-    vscode.window.showInformationMessage(`[Flagship] Project ${project.name} set to ${picked} successfully.`);
+    vscode.window.showInformationMessage(`[AB Tasty] Project ${project.name} set to ${picked} successfully.`);
     return;
   }
   if (picked === 'interrupted') {
     await cli.SwitchProject(project.id!, picked);
-    vscode.window.showInformationMessage(`[Flagship] Project ${project.name} set to ${picked} successfully.`);
+    vscode.window.showInformationMessage(`[AB Tasty] Project ${project.name} set to ${picked} successfully.`);
     return;
   }
   return;
@@ -147,17 +152,17 @@ export async function switchCampaignBox(context: vscode.ExtensionContext, campai
   });
   if (picked === 'active') {
     await cli.SwitchProject(campaign.id!, picked);
-    vscode.window.showInformationMessage(`[Flagship] Campaign ${campaign.name} set to ${picked} successfully.`);
+    vscode.window.showInformationMessage(`[AB Tasty] Campaign ${campaign.name} set to ${picked} successfully.`);
     return;
   }
   if (picked === 'paused') {
     await cli.SwitchProject(campaign.id!, picked);
-    vscode.window.showInformationMessage(`[Flagship] Campaign ${campaign.name} set to ${picked} successfully.`);
+    vscode.window.showInformationMessage(`[AB Tasty] Campaign ${campaign.name} set to ${picked} successfully.`);
     return;
   }
   if (picked === 'interrupted') {
     await cli.SwitchProject(campaign.id!, picked);
-    vscode.window.showInformationMessage(`[Flagship] Campaign ${campaign.name} set to ${picked} successfully.`);
+    vscode.window.showInformationMessage(`[AB Tasty] Campaign ${campaign.name} set to ${picked} successfully.`);
     return;
   }
   return;

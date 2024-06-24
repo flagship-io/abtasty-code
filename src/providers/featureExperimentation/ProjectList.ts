@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 import {
   FEATURE_EXPERIMENTATION_PROJECT_LIST_LOAD,
   FEATURE_EXPERIMENTATION_PROJECT_LIST_REFRESH,
-} from '../commands/const';
+} from '../../commands/const';
 import {
   CIRCLE_FILLED,
   CIRCLE_OUTLINE,
@@ -18,12 +18,13 @@ import {
   MILESTONE_PAUSED,
   TARGET,
   WATCH,
-} from '../icons';
-import { PERMISSION_DENIED_PANEL } from '../const';
-import { Authentication, Configuration, Project } from '../model';
-import { ProjectStore } from '../store/ProjectStore';
-import { GLOBAL_CURRENT_AUTHENTICATION } from '../services/const';
-import { StateConfiguration } from '../stateConfiguration';
+} from '../../icons';
+import { PERMISSION_DENIED_PANEL } from '../../const';
+import { Authentication, Configuration, Project } from '../../model';
+import { ProjectStore } from '../../store/featureExperimentation/ProjectStore';
+
+import { StateConfiguration } from '../../stateConfiguration';
+import { GLOBAL_CURRENT_AUTHENTICATION_FE } from '../../services/featureExperimentation/const';
 
 export class ProjectListProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
   private _tree: ProjectTreeItem[] = [];
@@ -48,7 +49,7 @@ export class ProjectListProvider implements vscode.TreeDataProvider<vscode.TreeI
   }
 
   async refresh() {
-    const { scope } = (this.context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION) as Authentication) || {};
+    const { scope } = (this.context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION_FE) as Authentication) || {};
     if (scope?.includes('project.list') && scope?.includes('campaign.list')) {
       await this.getRefreshedProjects();
     }
@@ -56,7 +57,7 @@ export class ProjectListProvider implements vscode.TreeDataProvider<vscode.TreeI
   }
 
   load() {
-    const { scope } = (this.context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION) as Authentication) || {};
+    const { scope } = (this.context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION_FE) as Authentication) || {};
     if (scope?.includes('project.list') && scope?.includes('campaign.list')) {
       this.getLoadedProjects();
     }
@@ -68,7 +69,7 @@ export class ProjectListProvider implements vscode.TreeDataProvider<vscode.TreeI
   }
 
   getChildren(element?: ProjectTreeItem): vscode.ProviderResult<vscode.TreeItem[]> {
-    const { scope } = (this.context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION) as Authentication) || {};
+    const { scope } = (this.context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION_FE) as Authentication) || {};
     if (typeof element === 'undefined') {
       if (!scope?.includes('project.list') || !scope?.includes('campaign.list')) {
         return [new ProjectTreeItem(PERMISSION_DENIED_PANEL)];

@@ -1,10 +1,13 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
 import * as vscode from 'vscode';
-import { Cli } from './Cli';
-import { FlagAnalyzedType } from '../model';
-import { FEATURE_EXPERIMENTATION_FIND_IN_FILE, FEATURE_EXPERIMENTATION_FLAG_IN_FILE_REFRESH } from '../commands/const';
-import { rootPath } from '../setupProviders';
+import { Cli } from '../Cli';
+import { FlagAnalyzedType } from '../../model';
+import {
+  FEATURE_EXPERIMENTATION_FIND_IN_FILE,
+  FEATURE_EXPERIMENTATION_FLAG_IN_FILE_REFRESH,
+} from '../../commands/const';
+import { rootPath } from '../../setupProviders';
 
 export class FileAnalyzed extends vscode.TreeItem {
   public readonly file: string | undefined;

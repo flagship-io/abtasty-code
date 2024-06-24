@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
-import { Goal } from '../model';
 import { GLOBAL_LIST_GOAL } from './const';
+import { Goal } from '../../model';
 
 export class GoalDataService {
   private context: vscode.ExtensionContext;

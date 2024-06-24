@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
-import { Project } from '../model';
-import { Cli } from '../providers/Cli';
-import { ProjectDataService } from '../services/ProjectDataService';
+import { Project } from '../../model';
+import { Cli } from '../../providers/Cli';
+import { ProjectDataService } from '../../services/featureExperimentation/ProjectDataService';
 
 export class ProjectStore {
   private cli: Cli;
@@ -32,7 +32,7 @@ export class ProjectStore {
     const cliResponse = await this.cli.CreateProject(project);
     if (cliResponse.id) {
       await this.projectService.saveProject(cliResponse);
-      vscode.window.showInformationMessage(`[Flagship] Project created successfully !`);
+      vscode.window.showInformationMessage(`[AB Tasty] Project created successfully !`);
     }
     return cliResponse;
   }
@@ -41,7 +41,7 @@ export class ProjectStore {
     const cliResponse = projectId ? await this.cli.EditProject(projectId, newProject) : ({} as Project);
     if (cliResponse.id) {
       await this.projectService.editProject(projectId, cliResponse);
-      vscode.window.showInformationMessage(`[Flagship] Project edited successfully`);
+      vscode.window.showInformationMessage(`[AB Tasty] Project edited successfully`);
     }
     return cliResponse;
   }
@@ -50,7 +50,7 @@ export class ProjectStore {
     const cliResponse = projectId ? await this.cli.DeleteProject(projectId) : false;
     if (cliResponse) {
       await this.projectService.deleteProject(projectId);
-      vscode.window.showInformationMessage(`[Flagship] Project deleted successfully`);
+      vscode.window.showInformationMessage(`[AB Tasty] Project deleted successfully`);
     }
     return cliResponse;
   }

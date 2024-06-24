@@ -1,10 +1,13 @@
 import * as vscode from 'vscode';
-import { FEATURE_EXPERIMENTATION_GOAL_LIST_LOAD, FEATURE_EXPERIMENTATION_GOAL_LIST_REFRESH } from '../commands/const';
-import { PERMISSION_DENIED_PANEL } from '../const';
-import { ROCKET } from '../icons';
-import { Authentication, Configuration, ItemResource } from '../model';
-import { GoalStore } from '../store/GoalStore';
-import { GLOBAL_CURRENT_AUTHENTICATION } from '../services/const';
+import {
+  FEATURE_EXPERIMENTATION_GOAL_LIST_LOAD,
+  FEATURE_EXPERIMENTATION_GOAL_LIST_REFRESH,
+} from '../../commands/const';
+import { PERMISSION_DENIED_PANEL } from '../../const';
+import { ROCKET } from '../../icons';
+import { Authentication, Configuration, ItemResource } from '../../model';
+import { GoalStore } from '../../store/featureExperimentation/GoalStore';
+import { GLOBAL_CURRENT_AUTHENTICATION_FE } from '../../services/featureExperimentation/const';
 
 export class GoalListProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
   private _goals: GoalItem[] = [];
@@ -24,7 +27,7 @@ export class GoalListProvider implements vscode.TreeDataProvider<vscode.TreeItem
 
   async refresh() {
     this._goals = [];
-    const { scope } = (this.context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION) as Authentication) || {};
+    const { scope } = (this.context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION_FE) as Authentication) || {};
     if (scope?.includes('goal.list')) {
       await this.getRefreshedGoals();
     }
@@ -33,7 +36,7 @@ export class GoalListProvider implements vscode.TreeDataProvider<vscode.TreeItem
 
   async load() {
     this._goals = [];
-    const { scope } = (this.context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION) as Authentication) || {};
+    const { scope } = (this.context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION_FE) as Authentication) || {};
     if (scope?.includes('goal.list')) {
       this.getLoadedGoals();
     }
@@ -46,7 +49,7 @@ export class GoalListProvider implements vscode.TreeDataProvider<vscode.TreeItem
 
   getChildren(element?: vscode.TreeItem): vscode.ProviderResult<vscode.TreeItem[]> {
     const items: vscode.TreeItem[] = [];
-    const { scope } = (this.context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION) as Authentication) || {};
+    const { scope } = (this.context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION_FE) as Authentication) || {};
     if (!scope?.includes('goal.list')) {
       return [new vscode.TreeItem(PERMISSION_DENIED_PANEL)];
     }

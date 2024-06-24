@@ -1,9 +1,10 @@
 import * as vscode from 'vscode';
+
+import { Flag } from '../../model';
+import { isGetFlagFunction } from '../../setupProviders';
+import { FEATURE_EXPERIMENTATION_TRIGGER_FLAG_COMPLETION } from '../../commands/const';
 import { FlagItem } from './FlagList';
-import { Cli } from './Cli';
-import { Flag } from '../model';
-import { isGetFlagFunction } from '../setupProviders';
-import { FEATURE_EXPERIMENTATION_TRIGGER_FLAG_COMPLETION } from '../commands/const';
+import { Cli } from '../Cli';
 
 var triggerFlagCompletion = false;
 
@@ -36,7 +37,7 @@ export default class FlagshipCompletionProvider implements vscode.CompletionItem
         mark.isTrusted = true;
         mark.supportHtml = true;
         mark.value = `Flag: ${flag.key}`;
-        flagCompletion.detail = flag.type ? `[Flagship] Type: ${flag.type}` : '';
+        flagCompletion.detail = flag.type ? `[AB Tasty] Type: ${flag.type}` : '';
         mark.appendMarkdown(`<p>Description: ${flag.description}</p>`);
         mark.appendMarkdown(`<p>Default value: ${flag.defaultValue}</p>`);
 

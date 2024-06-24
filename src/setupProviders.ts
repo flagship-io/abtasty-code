@@ -1,30 +1,30 @@
 import * as vscode from 'vscode';
 import { StateConfiguration } from './stateConfiguration';
 import { Cli } from './providers/Cli';
-import { QuickAccessListProvider } from './providers/QuickAccessList';
-import { deleteFlagInputBox, flagInputBox } from './menu/FlagMenu';
-import { FlagItem, FlagListProvider } from './providers/FlagList';
+import { QuickAccessListProvider } from './providers/featureExperimentation/QuickAccessList';
+import { deleteFlagInputBox, flagInputBox } from './menu/featureExperimentation/FlagMenu';
+import { FlagItem, FlagListProvider } from './providers/featureExperimentation/FlagList';
 import {
   deleteCampaignBox,
   deleteProjectInputBox,
   deleteVariationBox,
   deleteVariationGroupBox,
   projectInputBox,
-} from './menu/ProjectMenu';
+} from './menu/featureExperimentation/ProjectMenu';
 import {
   CampaignItem,
   ProjectItem,
   ProjectListProvider,
   VariationGroupItem,
   VariationItem,
-} from './providers/ProjectList';
-import { FileAnalyzedProvider, FlagAnalyzed } from './providers/FlagAnalyzeList';
-import { deleteTargetingKeyInputBox, targetingKeyInputBox } from './menu/TargetingKeyMenu';
-import { TargetingKeyItem, TargetingKeyListProvider } from './providers/TargetingKeyList';
-import { deleteGoalInputBox, goalInputBox } from './menu/GoalMenu';
-import { GoalItem, GoalListProvider } from './providers/GoalList';
-import FlagshipCompletionProvider from './providers/FlagshipCompletion';
-import FlagshipHoverProvider from './providers/FlagshipHover';
+} from './providers/featureExperimentation/ProjectList';
+import { FileAnalyzedProvider, FlagAnalyzed } from './providers/featureExperimentation/FlagAnalyzeList';
+import { deleteTargetingKeyInputBox, targetingKeyInputBox } from './menu/featureExperimentation/TargetingKeyMenu';
+import { TargetingKeyItem, TargetingKeyListProvider } from './providers/featureExperimentation/TargetingKeyList';
+import { deleteGoalInputBox, goalInputBox } from './menu/featureExperimentation/GoalMenu';
+import { GoalItem, GoalListProvider } from './providers/featureExperimentation/GoalList';
+import FlagshipCompletionProvider from './providers/featureExperimentation/FlagshipCompletion';
+import FlagshipHoverProvider from './providers/featureExperimentation/FlagshipHover';
 import {
   FEATURE_EXPERIMENTATION_ADD_FLAG,
   FEATURE_EXPERIMENTATION_CAMPAIGN_LIST_COPY,
@@ -61,11 +61,14 @@ import {
 } from './commands/const';
 import { DEFAULT_BASE_URI, PERMISSION_DENIED } from './const';
 import { Authentication, Configuration, Scope } from './model';
-import { FlagStore } from './store/FlagStore';
-import { ProjectStore } from './store/ProjectStore';
-import { TargetingKeyStore } from './store/TargetingKeyStore';
-import { GoalStore } from './store/GoalStore';
-import { GLOBAL_CURRENT_AUTHENTICATION } from './services/const';
+import { FlagStore } from './store/featureExperimentation/FlagStore';
+import { ProjectStore } from './store/featureExperimentation/ProjectStore';
+import { TargetingKeyStore } from './store/featureExperimentation/TargetingKeyStore';
+import { GoalStore } from './store/featureExperimentation/GoalStore';
+import {
+  FEATURE_EXPERIMENTATION_CONFIGURED,
+  GLOBAL_CURRENT_AUTHENTICATION_FE,
+} from './services/featureExperimentation/const';
 
 const documentSelector: vscode.DocumentSelector = [
   {
@@ -155,7 +158,7 @@ export const rootPath =
     : undefined;
 
 export async function setupProviders(context: vscode.ExtensionContext, stateConfig: StateConfiguration, cli: Cli) {
-  const configured = await context.globalState.get('FSConfigured');
+  const configured = await context.globalState.get(FEATURE_EXPERIMENTATION_CONFIGURED);
 
   const flagStore = new FlagStore(context, cli);
   const projectStore = new ProjectStore(context, cli);
@@ -206,7 +209,7 @@ export async function setupProviders(context: vscode.ExtensionContext, stateConf
   const getTokenInfo = vscode.commands.registerCommand(FEATURE_EXPERIMENTATION_GET_TOKEN_SCOPE, async () => {
     const tokenInfo = await cli.GetTokenInfo();
     const scopes: any = {};
-    tokenInfo.scope.split(' ').map((s) => {
+    tokenInfo.scope.split(' ').map((s: any) => {
       if (s.includes('.')) {
         const key = s.split('.');
         scopes[key[0]] = [...(scopes[key[0]] || []), key[1]];
@@ -220,7 +223,7 @@ export async function setupProviders(context: vscode.ExtensionContext, stateConf
   });
 
   const createProject = vscode.commands.registerCommand(FEATURE_EXPERIMENTATION_CREATE_PROJECT, async () => {
-    const { scope } = (context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION) as Authentication) || {};
+    const { scope } = (context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION_FE) as Authentication) || {};
     if (scope?.includes('project.create')) {
       const project = new ProjectItem();
       await projectInputBox(project, projectStore);
@@ -240,7 +243,7 @@ export async function setupProviders(context: vscode.ExtensionContext, stateConf
   const createFlag = vscode.commands.registerCommand(
     FEATURE_EXPERIMENTATION_CREATE_FLAG,
     async (flagKey: string | undefined) => {
-      const { scope } = (context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION) as Authentication) || {};
+      const { scope } = (context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION_FE) as Authentication) || {};
 
       if (scope?.includes('flag.create')) {
         const flag = new FlagItem();
@@ -257,7 +260,7 @@ export async function setupProviders(context: vscode.ExtensionContext, stateConf
   );
 
   const createTargetingKey = vscode.commands.registerCommand(FEATURE_EXPERIMENTATION_CREATE_TARGETING_KEY, async () => {
-    const { scope } = (context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION) as Authentication) || {};
+    const { scope } = (context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION_FE) as Authentication) || {};
     if (scope?.includes('targeting_key.create')) {
       const targetingKey = new TargetingKeyItem();
       await targetingKeyInputBox(targetingKey, targetingKeyStore);
@@ -269,7 +272,7 @@ export async function setupProviders(context: vscode.ExtensionContext, stateConf
   });
 
   const createGoal = vscode.commands.registerCommand(FEATURE_EXPERIMENTATION_CREATE_GOAL, async () => {
-    const { scope } = (context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION) as Authentication) || {};
+    const { scope } = (context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION_FE) as Authentication) || {};
     if (scope?.includes('goal.create')) {
       const goal = new GoalItem();
       await goalInputBox(goal, goalStore);
@@ -283,11 +286,11 @@ export async function setupProviders(context: vscode.ExtensionContext, stateConf
   const projectDisposables = [
     vscode.commands.registerCommand(FEATURE_EXPERIMENTATION_PROJECT_LIST_COPY, async (project: ProjectItem) => {
       vscode.env.clipboard.writeText(project.id!);
-      vscode.window.showInformationMessage(`[Flagship] Project: ${project.name}'s ID copied to your clipboard.`);
+      vscode.window.showInformationMessage(`[AB Tasty] Project: ${project.name}'s ID copied to your clipboard.`);
     }),
 
     vscode.commands.registerCommand(FEATURE_EXPERIMENTATION_PROJECT_LIST_EDIT, async (project: ProjectItem) => {
-      const { scope } = (context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION) as Authentication) || {};
+      const { scope } = (context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION_FE) as Authentication) || {};
       if (scope?.includes('project.update')) {
         await projectInputBox(project, projectStore);
         await vscode.commands.executeCommand(FEATURE_EXPERIMENTATION_PROJECT_LIST_LOAD);
@@ -298,7 +301,7 @@ export async function setupProviders(context: vscode.ExtensionContext, stateConf
     }),
 
     vscode.commands.registerCommand(FEATURE_EXPERIMENTATION_PROJECT_LIST_DELETE, async (project: ProjectItem) => {
-      const { scope } = (context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION) as Authentication) || {};
+      const { scope } = (context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION_FE) as Authentication) || {};
       if (scope?.includes('project.delete')) {
         await deleteProjectInputBox(project, projectStore);
         await vscode.commands.executeCommand(FEATURE_EXPERIMENTATION_PROJECT_LIST_LOAD);
@@ -312,7 +315,7 @@ export async function setupProviders(context: vscode.ExtensionContext, stateConf
   const campaignDisposables = [
     vscode.commands.registerCommand(FEATURE_EXPERIMENTATION_CAMPAIGN_LIST_COPY, async (campaign: CampaignItem) => {
       vscode.env.clipboard.writeText(campaign.id!);
-      vscode.window.showInformationMessage(`[Flagship] Campaign: ${campaign.name}'s ID copied to your clipboard.`);
+      vscode.window.showInformationMessage(`[AB Tasty] Campaign: ${campaign.name}'s ID copied to your clipboard.`);
     }),
 
     vscode.commands.registerCommand(
@@ -320,7 +323,7 @@ export async function setupProviders(context: vscode.ExtensionContext, stateConf
       async (campaign: CampaignItem) => {
         // eslint-disable-next-line @typescript-eslint/naming-convention
         const { account_environment_id } =
-          ((await context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION)) as Authentication) || {};
+          ((await context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION_FE)) as Authentication) || {};
         await vscode.env.openExternal(
           vscode.Uri.parse(
             `${DEFAULT_BASE_URI}/env/${account_environment_id}/report/${campaign.type}/${campaign.id}/details`,
@@ -341,7 +344,7 @@ export async function setupProviders(context: vscode.ExtensionContext, stateConf
       async (variationGroup: VariationGroupItem) => {
         vscode.env.clipboard.writeText(variationGroup.id!);
         vscode.window.showInformationMessage(
-          `[Flagship] Variation group: ${variationGroup.name}'s ID copied to your clipboard.`,
+          `[AB Tasty] Variation group: ${variationGroup.name}'s ID copied to your clipboard.`,
         );
       },
     ),
@@ -358,7 +361,7 @@ export async function setupProviders(context: vscode.ExtensionContext, stateConf
   const variationDisposables = [
     vscode.commands.registerCommand(FEATURE_EXPERIMENTATION_VARIATION_LIST_COPY, async (variation: VariationItem) => {
       vscode.env.clipboard.writeText(variation.id!);
-      vscode.window.showInformationMessage(`[Flagship] Variation: ${variation.name}'s ID copied to your clipboard.`);
+      vscode.window.showInformationMessage(`[AB Tasty] Variation: ${variation.name}'s ID copied to your clipboard.`);
     }),
 
     vscode.commands.registerCommand(FEATURE_EXPERIMENTATION_VARIATION_LIST_DELETE, async (variation: VariationItem) => {
@@ -370,11 +373,11 @@ export async function setupProviders(context: vscode.ExtensionContext, stateConf
   const flagDisposables = [
     vscode.commands.registerCommand(FEATURE_EXPERIMENTATION_FLAG_LIST_COPY, async (flag: FlagItem) => {
       vscode.env.clipboard.writeText(flag.key!);
-      vscode.window.showInformationMessage(`[Flagship] Flag: ${flag.key} copied to your clipboard.`);
+      vscode.window.showInformationMessage(`[AB Tasty] Flag: ${flag.key} copied to your clipboard.`);
     }),
 
     vscode.commands.registerCommand(FEATURE_EXPERIMENTATION_FLAG_LIST_EDIT, async (flag: FlagItem) => {
-      const { scope } = (context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION) as Authentication) || {};
+      const { scope } = (context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION_FE) as Authentication) || {};
       if (scope?.includes('flag.update')) {
         await flagInputBox(flag, flagStore);
         await vscode.commands.executeCommand(FEATURE_EXPERIMENTATION_FLAG_LIST_LOAD);
@@ -385,7 +388,7 @@ export async function setupProviders(context: vscode.ExtensionContext, stateConf
     }),
 
     vscode.commands.registerCommand(FEATURE_EXPERIMENTATION_FLAG_LIST_DELETE, async (flag: FlagItem) => {
-      const { scope } = (context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION) as Authentication) || {};
+      const { scope } = (context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION_FE) as Authentication) || {};
       if (scope?.includes('flag.delete')) {
         await deleteFlagInputBox(flag, flagStore);
         await vscode.commands.executeCommand(FEATURE_EXPERIMENTATION_FLAG_LIST_LOAD);
@@ -408,7 +411,7 @@ export async function setupProviders(context: vscode.ExtensionContext, stateConf
     }),
 
     vscode.commands.registerCommand(FEATURE_EXPERIMENTATION_ADD_FLAG, async (flagInFile: FlagAnalyzed) => {
-      const { scope } = (context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION) as Authentication) || {};
+      const { scope } = (context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION_FE) as Authentication) || {};
       if (scope?.includes('flag.create')) {
         const flag = new FlagItem();
         flag.key = flagInFile.flagKey;
@@ -429,7 +432,7 @@ export async function setupProviders(context: vscode.ExtensionContext, stateConf
     vscode.commands.registerCommand(
       FEATURE_EXPERIMENTATION_TARGETING_KEY_LIST_EDIT,
       async (targetingKey: TargetingKeyItem) => {
-        const { scope } = (context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION) as Authentication) || {};
+        const { scope } = (context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION_FE) as Authentication) || {};
         if (scope?.includes('targeting_key.update')) {
           await targetingKeyInputBox(targetingKey, targetingKeyStore);
           await vscode.commands.executeCommand(FEATURE_EXPERIMENTATION_TARGETING_KEY_LIST_LOAD);
@@ -443,7 +446,7 @@ export async function setupProviders(context: vscode.ExtensionContext, stateConf
     vscode.commands.registerCommand(
       FEATURE_EXPERIMENTATION_TARGETING_KEY_LIST_DELETE,
       async (targetingKey: TargetingKeyItem) => {
-        const { scope } = (context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION) as Authentication) || {};
+        const { scope } = (context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION_FE) as Authentication) || {};
         if (scope?.includes('targeting_key.delete')) {
           await deleteTargetingKeyInputBox(targetingKey, targetingKeyStore);
           await vscode.commands.executeCommand(FEATURE_EXPERIMENTATION_TARGETING_KEY_LIST_LOAD);
@@ -457,7 +460,7 @@ export async function setupProviders(context: vscode.ExtensionContext, stateConf
 
   const goalDisposables = [
     vscode.commands.registerCommand(FEATURE_EXPERIMENTATION_GOAL_LIST_EDIT, async (goal: GoalItem) => {
-      const { scope } = (context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION) as Authentication) || {};
+      const { scope } = (context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION_FE) as Authentication) || {};
       if (scope?.includes('goal.update')) {
         await goalInputBox(goal, goalStore);
         await vscode.commands.executeCommand(FEATURE_EXPERIMENTATION_GOAL_LIST_LOAD);
@@ -468,7 +471,7 @@ export async function setupProviders(context: vscode.ExtensionContext, stateConf
     }),
 
     vscode.commands.registerCommand(FEATURE_EXPERIMENTATION_GOAL_LIST_DELETE, async (goal: GoalItem) => {
-      const { scope } = (context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION) as Authentication) || {};
+      const { scope } = (context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION_FE) as Authentication) || {};
       if (scope?.includes('goal.delete')) {
         await deleteGoalInputBox(goal, goalStore);
         await vscode.commands.executeCommand(FEATURE_EXPERIMENTATION_GOAL_LIST_LOAD);

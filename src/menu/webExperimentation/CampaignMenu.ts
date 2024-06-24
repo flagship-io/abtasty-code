@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import * as vscode from 'vscode';
-import { MultiStepInput } from '../multipleStepInput';
-import { FlagItem } from '../providers/FlagList';
-import { FlagStore } from '../store/FlagStore';
-import { Flag } from '../model';
+import { MultiStepInput } from '../../multipleStepInput';
+import { FlagItem } from '../../providers/featureExperimentation/FlagList';
+import { FlagStore } from '../../store/featureExperimentation/FlagStore';
+import { Flag } from '../../model';
 
-interface FlagSchema {
+interface CampaignSchema {
   name: string;
   type: vscode.QuickPickItem;
   description: string;
@@ -16,8 +16,8 @@ const flagTypes: vscode.QuickPickItem[] = ['string', 'boolean', 'number', 'array
   label,
 }));
 
-export async function flagInputBox(flag: FlagItem, flagStore: FlagStore) {
-  let flagData = {} as Partial<FlagSchema>;
+export async function CampaignInputBox(flag: FlagItem, flagStore: FlagStore) {
+  let flagData = {} as Partial<CampaignSchema>;
 
   let title = 'Create Flag';
 
@@ -33,10 +33,10 @@ export async function flagInputBox(flag: FlagItem, flagStore: FlagStore) {
   }
 
   async function collectInputs() {
-    await MultiStepInput.run((input) => flagName(input));
+    await MultiStepInput.run((input) => campaignName(input));
   }
 
-  async function flagName(input: MultiStepInput) {
+  async function campaignName(input: MultiStepInput) {
     flagData.name = await input.showInputBox({
       title,
       step: 1,
@@ -49,12 +49,12 @@ export async function flagInputBox(flag: FlagItem, flagStore: FlagStore) {
       shouldResume: shouldResume,
     });
     if (flag.id) {
-      return (input: MultiStepInput) => flagDescription(input);
+      return (input: MultiStepInput) => campaignDescription(input);
     }
-    return (input: MultiStepInput) => flagType(input);
+    return (input: MultiStepInput) => campaignType(input);
   }
 
-  async function flagType(input: MultiStepInput) {
+  async function campaignType(input: MultiStepInput) {
     flagData.type = await input.showQuickPick({
       title,
       step: 2,
@@ -65,10 +65,10 @@ export async function flagInputBox(flag: FlagItem, flagStore: FlagStore) {
       activeItem: flagTypes[0],
       shouldResume: shouldResume,
     });
-    return (input: MultiStepInput) => flagDescription(input);
+    return (input: MultiStepInput) => campaignDescription(input);
   }
 
-  async function flagDescription(input: MultiStepInput) {
+  async function campaignDescription(input: MultiStepInput) {
     flagData.description = await input.showInputBox({
       title,
       step: flag.id || flag.type === 'boolean' ? 2 : 3,
@@ -84,10 +84,10 @@ export async function flagInputBox(flag: FlagItem, flagStore: FlagStore) {
       flagData.defaultValue = 'not used';
       return;
     }
-    return (input: MultiStepInput) => flagDefaultValue(input);
+    return (input: MultiStepInput) => campaignDefaultValue(input);
   }
 
-  async function flagDefaultValue(input: MultiStepInput) {
+  async function campaignDefaultValue(input: MultiStepInput) {
     const defaultValue = await input.showInputBox({
       title,
       step: flag.id ? 3 : 4,
@@ -156,26 +156,26 @@ export async function flagInputBox(flag: FlagItem, flagStore: FlagStore) {
       } as Flag);
 
       if (!flagEdited.id) {
-        vscode.window.showErrorMessage(`[Flagship] Flag not edited`);
+        vscode.window.showErrorMessage(`[AB Tasty] Flag not edited`);
         return;
       }
       return;
     }
 
-    const flagCreated = await flagStore.saveFlag({
+    const campaignCreated = await flagStore.saveFlag({
       name,
       type: type!.label,
       description,
       default_value: defaultValue,
     } as Flag);
 
-    if (!flagCreated.id) {
-      vscode.window.showErrorMessage(`[Flagship] Flag not created`);
+    if (!campaignCreated.id) {
+      vscode.window.showErrorMessage(`[AB Tasty] Flag not created`);
       return;
     }
     return;
   }
-  vscode.window.showErrorMessage(`[Flagship] Flag not created`);
+  vscode.window.showErrorMessage(`[AB Tasty] Flag not created`);
 }
 
 export async function deleteFlagInputBox(flag: FlagItem, flagStore: FlagStore) {

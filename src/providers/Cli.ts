@@ -4,9 +4,12 @@ import * as vscode from 'vscode';
 import { exec, ExecOptions } from 'child_process';
 import { join } from 'path';
 import {
+  WebExpAccount,
+  FeatExpAccountEnvironment,
   Authentication,
   Campaign,
   Configuration,
+  CurrentAuthentication,
   FileAnalyzedType,
   Flag,
   Goal,
@@ -14,29 +17,27 @@ import {
   TargetingKey,
   TokenInfo,
 } from '../model';
-import { CliVersion } from '../cli/cliDownloader';
 import * as fs from 'fs';
+import { CliVersion } from '../cli/cliDownloader';
 export class Cli {
   private context: vscode.ExtensionContext;
   private extensionVersion: string;
+  private product: string;
 
-  constructor(context: vscode.ExtensionContext) {
-    this.extensionVersion = vscode.extensions.getExtension('ABTasty.flagship-code')?.packageJSON.version;
+  constructor(context: vscode.ExtensionContext, product: string) {
+    this.extensionVersion = vscode.extensions.getExtension('ABTasty.abtasty-code')?.packageJSON.version;
     this.context = context;
+    this.product = product;
   }
 
   exec(command: string, options: ExecOptions): Promise<{ stdout: string; stderr: string }> {
     return new Promise<{ stdout: string; stderr: string }>((resolve, reject) => {
-      exec(
-        command + ' --user-agent=flagship-ext-vscode/v' + this.extensionVersion,
-        options,
-        (error, stdout, stderr) => {
-          if (error) {
-            reject({ error, stdout, stderr });
-          }
-          resolve({ stdout, stderr });
-        },
-      );
+      exec(command + ' --user-agent=abtasty-ext-vscode/v' + this.extensionVersion, options, (error, stdout, stderr) => {
+        if (error) {
+          reject({ error, stdout, stderr });
+        }
+        resolve({ stdout, stderr });
+      });
     });
   }
 
@@ -83,17 +84,12 @@ export class Cli {
       if (!cliBin) {
         return false;
       }
-      const command = `${cliBin} feature-experimentation auth login -u ${authentication.username} -i ${authentication.client_id} -s ${authentication.client_secret} -a ${authentication.account_id}`;
+      const command = `${cliBin} ${this.product} auth login -u ${authentication.username} -i ${authentication.client_id} -s ${authentication.client_secret} -a ${authentication.account_id} --output-format json`;
       const output = await this.exec(command, {});
       console.log(output);
 
       if (output.stderr) {
         vscode.window.showErrorMessage(output.stderr);
-        return false;
-      }
-
-      if (output.stdout.includes('exists')) {
-        vscode.window.showErrorMessage(output.stdout);
         return false;
       }
 
@@ -111,17 +107,12 @@ export class Cli {
       if (!cliBin) {
         return false;
       }
-      const command = `${cliBin} feature-experimentation account use -i  ${authentication.account_id}`;
+      const command = `${cliBin} ${this.product} account use -i  ${authentication.account_id}`;
       const output = await this.exec(command, {});
       console.log(output);
 
       if (output.stderr) {
         vscode.window.showErrorMessage(output.stderr);
-        return false;
-      }
-
-      if (output.stdout.includes('exists')) {
-        vscode.window.showErrorMessage(output.stdout);
         return false;
       }
 
@@ -139,17 +130,12 @@ export class Cli {
       if (!cliBin) {
         return false;
       }
-      const command = `${cliBin} feature-experimentation account-environment use -i  ${authentication.account_environment_id}`;
+      const command = `${cliBin} feature-experimentation account-environment use -i ${authentication.account_environment_id} --output-format json`;
       const output = await this.exec(command, {});
       console.log(output);
 
       if (output.stderr) {
         vscode.window.showErrorMessage(output.stderr);
-        return false;
-      }
-
-      if (output.stdout.includes('exists')) {
-        vscode.window.showErrorMessage(output.stdout);
         return false;
       }
 
@@ -161,6 +147,29 @@ export class Cli {
     }
   }
 
+  async ListAccountEnvironment(): Promise<FeatExpAccountEnvironment[]> {
+    try {
+      const cliBin = await this.CliBin();
+      if (!cliBin) {
+        return [];
+      }
+
+      const command = `${cliBin} feature-experimentation account-environment list --output-format json`;
+      const output = await this.exec(command, {});
+
+      if (output.stderr) {
+        vscode.window.showErrorMessage(output.stderr);
+        return [];
+      }
+
+      return JSON.parse(output.stdout);
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return [];
+    }
+  }
+
   async DeleteAuthentication(username: string): Promise<boolean> {
     try {
       const cliBin = await this.CliBin();
@@ -168,7 +177,7 @@ export class Cli {
         return false;
       }
 
-      let command = `${cliBin} feature-experimentation auth delete -n ${username}`;
+      let command = `${cliBin} ${this.product} auth delete -u ${username}`;
       const output = await this.exec(command, {});
       console.log(output);
       return true;
@@ -185,7 +194,7 @@ export class Cli {
       if (!cliBin) {
         return [];
       }
-      const command = `${cliBin} feature-experimentation authentication list --output-format json`;
+      const command = `${cliBin} ${this.product} authentication list --output-format json`;
       const output = await this.exec(command, {});
       if (output.stderr) {
         vscode.window.showErrorMessage(output.stderr);
@@ -199,25 +208,66 @@ export class Cli {
     }
   }
 
-  async CurrentAuthentication(): Promise<Authentication> {
+  // DEFINED TO BE CHANGED BASED ON CLI
+  async GetAuthentication(username: string): Promise<Authentication> {
     try {
       const cliBin = await this.CliBin();
       if (!cliBin) {
         return {} as Authentication;
       }
-
-      const command = `${cliBin} feature-experimentation authentication current --output-format json`;
+      const command = `${cliBin} ${this.product} authentication get -u ${username} --output-format json`;
       const output = await this.exec(command, {});
       if (output.stderr) {
         vscode.window.showErrorMessage(output.stderr);
         return {} as Authentication;
+      }
+      return JSON.parse(output.stdout);
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return {} as Authentication;
+    }
+  }
+
+  async CurrentAuthentication(): Promise<CurrentAuthentication> {
+    try {
+      const cliBin = await this.CliBin();
+      if (!cliBin) {
+        return {} as CurrentAuthentication;
+      }
+
+      const command = `${cliBin} ${this.product} authentication current --output-format json`;
+      const output = await this.exec(command, {});
+      if (output.stderr) {
+        vscode.window.showErrorMessage(output.stderr);
+        return {} as CurrentAuthentication;
       }
 
       return JSON.parse(output.stdout);
     } catch (err: any) {
       vscode.window.showErrorMessage(err.error);
       console.error(err);
-      return {} as Authentication;
+      return {} as CurrentAuthentication;
+    }
+  }
+
+  async ListAccountWE(): Promise<WebExpAccount[]> {
+    try {
+      const cliBin = await this.CliBin();
+      if (!cliBin) {
+        return [];
+      }
+      const command = `${cliBin} web-experimentation account list --output-format json`;
+      const output = await this.exec(command, {});
+      if (output.stderr) {
+        vscode.window.showErrorMessage(output.stderr);
+        return [];
+      }
+      return JSON.parse(output.stdout);
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return [];
     }
   }
 

@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
-import { MultiStepInput } from '../multipleStepInput';
-import { TargetingKeyItem } from '../providers/TargetingKeyList';
-import { TargetingKeyStore } from '../store/TargetingKeyStore';
-import { TargetingKey } from '../model';
+import { MultiStepInput } from '../../multipleStepInput';
+import { TargetingKeyItem } from '../../providers/featureExperimentation/TargetingKeyList';
+import { TargetingKeyStore } from '../../store/featureExperimentation/TargetingKeyStore';
+import { TargetingKey } from '../../model';
 
 interface TargetingKeySchema {
   name: string;
@@ -101,7 +101,7 @@ export async function targetingKeyInputBox(targetingKey: TargetingKeyItem, targe
       } as TargetingKey);
 
       if (!targetingKeyEdited.id) {
-        vscode.window.showErrorMessage(`[Flagship] Targeting Key not edited`);
+        vscode.window.showErrorMessage(`[AB Tasty] Targeting Key not edited`);
         return;
       }
       return;
@@ -114,12 +114,12 @@ export async function targetingKeyInputBox(targetingKey: TargetingKeyItem, targe
     } as TargetingKey);
 
     if (!targetingKeyCreated.id) {
-      vscode.window.showErrorMessage(`[Flagship] Targeting key not created`);
+      vscode.window.showErrorMessage(`[AB Tasty] Targeting key not created`);
       return;
     }
     return;
   }
-  vscode.window.showErrorMessage(`[Flagship] Targeting key not created`);
+  vscode.window.showErrorMessage(`[AB Tasty] Targeting key not created`);
 }
 
 export async function deleteTargetingKeyInputBox(targetingKey: TargetingKeyItem, targetingKeyStore: TargetingKeyStore) {

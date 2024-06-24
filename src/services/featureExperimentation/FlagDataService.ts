@@ -1,7 +1,6 @@
 import * as vscode from 'vscode';
-import { Flag } from '../model';
-import { FEATURE_EXPERIMENTATION_LIST_FLAG_IN_WORKSPACE } from '../commands/const';
 import { GLOBAL_LIST_FLAG } from './const';
+import { Flag } from '../../model';
 
 export class FlagDataService {
   private context: vscode.ExtensionContext;

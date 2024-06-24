@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { Project } from '../model';
+import { Project } from '../../model';
 import { GLOBAL_LIST_PROJECT } from './const';
 
 export class ProjectDataService {

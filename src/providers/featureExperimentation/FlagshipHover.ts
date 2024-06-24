@@ -1,11 +1,11 @@
 import * as vscode from 'vscode';
-import { Cli } from './Cli';
-import { Authentication, Configuration, Flag } from '../model';
-import { StateConfiguration } from '../stateConfiguration';
-import { DEFAULT_BASE_URI } from '../const';
-import { FEATURE_EXPERIMENTATION_CREATE_FLAG, FEATURE_EXPERIMENTATION_OPEN_BROWSER } from '../commands/const';
-import { isGetFlagFunction } from '../setupProviders';
-import { GLOBAL_CURRENT_AUTHENTICATION } from '../services/const';
+import { Authentication, Configuration, Flag } from '../../model';
+import { StateConfiguration } from '../../stateConfiguration';
+import { DEFAULT_BASE_URI } from '../../const';
+import { FEATURE_EXPERIMENTATION_CREATE_FLAG, FEATURE_EXPERIMENTATION_OPEN_BROWSER } from '../../commands/const';
+import { isGetFlagFunction } from '../../setupProviders';
+import { GLOBAL_CURRENT_AUTHENTICATION_FE } from '../../services/featureExperimentation/const';
+import { Cli } from '../Cli';
 
 export const CANDIDATE_REGEX = /[\w\d][.\w\d\_\-]*/;
 
@@ -27,7 +27,7 @@ export default class FlagshipHoverProvider implements vscode.HoverProvider {
     const baseUrl = `${DEFAULT_BASE_URI}/env`;
     // eslint-disable-next-line @typescript-eslint/naming-convention
     const { account_environment_id } = (await this.stateConfig.getGlobalState(
-      GLOBAL_CURRENT_AUTHENTICATION,
+      GLOBAL_CURRENT_AUTHENTICATION_FE,
     )) as Authentication;
     const flagList: Flag[] = await this.cli.ListFlag();
     const candidate = document.getText(document.getWordRangeAtPosition(position, CANDIDATE_REGEX));

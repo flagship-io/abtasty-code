@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
-import { TargetingKey } from '../model';
-import { Cli } from '../providers/Cli';
-import { TargetingKeyDataService } from '../services/TargetingKeyDataService';
+import { TargetingKey } from '../../model';
+import { TargetingKeyDataService } from '../../services/featureExperimentation/TargetingKeyDataService';
+import { Cli } from '../../providers/Cli';
 
 export class TargetingKeyStore {
   private cli: Cli;
@@ -28,7 +28,7 @@ export class TargetingKeyStore {
     const cliResponse = await this.cli.CreateTargetingKey(targetingKey);
     if (cliResponse.id) {
       await this.targetingKeyService.saveTargetingKey(cliResponse);
-      vscode.window.showInformationMessage(`[Flagship] Targeting key created successfully !`);
+      vscode.window.showInformationMessage(`[AB Tasty] Targeting key created successfully !`);
     }
     return cliResponse;
   }
@@ -39,7 +39,7 @@ export class TargetingKeyStore {
       : ({} as TargetingKey);
     if (cliResponse.id) {
       await this.targetingKeyService.editTargetingKey(targetingKeyId, cliResponse);
-      vscode.window.showInformationMessage(`[Flagship] Targeting key edited successfully`);
+      vscode.window.showInformationMessage(`[AB Tasty] Targeting key edited successfully`);
     }
     return cliResponse;
   }
@@ -48,7 +48,7 @@ export class TargetingKeyStore {
     const cliResponse = targetingKeyId ? await this.cli.DeleteTargetingKey(targetingKeyId) : false;
     if (cliResponse) {
       await this.targetingKeyService.deleteTargetingKey(targetingKeyId);
-      vscode.window.showInformationMessage(`[Flagship] Targeting key deleted successfully`);
+      vscode.window.showInformationMessage(`[AB Tasty] Targeting key deleted successfully`);
     }
     return cliResponse;
   }

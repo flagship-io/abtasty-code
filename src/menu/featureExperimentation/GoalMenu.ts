@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
-import { MultiStepInput } from '../multipleStepInput';
-import { GoalItem } from '../providers/GoalList';
-import { GoalStore } from '../store/GoalStore';
-import { Goal } from '../model';
+import { MultiStepInput } from '../../multipleStepInput';
+import { GoalItem } from '../../providers/featureExperimentation/GoalList';
+import { GoalStore } from '../../store/featureExperimentation/GoalStore';
+import { Goal } from '../../model';
 
 interface GoalSchema {
   label: string;
@@ -125,7 +125,7 @@ export async function goalInputBox(goal: GoalItem, goalStore: GoalStore) {
       const goalEdited = await goalStore.editGoal(goal.id!, { label, operator: operator?.label, value } as Goal);
 
       if (!goalEdited.id) {
-        vscode.window.showErrorMessage(`[Flagship] Goal not edited`);
+        vscode.window.showErrorMessage(`[AB Tasty] Goal not edited`);
         return;
       }
       return;
@@ -139,12 +139,12 @@ export async function goalInputBox(goal: GoalItem, goalStore: GoalStore) {
     } as Goal);
 
     if (!goalCreated.id) {
-      vscode.window.showErrorMessage(`[Flagship] Goal not created`);
+      vscode.window.showErrorMessage(`[AB Tasty] Goal not created`);
       return;
     }
     return;
   }
-  vscode.window.showInformationMessage(`[Flagship] Goal not created`);
+  vscode.window.showInformationMessage(`[AB Tasty] Goal not created`);
 }
 
 export async function deleteGoalInputBox(goal: GoalItem, goalStore: GoalStore) {

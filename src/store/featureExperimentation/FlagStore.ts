@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
-import { Flag } from '../model';
-import { Cli } from '../providers/Cli';
-import { FlagDataService } from '../services/FlagDataService';
+import { Flag } from '../../model';
+import { Cli } from '../../providers/Cli';
+import { FlagDataService } from '../../services/featureExperimentation/FlagDataService';
 
 export class FlagStore {
   private cli: Cli;
@@ -26,7 +26,7 @@ export class FlagStore {
     const cliResponse = await this.cli.CreateFlag(flag);
     if (cliResponse.id) {
       await this.flagService.saveFlag(cliResponse);
-      vscode.window.showInformationMessage(`[Flagship] Flag created successfully !`);
+      vscode.window.showInformationMessage(`[AB Tasty] Flag created successfully !`);
     }
     return cliResponse;
   }
@@ -35,7 +35,7 @@ export class FlagStore {
     const cliResponse = flagId ? await this.cli.EditFlag(flagId, newFlag) : ({} as Flag);
     if (cliResponse.id) {
       await this.flagService.editFlag(flagId, cliResponse);
-      vscode.window.showInformationMessage(`[Flagship] Flag edited successfully`);
+      vscode.window.showInformationMessage(`[AB Tasty] Flag edited successfully`);
     }
     return cliResponse;
   }
@@ -44,7 +44,7 @@ export class FlagStore {
     const cliResponse = flagId ? await this.cli.DeleteFlag(flagId) : false;
     if (cliResponse) {
       await this.flagService.deleteFlag(flagId);
-      vscode.window.showInformationMessage(`[Flagship] Flag deleted successfully`);
+      vscode.window.showInformationMessage(`[AB Tasty] Flag deleted successfully`);
     }
     return cliResponse;
   }

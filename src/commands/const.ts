@@ -1,3 +1,5 @@
+// FEATURE EXP
+
 export const FEATURE_EXPERIMENTATION_FLAG_IN_FILE_REFRESH = 'featureExperimentation.flagsInFile.refresh';
 
 export const FEATURE_EXPERIMENTATION_OPEN_BROWSER = 'featureExperimentation.openBrowser';
@@ -6,7 +8,6 @@ export const FEATURE_EXPERIMENTATION_QUICK_ACCESS_REFRESH = 'featureExperimentat
 export const CHECK_CLI_VERSION = 'abtasty.checkCliVersion';
 export const FEATURE_EXPERIMENTATION_CLEAR_CONFIG = 'featureExperimentation.clearConfig';
 export const FEATURE_EXPERIMENTATION_SET_CREDENTIALS = 'featureExperimentation.setCredentials';
-export const SET_CREDENTIALS_WE = 'abtasty.setCredentialsWE';
 export const SET_CONTEXT = 'setContext';
 
 export const FEATURE_EXPERIMENTATION_CREATE_PROJECT = 'featureExperimentation.createProject';
@@ -55,3 +56,8 @@ export const FEATURE_EXPERIMENTATION_GOAL_LIST_DELETE = 'featureExperimentation.
 export const FEATURE_EXPERIMENTATION_FIND_IN_FILE = 'featureExperimentation.flagsInFile.findInFile';
 export const FEATURE_EXPERIMENTATION_ADD_FLAG = 'featureExperimentation.flagsInFile.addFlag';
 export const FEATURE_EXPERIMENTATION_LIST_FLAG_IN_WORKSPACE = 'featureExperimentation.flagsInFile.listFlagInWorkspace';
+
+// WEB EXP
+
+export const WEB_EXPERIMENTATION_CLEAR_CONFIG = 'webExperimentation.clearConfig';
+export const WEB_EXPERIMENTATION_SET_CREDENTIALS = 'webExperimentation.setCredentials';

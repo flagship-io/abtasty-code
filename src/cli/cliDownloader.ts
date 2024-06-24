@@ -8,10 +8,10 @@ import axios from 'axios';
 import { rimraf } from 'rimraf';
 import { createGunzip } from 'zlib';
 
-export const CliVersion = '1.0.2';
+export const CliVersion = '1.0.4';
 
 export async function CliDownloader(context: vscode.ExtensionContext, binaryDir: string) {
-  const flagshipDir = context.asAbsolutePath('abtasty-cli');
+  const abtastyDir = context.asAbsolutePath('abtasty-cli');
   const cliTar = context.asAbsolutePath(`abtasty-cli/abtasty-cli-${CliVersion}.tar.gz`);
 
   async function installDir(): Promise<void> {
@@ -21,8 +21,8 @@ export async function CliDownloader(context: vscode.ExtensionContext, binaryDir:
     const file = fs.createWriteStream(cliTar);
     const unzip = createGunzip();
 
-    if (!fs.existsSync(flagshipDir)) {
-      fs.mkdirSync(flagshipDir);
+    if (!fs.existsSync(abtastyDir)) {
+      fs.mkdirSync(abtastyDir);
     }
     if (!fs.existsSync(binaryDir)) {
       fs.mkdirSync(binaryDir);
@@ -73,7 +73,7 @@ export async function CliDownloader(context: vscode.ExtensionContext, binaryDir:
 
   async function download(): Promise<void> {
     try {
-      await rimraf(`${flagshipDir}/*`);
+      await rimraf(`${abtastyDir}/*`);
     } catch (err) {
       console.error(err);
     }
