@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { StateConfiguration } from './stateConfiguration';
-import { Cli } from './providers/Cli';
+import { Cli } from './cli/cmd/featureExperimentation/Cli';
 import { QuickAccessListProvider } from './providers/featureExperimentation/QuickAccessList';
 import { deleteFlagInputBox, flagInputBox } from './menu/featureExperimentation/FlagMenu';
 import { FlagItem, FlagListProvider } from './providers/featureExperimentation/FlagList';
@@ -157,7 +157,11 @@ export const rootPath =
     ? vscode.workspace.workspaceFolders[0].uri.fsPath
     : undefined;
 
-export async function setupProviders(context: vscode.ExtensionContext, stateConfig: StateConfiguration, cli: Cli) {
+export async function setupFeatExpProviders(
+  context: vscode.ExtensionContext,
+  stateConfig: StateConfiguration,
+  cli: Cli,
+) {
   const configured = await context.globalState.get(FEATURE_EXPERIMENTATION_CONFIGURED);
 
   const flagStore = new FlagStore(context, cli);

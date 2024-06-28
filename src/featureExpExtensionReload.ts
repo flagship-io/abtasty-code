@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
-import { setupProviders } from './setupProviders';
+import { setupFeatExpProviders } from './setupFeatExpProviders';
 import { StateConfiguration } from './stateConfiguration';
-import { Cli } from './providers/Cli';
+import { Cli } from './cli/cmd/featureExperimentation/Cli';
 import { SET_CONTEXT } from './commands/const';
 import { FEATURE_EXPERIMENTATION_CONFIGURED } from './services/featureExperimentation/const';
 
@@ -10,7 +10,7 @@ export async function featureExpExtensionReload(
   stateConfig: StateConfiguration,
   cli: Cli,
 ) {
-  await setupProviders(context, stateConfig, cli);
+  await setupFeatExpProviders(context, stateConfig, cli);
 
   if (await stateConfig.isGlobalConfiguredFeatExp()) {
     await context.globalState.update(FEATURE_EXPERIMENTATION_CONFIGURED, true);

@@ -36,15 +36,25 @@
           "default": "",
           "description": "Flagship Flags in File"
         },
-        "abtasty.featureExperimentation.configurationList": {
-          "type": "Configuration[]",
+        "abtasty.featureExperimentation.authenticationList": {
+          "type": "Authentication[]",
           "default": [],
-          "description": "List of configuration stored"
+          "description": "List of authentication stored"
         },
-        "abtasty.featureExperimentation.currentConfiguration": {
-          "type": "Configuration",
+        "abtasty.featureExperimentation.currentAuthentication": {
+          "type": "Authentication",
           "default": {},
-          "description": "current running configuration"
+          "description": "current running authentication"
+        },
+        "abtasty.webExperimentation.authenticationList": {
+          "type": "Authentication[]",
+          "default": [],
+          "description": "List of authentication stored"
+        },
+        "abtasty.webExperimentation.currentAuthentication": {
+          "type": "Authentication",
+          "default": {},
+          "description": "current running authentication"
         }
       }
     },
@@ -283,6 +293,16 @@
         "command": "featureExperimentation.flagsInFile.addFlag",
         "title": "Feature Experimentation: Add Flag found in flag in file panel",
         "icon": "$(add)"
+      },
+      {
+        "command": "webExperimentation.modificationList.refresh",
+        "title": "Web Experimentation: Refresh modification panel",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "webExperimentation.campaignList.refresh",
+        "title": "Web Experimentation: Refresh campaign panel",
+        "icon": "$(refresh)"
       }
     ],
     "menus": {
@@ -340,6 +360,16 @@
         {
           "command": "featureExperimentation.flagList.openInBrowser",
           "when": "view == featureExperimentation.flagList",
+          "group": "navigation@0"
+        },
+        {
+          "command": "webExperimentation.modificationList.refresh",
+          "when": "view == webExperimentation.modificationList",
+          "group": "navigation@0"
+        },
+        {
+          "command": "webExperimentation.campaignList.refresh",
+          "when": "view == webExperimentation.campaignList",
           "group": "navigation@0"
         }
       ],

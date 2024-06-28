@@ -48,10 +48,10 @@ export type CurrentAuthentication = {
 export type Project = {
   id: string;
   name: string;
-  campaigns?: Campaign[];
+  campaigns?: CampaignFE[];
 };
 
-export type Campaign = {
+export type CampaignFE = {
   id: string;
   name: string;
   type: string;
@@ -60,6 +60,45 @@ export type Campaign = {
   status: string;
   variation_groups: VariationGroup[];
   scheduler: Scheduler;
+  labels: string[];
+};
+
+export type CampaignWE = {
+  id: number;
+  name: string;
+  type: string;
+  sub_type: string;
+  description: string;
+  url: string;
+  state: string;
+  global_code: string;
+  source_code: string;
+  sub_tests: CampaignWE[];
+  labels: string[];
+  variations: VariationWE[];
+};
+
+export type VariationWE = {
+  id: number;
+  name: string;
+  type: string;
+  description: string;
+  traffic: number;
+  visual_editor: boolean;
+  code_editor: boolean;
+  components: ComponentWE[];
+};
+
+export type ComponentWE = {
+  id: string;
+  name: string;
+  description: string;
+  tags: string[];
+  js: string;
+  css: string;
+  html: string;
+  form: string;
+  options: string;
 };
 
 export type Scheduler = {
@@ -94,12 +133,22 @@ export type Variation = {
   name: string;
   reference: boolean;
   allocation: number;
-  modifications: Modification;
+  modifications: ModificationFE;
 };
 
-export type Modification = {
+export type ModificationFE = {
   type: string;
   value: any;
+};
+
+export type ModificationWE = {
+  id: number;
+  name: string;
+  type: string;
+  value: string;
+  variation_id: number;
+  selector: string;
+  engine: string;
 };
 
 export type Flag = {
