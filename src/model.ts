@@ -169,6 +169,11 @@ export type Goal = {
   value?: string;
 };
 
+export type AccountFE = {
+  id: string;
+  name: string;
+};
+
 export type TargetingKey = {
   id?: string;
   name: string;

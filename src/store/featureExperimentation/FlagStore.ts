@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { Flag } from '../../model';
-import { Cli } from '../../providers/Cli';
+import { Cli } from '../../cli/cmd/featureExperimentation/Cli';
 import { FlagDataService } from '../../services/featureExperimentation/FlagDataService';
 
 export class FlagStore {

@@ -3,7 +3,8 @@ import { StateConfiguration } from './stateConfiguration';
 import configureFeatureExperimentationCmd from './commands/configureFeatureExperimentation';
 import clearConfigCmd from './commands/clearConfig';
 import checkCliVersionCmd from './commands/checkCliVersion';
-import { Cli } from './cli/cmd/featureExperimentation/Cli';
+import { Cli as FEATURE_EXPERIMENTATION_CLI } from './cli/cmd/featureExperimentation/Cli';
+import { Cli as WEB_EXPERIMENTATION_CLI } from './cli/cmd/webExperimentation/Cli';
 import { FEATURE_EXPERIMENTATION } from './services/featureExperimentation/const';
 import configureWebExperimentationCmd from './commands/configureWebExperimentation';
 import { featureExpExtensionReload } from './featureExpExtensionReload';
@@ -11,8 +12,8 @@ import { WEB_EXPERIMENTATION } from './services/webExperimentation/const';
 import { webExpExtensionReload } from './webExpExtensionReload';
 
 export async function register(context: vscode.ExtensionContext, stateConfig: StateConfiguration): Promise<void> {
-  const cliFE = new Cli(context, FEATURE_EXPERIMENTATION);
-  const cliWE = new Cli(context, WEB_EXPERIMENTATION);
+  const cliFE = new FEATURE_EXPERIMENTATION_CLI(context);
+  const cliWE = new WEB_EXPERIMENTATION_CLI(context);
 
   await Promise.all([clearConfigCmd(context, stateConfig), checkCliVersionCmd(context, cliFE)]);
 

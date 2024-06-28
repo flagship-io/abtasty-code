@@ -1,11 +1,11 @@
 import * as vscode from 'vscode';
-import { Authentication, TokenInfo } from '../../model';
-import { Cli } from '../../providers/Cli';
-import { AuthenticationDataService } from '../../services/featureExperimentation/AuthenticationDataService';
+import { Authentication } from '../../model';
+import { Cli } from '../../cli/cmd/webExperimentation/Cli';
+import { AuthenticationDataService } from '../../services/webExperimentation/AuthenticationDataService';
 
 export class AuthenticationStore {
   private cli: Cli;
-  private authenticationService;
+  private authenticationService: AuthenticationDataService;
 
   constructor(context: vscode.ExtensionContext, cli: Cli) {
     this.cli = cli;
@@ -35,9 +35,8 @@ export class AuthenticationStore {
     vscode.window.showErrorMessage(`[AB Tasty] Error while selecting account !`);
   }
 
-  async createAuthentication(authentication: Authentication): Promise<Authentication> {
+  async createOrSetAuthentication(authentication: Authentication): Promise<Authentication> {
     const cliResponse = await this.cli.LoginAuthentication(authentication);
-    console.log(cliResponse);
     if (cliResponse) {
       await this.authenticationService.saveAuthentication(authentication);
       vscode.window.showInformationMessage(`[AB Tasty] Authentication set successfully !`);
@@ -60,22 +59,15 @@ export class AuthenticationStore {
 
   async getCurrentAuthentication() {
     const currAuth = await this.cli.CurrentAuthentication();
-    const tokenScope = await this.cli.GetTokenInfo();
-    const cliResponse = await this.cli.GetAuthentication(currAuth.current_used_credential);
+    const cliResponse = await this.cli.GetAuthentication(currAuth.current_used_credential!);
     if (cliResponse.username) {
-      cliResponse.scope = tokenScope.scope;
       this.authenticationService.setCurrentAuthentication(cliResponse);
     }
-
     return cliResponse;
   }
 
   async getAccountList() {
     const cliResponse = await this.cli.ListAccountWE();
     return cliResponse;
-  }
-
-  async getTokenInfo(): Promise<TokenInfo> {
-    return await this.cli.GetTokenInfo();
   }
 }

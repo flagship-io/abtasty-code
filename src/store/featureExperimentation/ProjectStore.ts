@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { Project } from '../../model';
-import { Cli } from '../../providers/Cli';
+import { Cli } from '../../cli/cmd/featureExperimentation/Cli';
 import { ProjectDataService } from '../../services/featureExperimentation/ProjectDataService';
 
 export class ProjectStore {

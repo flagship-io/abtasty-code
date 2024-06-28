@@ -7,7 +7,7 @@ import {
   WebExpAccount,
   FeatExpAccountEnvironment,
   Authentication,
-  Campaign,
+  CampaignFE,
   Configuration,
   CurrentAuthentication,
   FileAnalyzedType,
@@ -16,18 +16,18 @@ import {
   Project,
   TargetingKey,
   TokenInfo,
-} from '../model';
+  ModificationWE,
+  CampaignWE,
+} from '../../../model';
 import * as fs from 'fs';
-import { CliVersion } from '../cli/cliDownloader';
+import { CliVersion } from '../../cliDownloader';
 export class Cli {
   private context: vscode.ExtensionContext;
   private extensionVersion: string;
-  private product: string;
 
-  constructor(context: vscode.ExtensionContext, product: string) {
+  constructor(context: vscode.ExtensionContext) {
     this.extensionVersion = vscode.extensions.getExtension('ABTasty.abtasty-code')?.packageJSON.version;
     this.context = context;
-    this.product = product;
   }
 
   exec(command: string, options: ExecOptions): Promise<{ stdout: string; stderr: string }> {
@@ -84,16 +84,25 @@ export class Cli {
       if (!cliBin) {
         return false;
       }
-      const command = `${cliBin} ${this.product} auth login -u ${authentication.username} -i ${authentication.client_id} -s ${authentication.client_secret} -a ${authentication.account_id} --output-format json`;
-      const output = await this.exec(command, {});
-      console.log(output);
+      if (authentication.username) {
+        const command = `${cliBin} feature-experimentation auth login -u ${authentication.username} -i ${
+          authentication.client_id
+        } -s ${authentication.client_secret} ${
+          authentication.account_id ? `-a ${authentication.account_id}` : ``
+        } --output-format json`;
 
-      if (output.stderr) {
-        vscode.window.showErrorMessage(output.stderr);
-        return false;
+        console.log(command);
+        const output = await this.exec(command, {});
+        console.log(output);
+
+        if (output.stderr) {
+          vscode.window.showErrorMessage(output.stderr);
+          return false;
+        }
+
+        return true;
       }
-
-      return true;
+      return false;
     } catch (err: any) {
       vscode.window.showErrorMessage(err.error);
       console.error(err);
@@ -107,7 +116,8 @@ export class Cli {
       if (!cliBin) {
         return false;
       }
-      const command = `${cliBin} ${this.product} account use -i  ${authentication.account_id}`;
+      const command = `${cliBin} feature-experimentation account use -i  ${authentication.account_id} --output-format json`;
+      console.log(command);
       const output = await this.exec(command, {});
       console.log(output);
 
@@ -156,7 +166,7 @@ export class Cli {
 
       const command = `${cliBin} feature-experimentation account-environment list --output-format json`;
       const output = await this.exec(command, {});
-
+      console.log(output);
       if (output.stderr) {
         vscode.window.showErrorMessage(output.stderr);
         return [];
@@ -177,7 +187,7 @@ export class Cli {
         return false;
       }
 
-      let command = `${cliBin} ${this.product} auth delete -u ${username}`;
+      let command = `${cliBin} feature-experimentation auth delete -u ${username}`;
       const output = await this.exec(command, {});
       console.log(output);
       return true;
@@ -194,8 +204,9 @@ export class Cli {
       if (!cliBin) {
         return [];
       }
-      const command = `${cliBin} ${this.product} authentication list --output-format json`;
+      const command = `${cliBin} feature-experimentation authentication list --output-format json`;
       const output = await this.exec(command, {});
+      console.log(output);
       if (output.stderr) {
         vscode.window.showErrorMessage(output.stderr);
         return [];
@@ -215,8 +226,11 @@ export class Cli {
       if (!cliBin) {
         return {} as Authentication;
       }
-      const command = `${cliBin} ${this.product} authentication get -u ${username} --output-format json`;
+
+      const command = `${cliBin} feature-experimentation authentication get -u ${username} --output-format json`;
+      console.log(command);
       const output = await this.exec(command, {});
+      console.log(output);
       if (output.stderr) {
         vscode.window.showErrorMessage(output.stderr);
         return {} as Authentication;
@@ -236,8 +250,10 @@ export class Cli {
         return {} as CurrentAuthentication;
       }
 
-      const command = `${cliBin} ${this.product} authentication current --output-format json`;
+      const command = `${cliBin} feature-experimentation authentication current --output-format json`;
+      console.log(command);
       const output = await this.exec(command, {});
+      console.log(output);
       if (output.stderr) {
         vscode.window.showErrorMessage(output.stderr);
         return {} as CurrentAuthentication;
@@ -248,26 +264,6 @@ export class Cli {
       vscode.window.showErrorMessage(err.error);
       console.error(err);
       return {} as CurrentAuthentication;
-    }
-  }
-
-  async ListAccountWE(): Promise<WebExpAccount[]> {
-    try {
-      const cliBin = await this.CliBin();
-      if (!cliBin) {
-        return [];
-      }
-      const command = `${cliBin} web-experimentation account list --output-format json`;
-      const output = await this.exec(command, {});
-      if (output.stderr) {
-        vscode.window.showErrorMessage(output.stderr);
-        return [];
-      }
-      return JSON.parse(output.stdout);
-    } catch (err: any) {
-      vscode.window.showErrorMessage(err.error);
-      console.error(err);
-      return [];
     }
   }
 
@@ -345,6 +341,7 @@ export class Cli {
       }
       const command = `${cliBin} feature-experimentation project list --output-format json`;
       const output = await this.exec(command, {});
+      console.log(output);
       if (output.stderr) {
         vscode.window.showErrorMessage(output.stderr);
         return [];
@@ -365,6 +362,7 @@ export class Cli {
       }
       const command = `${cliBin} feature-experimentation project switch -i ${id} -s ${status}`;
       const output = await this.exec(command, {});
+      console.log(output);
       if (output.stderr) {
         vscode.window.showErrorMessage(output.stderr);
         return false;
@@ -477,6 +475,7 @@ export class Cli {
       }
       const command = `${cliBin} feature-experimentation goal list --output-format json`;
       const output = await this.exec(command, {});
+      console.log(output);
       if (output.stderr) {
         vscode.window.showErrorMessage(output.stderr);
         return [];
@@ -573,6 +572,7 @@ export class Cli {
       }
       const command = `${cliBin} feature-experimentation targeting-key list --output-format json`;
       const output = await this.exec(command, {});
+      console.log(output);
       if (output.stderr) {
         vscode.window.showErrorMessage(output.stderr);
         return [];
@@ -690,6 +690,7 @@ export class Cli {
       }
       const command = `${cliBin} feature-experimentation flag list --output-format json`;
       const output = await this.exec(command, {});
+      console.log(output);
       if (output.stderr) {
         vscode.window.showErrorMessage(output.stderr);
         return [];
@@ -714,6 +715,7 @@ export class Cli {
       }
       const command = `${cliBin} feature-experimentation analyze flag list --output-format json --directory ${path}`;
       const output = await this.exec(command, {});
+      console.log(output);
       if (output.stderr) {
         vscode.window.showErrorMessage(output.stderr);
         return [];
@@ -727,25 +729,25 @@ export class Cli {
     }
   }
 
-  async CreateCampaign(projectID: string): Promise<Campaign> {
+  async CreateCampaign(projectID: string): Promise<CampaignFE> {
     try {
       const cliBin = await this.CliBin();
       let command: string;
       if (!cliBin) {
-        return {} as Campaign;
+        return {} as CampaignFE;
       }
       command = `${cliBin} feature-experimentation campaign create -d '{"project_id":"${projectID}","name":"test_campaign","description":"DESCRIPTION","type":"ab","variation_groups":[{"variations":[{"name":"VARIATION_NAME","allocation":50,"reference":true}]}]}'`;
       const output = await this.exec(command, {});
       console.log(output);
       if (output.stderr) {
         vscode.window.showErrorMessage(output.stderr);
-        return {} as Campaign;
+        return {} as CampaignFE;
       }
       return JSON.parse(output.stdout);
     } catch (err: any) {
       vscode.window.showErrorMessage(err.error);
       console.error(err);
-      return {} as Campaign;
+      return {} as CampaignFE;
     }
   }
 
@@ -773,7 +775,7 @@ export class Cli {
     }
   }
 
-  async ListCampaign(): Promise<Campaign[]> {
+  async ListCampaign(): Promise<CampaignFE[]> {
     try {
       const cliBin = await this.CliBin();
       if (!cliBin) {
@@ -781,6 +783,7 @@ export class Cli {
       }
       const command = `${cliBin} feature-experimentation campaign list --output-format json`;
       const output = await this.exec(command, {});
+      console.log(output);
       if (output.stderr) {
         vscode.window.showErrorMessage(output.stderr);
         return [];
@@ -801,6 +804,7 @@ export class Cli {
       }
       const command = `${cliBin} feature-experimentation campaign switch -i ${id} -s ${status}`;
       const output = await this.exec(command, {});
+      console.log(output);
       if (output.stderr) {
         vscode.window.showErrorMessage(output.stderr);
         return false;
@@ -869,6 +873,7 @@ export class Cli {
       }
       const command = `${cliBin} feature-experimentation token info --output-format json`;
       const output = await this.exec(command, {});
+      console.log(output);
       if (output.stderr) {
         vscode.window.showErrorMessage(output.stderr);
         return {} as TokenInfo;

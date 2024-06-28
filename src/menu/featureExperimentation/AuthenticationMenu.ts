@@ -5,9 +5,10 @@ import { load } from 'js-yaml';
 import { readFile } from 'fs/promises';
 import path = require('path');
 import { CONFIG_ADD_ICON, CONFIG_CLEAR_ALL_ICON } from '../../icons';
-import { FeatExpAccountEnvironment, Authentication } from '../../model';
+import { FeatExpAccountEnvironment, Authentication, AccountFE } from '../../model';
 import { FEATURE_EXPERIMENTATION_CLEAR_CONFIG } from '../../commands/const';
 import { AuthenticationStore } from '../../store/featureExperimentation/AuthenticationStore';
+import { AccountFEStore } from '../../store/featureExperimentation/AccountStore';
 
 const configMethods = ['Insert credentials', 'Import credentials from file'];
 
@@ -33,9 +34,11 @@ export class AuthenticationMenu {
   private title: string;
   private authentication!: Authentication;
   private authenticationList: Authentication[];
+  private accountList: AccountFE[];
   private authenticationListItem: vscode.QuickPickItem[];
   private currentAuthentication: Authentication;
   private authenticationStore: AuthenticationStore;
+  private accountStore: AccountFEStore;
   private deletingMode: boolean;
   private cancelMode: boolean;
 
@@ -43,6 +46,8 @@ export class AuthenticationMenu {
     authenticationList: Authentication[],
     currentAuthentication: Authentication,
     authenticationStore: AuthenticationStore,
+    accountList: AccountFE[],
+    accountStore: AccountFEStore,
   ) {
     this.title = 'Configure Feature Experimentation';
     this.authentication = {
@@ -54,6 +59,10 @@ export class AuthenticationMenu {
     } as Authentication;
     this.currentAuthentication = currentAuthentication;
     this.authenticationList = authenticationList;
+
+    this.accountList = accountList;
+    this.accountStore = accountStore;
+
     this.authenticationListItem = authenticationList.map((p) => ({
       label: p.username,
     }));
@@ -153,7 +162,7 @@ export class AuthenticationMenu {
 
     this.authentication = credential;
 
-    const authSuccess = await this.authenticationStore.createAuthentication(this.authentication);
+    const authSuccess = await this.authenticationStore.createOrSetAuthentication(this.authentication);
     if (authSuccess) {
       return (input: MultiStepInput) => this.pickAccountEnvironmentID(input, credential);
     }

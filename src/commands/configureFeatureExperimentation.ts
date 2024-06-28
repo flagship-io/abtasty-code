@@ -1,31 +1,35 @@
 import * as vscode from 'vscode';
-import { Cli } from '../providers/Cli';
+import { Cli } from '../cli/cmd/featureExperimentation/Cli';
 import {
   FEATURE_EXPERIMENTATION_FLAG_IN_FILE_REFRESH,
   FEATURE_EXPERIMENTATION_FLAG_LIST_REFRESH,
   FEATURE_EXPERIMENTATION_GOAL_LIST_REFRESH,
   FEATURE_EXPERIMENTATION_PROJECT_LIST_REFRESH,
   FEATURE_EXPERIMENTATION_QUICK_ACCESS_REFRESH,
-  SET_CONTEXT,
   FEATURE_EXPERIMENTATION_SET_CREDENTIALS,
-  WEB_EXPERIMENTATION_SET_CREDENTIALS,
   FEATURE_EXPERIMENTATION_TARGETING_KEY_LIST_REFRESH,
+  SET_CONTEXT,
 } from './const';
 
-import { AuthenticationStore } from '../store/featureExperimentation/AuthenticationStore';
 import { AuthenticationMenu } from '../menu/featureExperimentation/AuthenticationMenu';
 import { FEATURE_EXPERIMENTATION_CONFIGURED } from '../services/featureExperimentation/const';
+import { AuthenticationStore } from '../store/featureExperimentation/AuthenticationStore';
+import { AccountFEStore } from '../store/featureExperimentation/AccountStore';
 
 export let currentConfigurationNameStatusBar: vscode.StatusBarItem;
 
 export default async function configureFeatureExperimentationCmd(context: vscode.ExtensionContext, cli: Cli) {
   const authenticationStore: AuthenticationStore = new AuthenticationStore(context, cli);
+  const accountStore: AccountFEStore = new AccountFEStore(context);
   const configureExtension: vscode.Disposable = vscode.commands.registerCommand(
     FEATURE_EXPERIMENTATION_SET_CREDENTIALS,
     async () => {
       try {
         const authenticationList = (await authenticationStore.refreshAuthentication()) || [];
         const currentAuthentication = (await authenticationStore.getCurrentAuthentication()) || {};
+
+        const accountList = accountStore.loadAccount() || [];
+
         const sortedAuth = authenticationList.sort((a, b) => {
           if (a.username === currentAuthentication.username) {
             return -1;
@@ -36,7 +40,13 @@ export default async function configureFeatureExperimentationCmd(context: vscode
           }
         });
 
-        const authenticationMenu = new AuthenticationMenu(sortedAuth, currentAuthentication, authenticationStore);
+        const authenticationMenu = new AuthenticationMenu(
+          sortedAuth,
+          currentAuthentication,
+          authenticationStore,
+          accountList,
+          accountStore,
+        );
 
         const configurationAddedOrSelected = await authenticationMenu.configure();
         const cliAuthenticated = !!configurationAddedOrSelected.username;
@@ -69,7 +79,7 @@ export default async function configureFeatureExperimentationCmd(context: vscode
 
         return;
       } catch (err) {
-        console.error(`[AB Tasty] Failed configuring Flagship Extension: ${err}`);
+        console.error(`[AB Tasty] Failed configuring AB Tasty Extension: ${err}`);
         vscode.window.showErrorMessage('[AB Tasty] An unexpected error occurred, please try again later.');
       }
     },
@@ -81,7 +91,7 @@ export default async function configureFeatureExperimentationCmd(context: vscode
 
 function updateStatusBarItem(currName?: string) {
   if (currName !== undefined) {
-    currentConfigurationNameStatusBar.text = `$(megaphone) Current Flagship configuration: ${currName}`;
+    currentConfigurationNameStatusBar.text = `$(megaphone) Current Feature experimentation configuration: ${currName}`;
     currentConfigurationNameStatusBar.command = FEATURE_EXPERIMENTATION_SET_CREDENTIALS;
     currentConfigurationNameStatusBar.show();
     return;

@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { CHECK_CLI_VERSION } from './const';
-import { Cli } from '../providers/Cli';
+import { Cli } from '../cli/cmd/featureExperimentation/Cli';
 
 export default async function checkCliVersionCmd(context: vscode.ExtensionContext, cli: Cli) {
   const checkCliVersion: vscode.Disposable = vscode.commands.registerCommand(CHECK_CLI_VERSION, async () => {

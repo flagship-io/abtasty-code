@@ -1,19 +1,16 @@
 import * as vscode from 'vscode';
-import { Cli } from '../providers/Cli';
+import { Cli } from '../cli/cmd/webExperimentation/Cli';
 import {
-  FEATURE_EXPERIMENTATION_FLAG_IN_FILE_REFRESH,
-  FEATURE_EXPERIMENTATION_FLAG_LIST_REFRESH,
-  FEATURE_EXPERIMENTATION_GOAL_LIST_REFRESH,
-  FEATURE_EXPERIMENTATION_PROJECT_LIST_REFRESH,
-  FEATURE_EXPERIMENTATION_QUICK_ACCESS_REFRESH,
   SET_CONTEXT,
+  WEB_EXPERIMENTATION_CAMPAIGN_LIST_REFRESH,
+  WEB_EXPERIMENTATION_MODIFICATION_LIST_REFRESH,
+  WEB_EXPERIMENTATION_QUICK_ACCESS_REFRESH,
   WEB_EXPERIMENTATION_SET_CREDENTIALS,
-  FEATURE_EXPERIMENTATION_TARGETING_KEY_LIST_REFRESH,
 } from './const';
 
-import { AuthenticationStore } from '../store/webExperimentation/AuthenticationStore';
 import { AuthenticationMenu } from '../menu/webExperimentation/AuthenticationMenu';
 import { WEB_EXPERIMENTATION_CONFIGURED } from '../services/webExperimentation/const';
+import { AuthenticationStore } from '../store/webExperimentation/AuthenticationStore';
 
 export let currentConfigurationNameStatusBar: vscode.StatusBarItem;
 
@@ -23,8 +20,6 @@ export default async function configureWebExperimentationCmd(context: vscode.Ext
     WEB_EXPERIMENTATION_SET_CREDENTIALS,
     async () => {
       try {
-        await context.globalState.update(WEB_EXPERIMENTATION_CONFIGURED, true);
-        await vscode.commands.executeCommand(SET_CONTEXT, 'abtasty:explorer', 'webExperimentation');
         const authenticationList = (await authenticationStore.refreshAuthentication()) || [];
         const currentAuthentication = (await authenticationStore.getCurrentAuthentication()) || {};
         const sortedAuth = authenticationList.sort((a, b) => {
@@ -50,12 +45,9 @@ export default async function configureWebExperimentationCmd(context: vscode.Ext
           updateStatusBarItem(updatedCurrentConfiguration.username);
 
           await Promise.all([
-            vscode.commands.executeCommand(FEATURE_EXPERIMENTATION_FLAG_LIST_REFRESH),
-            vscode.commands.executeCommand(FEATURE_EXPERIMENTATION_FLAG_IN_FILE_REFRESH),
-            vscode.commands.executeCommand(FEATURE_EXPERIMENTATION_GOAL_LIST_REFRESH),
-            vscode.commands.executeCommand(FEATURE_EXPERIMENTATION_TARGETING_KEY_LIST_REFRESH),
-            vscode.commands.executeCommand(FEATURE_EXPERIMENTATION_PROJECT_LIST_REFRESH),
-            vscode.commands.executeCommand(FEATURE_EXPERIMENTATION_QUICK_ACCESS_REFRESH),
+            vscode.commands.executeCommand(WEB_EXPERIMENTATION_MODIFICATION_LIST_REFRESH),
+            vscode.commands.executeCommand(WEB_EXPERIMENTATION_CAMPAIGN_LIST_REFRESH),
+            vscode.commands.executeCommand(WEB_EXPERIMENTATION_QUICK_ACCESS_REFRESH),
           ]);
           return;
         }
@@ -70,26 +62,19 @@ export default async function configureWebExperimentationCmd(context: vscode.Ext
 
         return;
       } catch (err) {
-        console.error(`[AB Tasty] Failed configuring Flagship Extension: ${err}`);
+        console.error(`[AB Tasty] Failed configuring AB Tasty Extension: ${err}`);
         vscode.window.showErrorMessage('[AB Tasty] An unexpected error occurred, please try again later.');
       }
     },
   );
 
-  /*   const configureExtensionWE: vscode.Disposable = vscode.commands.registerCommand(
-    WEB_EXPERIMENTATION_SET_CREDENTIALS,
-    async () => {
-      await context.globalState.update(FEATURE_EXPERIMENTATION_CONFIGURED, true);
-      await vscode.commands.executeCommand(SET_CONTEXT, 'abtasty:explorer', 'webExperimentation');
-    },
-  ); */
   currentConfigurationNameStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
   context.subscriptions.push(configureExtension, currentConfigurationNameStatusBar);
 }
 
 function updateStatusBarItem(currName?: string) {
   if (currName !== undefined) {
-    currentConfigurationNameStatusBar.text = `$(megaphone) Current Flagship configuration: ${currName}`;
+    currentConfigurationNameStatusBar.text = `$(megaphone) Current Web Experimentation configuration: ${currName}`;
     currentConfigurationNameStatusBar.command = WEB_EXPERIMENTATION_SET_CREDENTIALS;
     currentConfigurationNameStatusBar.show();
     return;

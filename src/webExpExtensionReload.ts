@@ -1,17 +1,16 @@
 import * as vscode from 'vscode';
-import { setupProviders } from './setupProviders';
-import { StateConfiguration } from './stateConfiguration';
-import { Cli } from './providers/Cli';
 import { SET_CONTEXT } from './commands/const';
+import { Cli } from './cli/cmd/webExperimentation/Cli';
 import { WEB_EXPERIMENTATION_CONFIGURED } from './services/webExperimentation/const';
+import { StateConfiguration } from './stateConfiguration';
+import { setupWebExpProviders } from './setupWebExpProviders';
 
 export async function webExpExtensionReload(
   context: vscode.ExtensionContext,
   stateConfig: StateConfiguration,
   cli: Cli,
 ) {
-  // TODO: setProviders for WEB
-  //await setupProviders(context, stateConfig, cli);
+  await setupWebExpProviders(context, cli);
 
   if (await stateConfig.isGlobalConfiguredWebExp()) {
     await context.globalState.update(WEB_EXPERIMENTATION_CONFIGURED, true);

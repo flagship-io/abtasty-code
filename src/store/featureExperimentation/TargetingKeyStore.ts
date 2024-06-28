@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { TargetingKey } from '../../model';
 import { TargetingKeyDataService } from '../../services/featureExperimentation/TargetingKeyDataService';
-import { Cli } from '../../providers/Cli';
+import { Cli } from '../../cli/cmd/featureExperimentation/Cli';
 
 export class TargetingKeyStore {
   private cli: Cli;

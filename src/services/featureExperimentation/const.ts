@@ -4,5 +4,7 @@ export const GLOBAL_LIST_PROJECT = 'global_list_project';
 export const GLOBAL_LIST_GOAL = 'global_list_goal';
 export const GLOBAL_LIST_AUTHENTICATION_FE = 'global_list_authentication_fe';
 export const GLOBAL_CURRENT_AUTHENTICATION_FE = 'global_current_authentication_fe';
+export const CURRENT_SET_CAMPAIGN_ID = 'current_set_campaign_ID';
 export const FEATURE_EXPERIMENTATION = 'feature-experimentation';
 export const FEATURE_EXPERIMENTATION_CONFIGURED = 'FEConfigured';
+export const GLOBAL_LIST_ACCOUNT_FE = 'global_list_account_fe';

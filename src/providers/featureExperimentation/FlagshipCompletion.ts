@@ -1,10 +1,10 @@
 import * as vscode from 'vscode';
 
 import { Flag } from '../../model';
-import { isGetFlagFunction } from '../../setupProviders';
+import { isGetFlagFunction } from '../../setupFeatExpProviders';
 import { FEATURE_EXPERIMENTATION_TRIGGER_FLAG_COMPLETION } from '../../commands/const';
 import { FlagItem } from './FlagList';
-import { Cli } from '../Cli';
+import { Cli } from '../../cli/cmd/featureExperimentation/Cli';
 
 var triggerFlagCompletion = false;
 

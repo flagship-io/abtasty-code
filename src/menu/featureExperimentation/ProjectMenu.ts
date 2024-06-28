@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { Cli } from '../../providers/Cli';
+import { Cli } from '../../cli/cmd/featureExperimentation/Cli';
 import {
   CampaignItem,
   ProjectItem,
@@ -7,7 +7,7 @@ import {
   VariationItem,
 } from '../../providers/featureExperimentation/ProjectList';
 import { ProjectStore } from '../../store/featureExperimentation/ProjectStore';
-import { Campaign, Project } from '../../model';
+import { CampaignFE, Project } from '../../model';
 
 interface ProjectSchema {
   name: string;
@@ -50,7 +50,7 @@ export async function projectInputBox(project: ProjectItem, projectStore: Projec
       }
       return;
     }
-    const projectCreated = await projectStore.saveProject({ name, campaigns: [] as Campaign[] } as Project);
+    const projectCreated = await projectStore.saveProject({ name, campaigns: [] as CampaignFE[] } as Project);
 
     if (!projectCreated.id) {
       vscode.window.showErrorMessage(`[AB Tasty] Project not created`);

@@ -113,7 +113,7 @@ export class AuthenticationMenu {
 
     this.authentication = credential;
 
-    const authSuccess = await this.authenticationStore.createAuthentication(this.authentication);
+    const authSuccess = await this.authenticationStore.createOrSetAuthentication(this.authentication);
     if (authSuccess) {
       return (input: MultiStepInput) => this.pickAccountID(input, credential);
     }
@@ -175,7 +175,12 @@ export class AuthenticationMenu {
     });
 
     if (picked.label === 'select') {
-      return (input: MultiStepInput) => this.inputAccountID(input, credential);
+      this.authentication = credential;
+      const authSuccess = await this.authenticationStore.createOrSetAuthentication(this.authentication);
+      if (authSuccess) {
+        return (input: MultiStepInput) => this.pickAccountID(input, credential);
+      }
+      return;
     } else if (picked.label === 'delete') {
       return (input: MultiStepInput) => this.pickConfirmationDelete(input, pick);
     }
@@ -279,7 +284,7 @@ export class AuthenticationMenu {
 
   async validateCredentials(value: string, credentialAttribute: string) {
     if (
-      credentialAttribute === 'Credential name' &&
+      credentialAttribute === 'Authentication username' &&
       !!this.authenticationList.map((i) => i.username).find((i) => i === value)
     ) {
       return 'Authentication name already exists';
@@ -289,18 +294,15 @@ export class AuthenticationMenu {
       return `Invalid ${credentialAttribute}`;
     }
 
-    if (
-      credentialAttribute === 'ClientID' &&
-      !value.match(/^[a-zA-Z0-9]{8}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{12}$/g)
-    ) {
+    if (credentialAttribute === 'ClientID' && !value.match(/^\w{53}$/g)) {
       return `Invalid ${credentialAttribute}`;
     }
 
-    if (credentialAttribute === 'ClientSecret' && !value.match(/^[a-zA-Z0-9]{64}$/g)) {
+    if (credentialAttribute === 'ClientSecret' && !value.match(/^[a-zA-Z0-9]{50}$/g)) {
       return `Invalid ${credentialAttribute}`;
     }
 
-    if (value === '' || value.match(/[^a-zA-Z\d\-]/g)) {
+    if (value === '' || value.match(/[^a-zA-Z\d\-\_]/g)) {
       return `Invalid ${credentialAttribute}`;
     }
   }

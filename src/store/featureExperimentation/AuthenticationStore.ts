@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { Authentication, TokenInfo } from '../../model';
-import { Cli } from '../../providers/Cli';
+import { Cli } from '../../cli/cmd/featureExperimentation/Cli';
 import { AuthenticationDataService } from '../../services/featureExperimentation/AuthenticationDataService';
 
 export class AuthenticationStore {
@@ -35,9 +35,8 @@ export class AuthenticationStore {
     vscode.window.showErrorMessage(`[AB Tasty] Error while selecting account environment !`);
   }
 
-  async createAuthentication(authentication: Authentication): Promise<Authentication> {
+  async createOrSetAuthentication(authentication: Authentication): Promise<Authentication> {
     const cliResponse = await this.cli.LoginAuthentication(authentication);
-    console.log(cliResponse);
     if (cliResponse) {
       await this.authenticationService.saveAuthentication(authentication);
       vscode.window.showInformationMessage(`[AB Tasty] Authentication set successfully !`);

@@ -61,3 +61,17 @@ export const FEATURE_EXPERIMENTATION_LIST_FLAG_IN_WORKSPACE = 'featureExperiment
 
 export const WEB_EXPERIMENTATION_CLEAR_CONFIG = 'webExperimentation.clearConfig';
 export const WEB_EXPERIMENTATION_SET_CREDENTIALS = 'webExperimentation.setCredentials';
+
+export const WEB_EXPERIMENTATION_QUICK_ACCESS_REFRESH = 'webExperimentation.quickAccess.refresh';
+
+export const WEB_EXPERIMENTATION_CREATE_MODIFICATION = 'webExperimentation.createModification';
+export const WEB_EXPERIMENTATION_MODIFICATION_LIST_REFRESH = 'webExperimentation.modificationList.refresh';
+export const WEB_EXPERIMENTATION_MODIFICATION_LIST_LOAD = 'webExperimentation.modificationList.load';
+export const WEB_EXPERIMENTATION_MODIFICATION_LIST_EDIT = 'webExperimentation.modificationList.editModification';
+export const WEB_EXPERIMENTATION_MODIFICATION_LIST_DELETE = 'webExperimentation.modificationList.deleteModification';
+
+export const WEB_EXPERIMENTATION_CREATE_CAMPAIGN = 'webExperimentation.createCampaign';
+export const WEB_EXPERIMENTATION_CAMPAIGN_LIST_REFRESH = 'webExperimentation.campaignList.refresh';
+export const WEB_EXPERIMENTATION_CAMPAIGN_LIST_LOAD = 'webExperimentation.campaignList.load';
+export const WEB_EXPERIMENTATION_CAMPAIGN_LIST_EDIT = 'webExperimentation.campaignList.editCampaign';
+export const WEB_EXPERIMENTATION_CAMPAIGN_LIST_DELETE = 'webExperimentation.campaignList.deleteCampaign';

@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { Goal } from '../../model';
-import { Cli } from '../../providers/Cli';
+import { Cli } from '../../cli/cmd/featureExperimentation/Cli';
 import { GoalDataService } from '../../services/featureExperimentation/GoalDataService';
 
 export class GoalStore {
