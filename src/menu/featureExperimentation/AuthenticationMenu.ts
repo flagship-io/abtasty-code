@@ -5,7 +5,7 @@ import { load } from 'js-yaml';
 import { readFile } from 'fs/promises';
 import path = require('path');
 import { CONFIG_ADD_ICON, CONFIG_CLEAR_ALL_ICON } from '../../icons';
-import { FeatExpAccountEnvironment, Authentication, AccountFE } from '../../model';
+import { AccountEnvironmentFE, Authentication, AccountFE } from '../../model';
 import { FEATURE_EXPERIMENTATION_CLEAR_CONFIG } from '../../commands/const';
 import { AuthenticationStore } from '../../store/featureExperimentation/AuthenticationStore';
 import { AccountFEStore } from '../../store/featureExperimentation/AccountStore';
@@ -29,6 +29,7 @@ const CreateAuthenticationButton = new CustomButton(CONFIG_ADD_ICON, 'Create new
 
 // TODO later
 const CreateAccountEnvironmentButton = new CustomButton(CONFIG_ADD_ICON, 'Insert new account environment ID', 'create');
+const CreateAccountButton = new CustomButton(CONFIG_ADD_ICON, 'Insert new account ID', 'create');
 
 export class AuthenticationMenu {
   private title: string;
@@ -144,7 +145,7 @@ export class AuthenticationMenu {
       validate: (value) => this.validateCredentials(value, 'ClientSecret'),
       shouldResume: this.shouldResume,
     });
-    return (input: MultiStepInput) => this.inputAccountID(input, credential);
+    return (input: MultiStepInput) => this.pickAccountID(input, credential);
   }
 
   async inputAccountID(input: MultiStepInput, credential: Authentication) {
@@ -161,7 +162,10 @@ export class AuthenticationMenu {
     });
 
     this.authentication = credential;
-
+    await this.accountStore.saveAccount({
+      id: this.authentication.account_id,
+      associatedUsername: credential.username,
+    } as AccountFE);
     const authSuccess = await this.authenticationStore.createOrSetAuthentication(this.authentication);
     if (authSuccess) {
       return (input: MultiStepInput) => this.pickAccountEnvironmentID(input, credential);
@@ -273,7 +277,7 @@ export class AuthenticationMenu {
     });
 
     if (picked.label === 'select') {
-      return (input: MultiStepInput) => this.inputAccountID(input, credential);
+      return (input: MultiStepInput) => this.pickAccountID(input, credential);
     } else if (picked.label === 'delete') {
       return (input: MultiStepInput) => this.pickConfirmationDelete(input, pick);
     }
@@ -291,6 +295,33 @@ export class AuthenticationMenu {
       return;
     }
     return;
+  }
+
+  async pickAccountID(input: MultiStepInput, credential: Authentication) {
+    const pick = await input.showQuickPick({
+      title: this.title,
+      step: 1,
+      totalSteps: 1,
+      placeholder: 'Pick an account',
+      items: this.accountList.map((i) => quickPickAccount(i)),
+      buttons: [CreateAccountButton],
+      shouldResume: this.shouldResume,
+      ignoreFocusOut: true,
+    });
+    if (pick instanceof CustomButton) {
+      if (pick.method === 'create') {
+        return (input: MultiStepInput) => this.inputAccountID(input, credential);
+      }
+    } else {
+      credential.account_id = pick.label;
+      this.authentication = credential;
+      const authSuccess = await this.authenticationStore.createOrSetAuthentication(this.authentication);
+      if (authSuccess) {
+        return (input: MultiStepInput) => this.pickAccountEnvironmentID(input, credential);
+      }
+
+      return {} as Authentication;
+    }
   }
 
   async pickAccountEnvironmentID(input: MultiStepInput, credential: Authentication) {
@@ -434,10 +465,19 @@ function quickPickAuthentication(currentConfig: Authentication, resource: Authen
   };
 }
 
-function quickPickAccountEnvironment(resource: FeatExpAccountEnvironment): vscode.QuickPickItem {
+function quickPickAccountEnvironment(resource: AccountEnvironmentFE): vscode.QuickPickItem {
   return {
     label: resource.id,
     description: `Environment: '${resource.environment}'`,
+  };
+}
+
+function quickPickAccount(resource: AccountFE): vscode.QuickPickItem {
+  return {
+    label: resource.id,
+    description: `associated username: '${resource.associatedUsername}' ${
+      resource.name ? `name: ${resource.name}` : ``
+    }`,
   };
 }
 

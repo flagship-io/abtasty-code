@@ -26,9 +26,19 @@ export class AuthenticationStore {
   }
 
   async selectAccount(authentication: Authentication) {
-    const accEnvSet = await this.cli.UseAccount(authentication);
-    if (accEnvSet) {
+    const accSet = await this.cli.UseAccount(authentication);
+    if (accSet) {
       vscode.window.showInformationMessage(`[AB Tasty] Account selected successfully !`);
+      return;
+    }
+
+    vscode.window.showErrorMessage(`[AB Tasty] Error while selecting account !`);
+  }
+
+  async selectDefaultWorkingDir(authentication: Authentication) {
+    const accSet = await this.cli.UseWorkingDir(authentication);
+    if (accSet) {
+      vscode.window.showInformationMessage(`[AB Tasty] Working directory set successfully !`);
       return;
     }
 

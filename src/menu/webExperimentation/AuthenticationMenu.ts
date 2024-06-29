@@ -5,9 +5,10 @@ import { load } from 'js-yaml';
 import { readFile } from 'fs/promises';
 import path = require('path');
 import { CONFIG_ADD_ICON, CONFIG_CLEAR_ALL_ICON } from '../../icons';
-import { WebExpAccount, Authentication } from '../../model';
+import { AccountWE, Authentication } from '../../model';
 import { WEB_EXPERIMENTATION_CLEAR_CONFIG } from '../../commands/const';
 import { AuthenticationStore } from '../../store/webExperimentation/AuthenticationStore';
+import { rootPath } from '../../setupWebExpProviders';
 
 class CustomButton implements vscode.QuickInputButton {
   constructor(
@@ -43,6 +44,7 @@ export class AuthenticationMenu {
       client_id: '',
       client_secret: '',
       username: '',
+      working_dir: '',
     } as Authentication;
     this.currentAuthentication = currentAuthentication;
     this.authenticationList = authenticationList;
@@ -315,6 +317,11 @@ export class AuthenticationMenu {
     }
 
     if (this.authentication.username) {
+      if (rootPath) {
+        this.authentication.working_dir = rootPath;
+        await this.authenticationStore.selectDefaultWorkingDir(this.authentication);
+      }
+
       await this.authenticationStore.selectAccount(this.authentication);
       configuringExtension(this.cancelMode);
       return this.authentication;
@@ -336,7 +343,7 @@ function quickPickAuthentication(currentConfig: Authentication, resource: Authen
   };
 }
 
-function quickPickAccount(resource: WebExpAccount): vscode.QuickPickItem {
+function quickPickAccount(resource: AccountWE): vscode.QuickPickItem {
   return {
     label: String(resource.id),
     description: `Name: '${resource.name}'`,

@@ -1,14 +1,13 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable-next-line @typescript-eslint/no-var-requires */
-import * as vscode from 'vscode';
 import { exec, ExecOptions } from 'child_process';
+import * as fs from 'fs';
 import { join } from 'path';
+import * as vscode from 'vscode';
 import {
-  WebExpAccount,
-  FeatExpAccountEnvironment,
+  AccountEnvironmentFE,
   Authentication,
   CampaignFE,
-  Configuration,
   CurrentAuthentication,
   FileAnalyzedType,
   Flag,
@@ -16,10 +15,7 @@ import {
   Project,
   TargetingKey,
   TokenInfo,
-  ModificationWE,
-  CampaignWE,
 } from '../../../model';
-import * as fs from 'fs';
 import { CliVersion } from '../../cliDownloader';
 export class Cli {
   private context: vscode.ExtensionContext;
@@ -157,7 +153,7 @@ export class Cli {
     }
   }
 
-  async ListAccountEnvironment(): Promise<FeatExpAccountEnvironment[]> {
+  async ListAccountEnvironment(): Promise<AccountEnvironmentFE[]> {
     try {
       const cliBin = await this.CliBin();
       if (!cliBin) {

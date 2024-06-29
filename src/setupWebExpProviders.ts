@@ -16,6 +16,11 @@ import { CampaignStore } from './store/webExperimentation/CampaignStore';
 import { deleteCampaignInputBox } from './menu/webExperimentation/CampaignMenu';
 import { CampaignListProvider } from './providers/webExperimentation/CampaignList';
 
+export const rootPath =
+  vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0
+    ? vscode.workspace.workspaceFolders[0].uri.fsPath
+    : undefined;
+
 export async function setupWebExpProviders(context: vscode.ExtensionContext, cli: Cli) {
   const configured = await context.globalState.get(WEB_EXPERIMENTATION_CONFIGURED);
 

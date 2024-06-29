@@ -1,25 +1,10 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable-next-line @typescript-eslint/no-var-requires */
-import * as vscode from 'vscode';
 import { exec, ExecOptions } from 'child_process';
-import { join } from 'path';
-import {
-  WebExpAccount,
-  FeatExpAccountEnvironment,
-  Authentication,
-  CampaignFE,
-  Configuration,
-  CurrentAuthentication,
-  FileAnalyzedType,
-  Flag,
-  Goal,
-  Project,
-  TargetingKey,
-  TokenInfo,
-  ModificationWE,
-  CampaignWE,
-} from '../../../model';
 import * as fs from 'fs';
+import { join } from 'path';
+import * as vscode from 'vscode';
+import { AccountWE, Authentication, CampaignWE, CurrentAuthentication, ModificationWE } from '../../../model';
 import { CliVersion } from '../../cliDownloader';
 export class Cli {
   private context: vscode.ExtensionContext;
@@ -134,6 +119,30 @@ export class Cli {
     }
   }
 
+  async UseWorkingDir(authentication: Authentication): Promise<boolean> {
+    try {
+      const cliBin = await this.CliBin();
+      if (!cliBin) {
+        return false;
+      }
+      const command = `${cliBin} web-experimentation working-directory set --path  ${authentication.working_dir} --output-format json`;
+      console.log(command);
+      const output = await this.exec(command, {});
+      console.log(output);
+
+      if (output.stderr) {
+        vscode.window.showErrorMessage(output.stderr);
+        return false;
+      }
+
+      return true;
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return false;
+    }
+  }
+
   async DeleteAuthentication(username: string): Promise<boolean> {
     try {
       const cliBin = await this.CliBin();
@@ -221,7 +230,7 @@ export class Cli {
     }
   }
 
-  async ListAccountWE(): Promise<WebExpAccount[]> {
+  async ListAccountWE(): Promise<AccountWE[]> {
     try {
       const cliBin = await this.CliBin();
       if (!cliBin) {

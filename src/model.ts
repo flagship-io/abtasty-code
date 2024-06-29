@@ -18,12 +18,13 @@ export type Authentication = {
   client_secret: string;
   account_id: string;
   account_environment_id: string;
-  account_environment_list: FeatExpAccountEnvironment[];
+  account_environment_list: AccountEnvironmentFE[];
   path: string;
   scope?: string;
+  working_dir: string;
 };
 
-export type FeatExpAccountEnvironment = {
+export type AccountEnvironmentFE = {
   id: string;
   environment: string;
   is_main: boolean;
@@ -31,7 +32,7 @@ export type FeatExpAccountEnvironment = {
   single_assignment: boolean;
 };
 
-export type WebExpAccount = {
+export type AccountWE = {
   id: number;
   name: string;
   identifier: string;
@@ -172,6 +173,7 @@ export type Goal = {
 export type AccountFE = {
   id: string;
   name: string;
+  associatedUsername: string;
 };
 
 export type TargetingKey = {
