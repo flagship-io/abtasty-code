@@ -3,13 +3,17 @@ import {
   WEB_EXPERIMENTATION_MODIFICATION_LIST_LOAD,
   WEB_EXPERIMENTATION_MODIFICATION_LIST_REFRESH,
 } from '../../commands/const';
-import { ROCKET } from '../../icons';
-import { ItemResource } from '../../model';
-import { CURRENT_SET_CAMPAIGN_ID } from '../../services/featureExperimentation/const';
+import { CIRCLE_FILLED, ROCKET } from '../../icons';
+import { ItemResource, ModificationWE } from '../../model';
+import { CURRENT_SET_CAMPAIGN_ID } from '../../services/webExperimentation/const';
 import { ModificationStore } from '../../store/webExperimentation/ModificationStore';
+import { SET_CAMPAIGN_ID_FOR_MODIFICATION } from '../../const';
 
 export class ModificationListProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
-  private _modifications: ModificationItem[] = [];
+  private _modifications: CampaignTreeItem = {
+    children: undefined,
+    parentID: undefined,
+  };
   private modificationStore: ModificationStore;
 
   private _onDidChangeTreeData: vscode.EventEmitter<vscode.TreeItem | undefined | void> = new vscode.EventEmitter<
@@ -25,19 +29,23 @@ export class ModificationListProvider implements vscode.TreeDataProvider<vscode.
   }
 
   async refresh() {
-    this._modifications = [];
-    // TODO: to be set later
-    /*     const campaignID = (this.context.globalState.get(CURRENT_SET_CAMPAIGN_ID) as number) || 0;
+    this._modifications = {
+      children: undefined,
+      parentID: undefined,
+    };
+    const campaignID = ((await this.context.globalState.get(CURRENT_SET_CAMPAIGN_ID)) as number) || 0;
     if (campaignID) {
       await this.getRefreshedModifications(campaignID);
-    } */
-    await this.getRefreshedModifications(0);
+    }
     this._onDidChangeTreeData.fire();
   }
 
   async load() {
-    this._modifications = [];
-    const campaignID = (this.context.globalState.get(CURRENT_SET_CAMPAIGN_ID) as number) || 0;
+    this._modifications = {
+      children: undefined,
+      parentID: undefined,
+    };
+    const campaignID = ((await this.context.globalState.get(CURRENT_SET_CAMPAIGN_ID)) as number) || 0;
     if (campaignID) {
       this.getLoadedModifications(campaignID);
     }
@@ -48,24 +56,23 @@ export class ModificationListProvider implements vscode.TreeDataProvider<vscode.
     return element;
   }
 
-  getChildren(element?: vscode.TreeItem): vscode.ProviderResult<vscode.TreeItem[]> {
+  getChildren(element?: CampaignTreeItem): vscode.ProviderResult<vscode.TreeItem[]> {
     const items: vscode.TreeItem[] = [];
-    // TODO: to set later
-    /*     const campaignID = (this.context.globalState.get(CURRENT_SET_CAMPAIGN_ID) as number) || 0;
-    if (!campaignID) {
-      return [new vscode.TreeItem(SET_CAMPAIGN_ID_FOR_MODIFICATION)];
-    }
- */
-    if (this._modifications.length === 0) {
-      const noModification = new vscode.TreeItem('No Modification found');
-      return [noModification];
-    }
-
+    const campaignID = (this.context.globalState.get(CURRENT_SET_CAMPAIGN_ID) as number) || 0;
     if (typeof element === 'undefined') {
-      return this._modifications;
+      if (!campaignID) {
+        return [new CampaignTreeItem(SET_CAMPAIGN_ID_FOR_MODIFICATION)];
+      }
+
+      return [this._modifications];
     }
 
-    Object.entries(this._modifications.find((f) => f === element)!).forEach(([k, v]) => {
+    if (element.children?.length === 0) {
+      return [new CampaignTreeItem('No resource found')];
+    }
+    return element.children;
+
+    /* Object.entries(this._modifications.find((f) => f === element)!).forEach(([k, v]) => {
       if (k === 'id' || k === 'name' || k === 'type' || k === 'variationId' || k === 'selector' || k === 'engine') {
         if (v !== undefined && v !== '') {
           items.push(this.getModificationInfo(k, v));
@@ -73,41 +80,36 @@ export class ModificationListProvider implements vscode.TreeDataProvider<vscode.
       }
     });
 
-    return items;
+    return new _CampaignItem(campaignID, campaignID, items); */
+  }
+
+  private mappingTree(campaignID: number, modificationList: ModificationWE[]) {
+    const modificationsItem = modificationList.map((m) => {
+      const modifItem = Object.entries(m).map(([key, value]) => new SimpleItem(key, value, undefined));
+      return new ModificationItem(
+        String(m.id),
+        m.name,
+        m.type,
+        m.value,
+        String(m.variation_id),
+        m.selector,
+        m.engine,
+        vscode.TreeItemCollapsibleState.Collapsed,
+        campaignID,
+        modifItem,
+      );
+    });
+    return new _CampaignItem(String(campaignID), String(campaignID), modificationsItem);
   }
 
   private async getRefreshedModifications(campaignID: number) {
     const modificationList = await this.modificationStore.refreshModification(campaignID);
-    modificationList.map((m) => {
-      const modification = new ModificationItem(
-        String(m.id),
-        m.name,
-        m.type,
-        m.value,
-        String(m.variation_id),
-        m.selector,
-        m.engine,
-        vscode.TreeItemCollapsibleState.Collapsed,
-      );
-      this._modifications.push(modification);
-    });
+    this._modifications = this.mappingTree(campaignID, modificationList);
   }
 
-  private getLoadedModifications(campaignID: number) {
-    const modificationList = this.modificationStore.loadModification(campaignID);
-    modificationList.map((m) => {
-      const modification = new ModificationItem(
-        String(m.id),
-        m.name,
-        m.type,
-        m.value,
-        String(m.variation_id),
-        m.selector,
-        m.engine,
-        vscode.TreeItemCollapsibleState.Collapsed,
-      );
-      this._modifications.push(modification);
-    });
+  private getLoadedModifications(campaignId: number) {
+    const modificationList = this.modificationStore.loadModification();
+    this._modifications = this.mappingTree(campaignId, modificationList);
   }
 
   private getModificationInfo(label: string, labelValue: string): vscode.TreeItem {
@@ -115,7 +117,22 @@ export class ModificationListProvider implements vscode.TreeDataProvider<vscode.
   }
 }
 
-export class ModificationItem extends vscode.TreeItem {
+class CampaignTreeItem extends vscode.TreeItem {
+  children: CampaignTreeItem[] | undefined;
+  parentID: string | undefined;
+
+  constructor(label?: string, children?: CampaignTreeItem[], parentID?: string, iconPath?: vscode.ThemeIcon) {
+    super(
+      label!,
+      children === undefined ? vscode.TreeItemCollapsibleState.None : vscode.TreeItemCollapsibleState.Collapsed,
+    );
+    this.children = children;
+    this.parentID = parentID;
+    this.iconPath = iconPath;
+  }
+}
+
+export class ModificationItem extends CampaignTreeItem {
   constructor(
     public readonly id?: string,
     public readonly name?: string,
@@ -125,12 +142,43 @@ export class ModificationItem extends vscode.TreeItem {
     public readonly selector?: string,
     public readonly engine?: string,
     public readonly collapsibleState?: vscode.TreeItemCollapsibleState,
+    public readonly campaignId?: number,
+    children?: CampaignTreeItem[],
+    parent?: any,
   ) {
-    super(name!, collapsibleState);
+    super(name!, children, parent);
     this.tooltip = `Type: ${this.type}`;
     this.description = type;
   }
   iconPath = ROCKET;
 
   contextValue = 'modificationWEItem';
+}
+
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export class _CampaignItem extends CampaignTreeItem {
+  constructor(public readonly id?: string, public readonly name?: string, children?: ModificationItem[], parent?: any) {
+    super(name!, children, parent);
+    this.tooltip = `- id: ${this.id}`;
+    this.description = `- id: ${this.id}`;
+  }
+  iconPath = ROCKET;
+
+  contextValue = '_campaignItem';
+}
+
+class SimpleItem extends CampaignTreeItem {
+  constructor(
+    public readonly key?: string,
+    public readonly value?: unknown,
+    children?: CampaignTreeItem[],
+    parent?: any,
+  ) {
+    super(key!, children, parent);
+    this.tooltip = JSON.stringify(value);
+    this.description = JSON.stringify(value);
+  }
+  iconPath = CIRCLE_FILLED;
+
+  contextValue = 'simpleItem';
 }

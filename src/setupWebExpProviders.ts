@@ -1,20 +1,28 @@
 import * as vscode from 'vscode';
+import { Cli } from './cli/cmd/webExperimentation/Cli';
 import {
   SET_CONTEXT,
+  WEB_EXPERIMENTATION_ACCOUNT_LIST_LOAD,
+  WEB_EXPERIMENTATION_ACCOUNT_LIST_SELECT,
   WEB_EXPERIMENTATION_CAMPAIGN_LIST_DELETE,
   WEB_EXPERIMENTATION_CAMPAIGN_LIST_LOAD,
+  WEB_EXPERIMENTATION_CAMPAIGN_SET_CAMPAIGN,
   WEB_EXPERIMENTATION_MODIFICATION_LIST_DELETE,
   WEB_EXPERIMENTATION_MODIFICATION_LIST_LOAD,
+  WEB_EXPERIMENTATION_MODIFICATION_LIST_REFRESH,
 } from './commands/const';
+import { selectAccountInputBox } from './menu/webExperimentation/AccountMenu';
+import { deleteCampaignInputBox } from './menu/webExperimentation/CampaignMenu';
 import { deleteModificationInputBox } from './menu/webExperimentation/ModificationMenu';
-import { Cli } from './cli/cmd/webExperimentation/Cli';
+import { AccountItem, AccountListProvider } from './providers/webExperimentation/AccountList';
+import { CampaignItem, CampaignListProvider } from './providers/webExperimentation/CampaignList';
 import { ModificationItem, ModificationListProvider } from './providers/webExperimentation/ModificationList';
 import { QuickAccessListProvider } from './providers/webExperimentation/QuickAccessList';
-import { WEB_EXPERIMENTATION_CONFIGURED } from './services/webExperimentation/const';
-import { ModificationStore } from './store/webExperimentation/ModificationStore';
+import { CURRENT_SET_CAMPAIGN_ID, WEB_EXPERIMENTATION_CONFIGURED } from './services/webExperimentation/const';
+import { AccountWEStore } from './store/webExperimentation/AccountStore';
+import { AuthenticationStore } from './store/webExperimentation/AuthenticationStore';
 import { CampaignStore } from './store/webExperimentation/CampaignStore';
-import { deleteCampaignInputBox } from './menu/webExperimentation/CampaignMenu';
-import { CampaignListProvider } from './providers/webExperimentation/CampaignList';
+import { ModificationStore } from './store/webExperimentation/ModificationStore';
 
 export const rootPath =
   vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0
@@ -26,7 +34,8 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
 
   const modificationStore = new ModificationStore(context, cli);
   const campaignStore = new CampaignStore(context, cli);
-
+  const accountStore = new AccountWEStore(context, cli);
+  const authenticationStore = new AuthenticationStore(context, cli);
   if (configured === true) {
     await vscode.commands.executeCommand(SET_CONTEXT, 'abtasty:explorer', 'webExperimentation');
   }
@@ -40,7 +49,15 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
   const campaignProvider = new CampaignListProvider(context, campaignStore);
   vscode.window.registerTreeDataProvider('webExperimentation.campaignList', campaignProvider);
 
-  await Promise.all([quickAccessView.refresh(), modificationProvider.refresh(), campaignProvider.refresh()]);
+  const accountProvider = new AccountListProvider(context, accountStore);
+  vscode.window.registerTreeDataProvider('webExperimentation.accountList', accountProvider);
+
+  await Promise.all([
+    quickAccessView.refresh(),
+    accountProvider.refresh(),
+    modificationProvider.refresh(),
+    campaignProvider.refresh(),
+  ]);
 
   const modificationDisposables = [
     vscode.commands.registerCommand(
@@ -54,15 +71,33 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
   ];
 
   const campaignDisposables = [
-    vscode.commands.registerCommand(
-      WEB_EXPERIMENTATION_CAMPAIGN_LIST_DELETE,
-      async (modification: ModificationItem) => {
-        await deleteCampaignInputBox(modification, campaignStore);
-        await vscode.commands.executeCommand(WEB_EXPERIMENTATION_CAMPAIGN_LIST_LOAD);
-        return;
-      },
-    ),
+    vscode.commands.registerCommand(WEB_EXPERIMENTATION_CAMPAIGN_LIST_DELETE, async (campaign: CampaignItem) => {
+      await deleteCampaignInputBox(campaign, campaignStore);
+      await vscode.commands.executeCommand(WEB_EXPERIMENTATION_CAMPAIGN_LIST_LOAD);
+      return;
+    }),
+
+    vscode.commands.registerCommand(WEB_EXPERIMENTATION_CAMPAIGN_SET_CAMPAIGN, async (campaign: CampaignItem) => {
+      await context.globalState.update(CURRENT_SET_CAMPAIGN_ID, campaign.id);
+      await vscode.commands.executeCommand(WEB_EXPERIMENTATION_MODIFICATION_LIST_REFRESH);
+      return;
+    }),
   ];
 
-  context.subscriptions.push(quickAccessProvider, ...modificationDisposables, ...campaignDisposables);
+  const accountDisposables = [
+    vscode.commands.registerCommand(WEB_EXPERIMENTATION_ACCOUNT_LIST_SELECT, async (account: AccountItem) => {
+      await selectAccountInputBox(account, authenticationStore);
+      await context.globalState.update(CURRENT_SET_CAMPAIGN_ID, undefined);
+      await Promise.all([quickAccessView.refresh(), modificationProvider.refresh(), campaignProvider.refresh()]);
+      await vscode.commands.executeCommand(WEB_EXPERIMENTATION_ACCOUNT_LIST_LOAD);
+      return;
+    }),
+  ];
+
+  context.subscriptions.push(
+    quickAccessProvider,
+    ...modificationDisposables,
+    ...campaignDisposables,
+    ...accountDisposables,
+  );
 }

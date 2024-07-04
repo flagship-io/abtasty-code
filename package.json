@@ -112,8 +112,13 @@
           "when": "abtasty:explorer == webExperimentation"
         },
         {
+          "id": "webExperimentation.accountList",
+          "name": "Account",
+          "when": "abtasty:explorer == webExperimentation"
+        },
+        {
           "id": "webExperimentation.campaignList",
-          "name": "Campaign Test",
+          "name": "Campaign",
           "when": "abtasty:explorer == webExperimentation"
         },
         {
@@ -303,6 +308,31 @@
         "command": "webExperimentation.campaignList.refresh",
         "title": "Web Experimentation: Refresh campaign panel",
         "icon": "$(refresh)"
+      },
+      {
+        "command": "webExperimentation.accountList.refresh",
+        "title": "Web Experimentation: Refresh account panel",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "webExperimentation.modificationList.deleteModification",
+        "title": "Web Experimentation: Remove the modification",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "webExperimentation.campaignList.deleteCampaign",
+        "title": "Web Experimentation: Remove the goal",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "webExperimentation.campaignList.setCampaign",
+        "title": "Set as global campaign",
+        "icon": "$(run)"
+      },
+      {
+        "command": "webExperimentation.accountList.selectAccount",
+        "title": "Web Experimentation: select account",
+        "icon": "$(run)"
       }
     ],
     "menus": {
@@ -370,6 +400,11 @@
         {
           "command": "webExperimentation.campaignList.refresh",
           "when": "view == webExperimentation.campaignList",
+          "group": "navigation@0"
+        },
+        {
+          "command": "webExperimentation.accountList.refresh",
+          "when": "view == webExperimentation.accountList",
           "group": "navigation@0"
         }
       ],
@@ -452,6 +487,26 @@
         {
           "command": "featureExperimentation.flagsInFile.addFlag",
           "when": "view == featureExperimentation.flagsInFile && viewItem == flagAnalyzedItem",
+          "group": "inline"
+        },
+        {
+          "command": "webExperimentation.modificationList.deleteModification",
+          "when": "view == webExperimentation.modificationList && viewItem == modificationWEItem",
+          "group": "inline"
+        },
+        {
+          "command": "webExperimentation.campaignList.deleteCampaign",
+          "when": "view == webExperimentation.campaignList && viewItem == campaignWEItem",
+          "group": "inline"
+        },
+        {
+          "command": "webExperimentation.campaignList.setCampaign",
+          "when": "view == webExperimentation.campaignList && viewItem == campaignWEItem",
+          "group": "navigation"
+        },
+        {
+          "command": "webExperimentation.accountList.selectAccount",
+          "when": "view == webExperimentation.accountList && viewItem == accountWEItem",
           "group": "inline"
         }
       ]

@@ -12,12 +12,12 @@ export class ModificationStore {
     this.modificationService = new ModificationDataService(context);
   }
 
-  loadModification(campaignId: number): ModificationWE[] {
+  loadModification(): ModificationWE[] {
     return this.modificationService.getState();
   }
 
   async refreshModification(campaignId: number): Promise<ModificationWE[]> {
-    const modifications = await this.cli.ListModificationWE('1161607');
+    const modifications = await this.cli.ListModificationWE(campaignId);
     await this.modificationService.loadState(modifications);
     return modifications;
   }
@@ -43,8 +43,10 @@ export class ModificationStore {
     return cliResponse;
   } */
 
-  async deleteModification(modificationId: number): Promise<boolean> {
-    const cliResponse = modificationId ? await this.cli.DeleteModification(String(modificationId)) : false;
+  async deleteModification(modificationId: number, campaignId: number): Promise<boolean> {
+    const cliResponse = modificationId
+      ? await this.cli.DeleteModification(String(modificationId), String(campaignId))
+      : false;
     if (cliResponse) {
       await this.modificationService.deleteModification(modificationId);
       vscode.window.showInformationMessage(`[AB Tasty] Modification deleted successfully`);

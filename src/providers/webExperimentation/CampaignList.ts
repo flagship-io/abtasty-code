@@ -125,7 +125,7 @@ export class CampaignItem extends vscode.TreeItem {
   ) {
     super(name!, collapsibleState);
     this.tooltip = `Type: ${this.type}`;
-    this.description = type;
+    this.description = `- id: ${this.id} type: ${this.type}`;
   }
   iconPath = ROCKET;
 

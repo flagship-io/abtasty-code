@@ -322,7 +322,7 @@ export class AuthenticationMenu {
         await this.authenticationStore.selectDefaultWorkingDir(this.authentication);
       }
 
-      await this.authenticationStore.selectAccount(this.authentication);
+      await this.authenticationStore.selectAccount(this.authentication.account_id);
       configuringExtension(this.cancelMode);
       return this.authentication;
     }

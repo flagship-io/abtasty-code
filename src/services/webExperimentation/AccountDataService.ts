@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { GLOBAL_LIST_ACCOUNT_WE } from './const';
 import { AccountWE } from '../../model';
 
-export class AccountDataService {
+export class AccountWEDataService {
   private context: vscode.ExtensionContext;
   private accountList: AccountWE[] = [];
 

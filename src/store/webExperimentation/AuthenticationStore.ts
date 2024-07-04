@@ -25,8 +25,8 @@ export class AuthenticationStore {
     return authentications;
   }
 
-  async selectAccount(authentication: Authentication) {
-    const accSet = await this.cli.UseAccount(authentication);
+  async selectAccount(accountId: string) {
+    const accSet = await this.cli.UseAccount(accountId);
     if (accSet) {
       vscode.window.showInformationMessage(`[AB Tasty] Account selected successfully !`);
       return;

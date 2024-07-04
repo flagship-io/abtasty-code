@@ -95,13 +95,13 @@ export class Cli {
     }
   }
 
-  async UseAccount(authentication: Authentication): Promise<boolean> {
+  async UseAccount(accountId: string): Promise<boolean> {
     try {
       const cliBin = await this.CliBin();
       if (!cliBin) {
         return false;
       }
-      const command = `${cliBin} web-experimentation account use -i  ${authentication.account_id} --output-format json`;
+      const command = `${cliBin} web-experimentation account use -i  ${accountId} --output-format json`;
       console.log(command);
       const output = await this.exec(command, {});
       console.log(output);
@@ -251,7 +251,28 @@ export class Cli {
     }
   }
 
-  async ListModificationWE(campaignId: string): Promise<ModificationWE[]> {
+  async CurrentAccountWE(): Promise<CurrentAuthentication> {
+    try {
+      const cliBin = await this.CliBin();
+      if (!cliBin) {
+        return {} as CurrentAuthentication;
+      }
+      const command = `${cliBin} web-experimentation account current --output-format json`;
+      const output = await this.exec(command, {});
+      console.log(output);
+      if (output.stderr) {
+        vscode.window.showErrorMessage(output.stderr);
+        return {} as CurrentAuthentication;
+      }
+      return JSON.parse(output.stdout);
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return {} as CurrentAuthentication;
+    }
+  }
+
+  async ListModificationWE(campaignId: number): Promise<ModificationWE[]> {
     try {
       const cliBin = await this.CliBin();
       if (!cliBin) {
@@ -272,7 +293,28 @@ export class Cli {
     }
   }
 
-  async DeleteModification(id: string): Promise<boolean> {
+  async ListVariationWE(campaignId: string, variationId: string): Promise<ModificationWE[]> {
+    try {
+      const cliBin = await this.CliBin();
+      if (!cliBin) {
+        return [];
+      }
+      const command = `${cliBin} web-experimentation variation list --campaign-id ${campaignId} -i  ${variationId} --output-format json`;
+      const output = await this.exec(command, {});
+      console.log(output);
+      if (output.stderr) {
+        vscode.window.showErrorMessage(output.stderr);
+        return [];
+      }
+      return JSON.parse(output.stdout);
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return [];
+    }
+  }
+
+  async DeleteModification(id: string, campaignId: string): Promise<boolean> {
     try {
       const cliBin = await this.CliBin();
       let command: string;
@@ -280,7 +322,7 @@ export class Cli {
         return false;
       }
 
-      command = `${cliBin} web-experimentation modification delete -i ${id}`;
+      command = `${cliBin} web-experimentation modification delete -i ${id} --campaign-id ${campaignId}`;
       const output = await this.exec(command, {});
       console.log(output);
       if (output.stderr) {

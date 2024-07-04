@@ -75,3 +75,8 @@ export const WEB_EXPERIMENTATION_CAMPAIGN_LIST_REFRESH = 'webExperimentation.cam
 export const WEB_EXPERIMENTATION_CAMPAIGN_LIST_LOAD = 'webExperimentation.campaignList.load';
 export const WEB_EXPERIMENTATION_CAMPAIGN_LIST_EDIT = 'webExperimentation.campaignList.editCampaign';
 export const WEB_EXPERIMENTATION_CAMPAIGN_LIST_DELETE = 'webExperimentation.campaignList.deleteCampaign';
+export const WEB_EXPERIMENTATION_CAMPAIGN_SET_CAMPAIGN = 'webExperimentation.campaignList.setCampaign';
+
+export const WEB_EXPERIMENTATION_ACCOUNT_LIST_REFRESH = 'webExperimentation.accountList.refresh';
+export const WEB_EXPERIMENTATION_ACCOUNT_LIST_LOAD = 'webExperimentation.accountList.load';
+export const WEB_EXPERIMENTATION_ACCOUNT_LIST_SELECT = 'webExperimentation.accountList.selectAccount';

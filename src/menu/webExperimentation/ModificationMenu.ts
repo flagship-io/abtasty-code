@@ -10,7 +10,8 @@ export async function deleteModificationInputBox(modification: ModificationItem,
   });
   if (picked === 'yes') {
     const modificationId = Number(modification.id!);
-    await modificationStore.deleteModification(modificationId);
+    const campaignId = Number(modification.campaignId!);
+    await modificationStore.deleteModification(modificationId, campaignId);
     return;
   }
   return;
