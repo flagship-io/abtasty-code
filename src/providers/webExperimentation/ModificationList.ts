@@ -10,7 +10,7 @@ import { ModificationStore } from '../../store/webExperimentation/ModificationSt
 import { SET_CAMPAIGN_ID_FOR_MODIFICATION } from '../../const';
 
 export class ModificationListProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
-  private _modifications: CampaignTreeItem = {
+  private _modifications: ModificationTreeItem = {
     children: undefined,
     parentID: undefined,
   };
@@ -56,36 +56,25 @@ export class ModificationListProvider implements vscode.TreeDataProvider<vscode.
     return element;
   }
 
-  getChildren(element?: CampaignTreeItem): vscode.ProviderResult<vscode.TreeItem[]> {
-    const items: vscode.TreeItem[] = [];
+  getChildren(element?: ModificationTreeItem): vscode.ProviderResult<vscode.TreeItem[]> {
     const campaignID = (this.context.globalState.get(CURRENT_SET_CAMPAIGN_ID) as number) || 0;
     if (typeof element === 'undefined') {
       if (!campaignID) {
-        return [new CampaignTreeItem(SET_CAMPAIGN_ID_FOR_MODIFICATION)];
+        return [new ModificationTreeItem(SET_CAMPAIGN_ID_FOR_MODIFICATION)];
       }
 
       return [this._modifications];
     }
 
     if (element.children?.length === 0) {
-      return [new CampaignTreeItem('No resource found')];
+      return [new ModificationTreeItem('No resource found')];
     }
     return element.children;
-
-    /* Object.entries(this._modifications.find((f) => f === element)!).forEach(([k, v]) => {
-      if (k === 'id' || k === 'name' || k === 'type' || k === 'variationId' || k === 'selector' || k === 'engine') {
-        if (v !== undefined && v !== '') {
-          items.push(this.getModificationInfo(k, v));
-        }
-      }
-    });
-
-    return new _CampaignItem(campaignID, campaignID, items); */
   }
 
   private mappingTree(campaignID: number, modificationList: ModificationWE[]) {
     const modificationsItem = modificationList.map((m) => {
-      const modifItem = Object.entries(m).map(([key, value]) => new SimpleItem(key, value, undefined));
+      const modifItem = Object.entries(m).map(([key, value]) => new SimpleModificationItem(key, value, undefined));
       return new ModificationItem(
         String(m.id),
         m.name,
@@ -111,17 +100,13 @@ export class ModificationListProvider implements vscode.TreeDataProvider<vscode.
     const modificationList = this.modificationStore.loadModification();
     this._modifications = this.mappingTree(campaignId, modificationList);
   }
-
-  private getModificationInfo(label: string, labelValue: string): vscode.TreeItem {
-    return new ItemResource(label, labelValue);
-  }
 }
 
-class CampaignTreeItem extends vscode.TreeItem {
-  children: CampaignTreeItem[] | undefined;
+class ModificationTreeItem extends vscode.TreeItem {
+  children: ModificationTreeItem[] | undefined;
   parentID: string | undefined;
 
-  constructor(label?: string, children?: CampaignTreeItem[], parentID?: string, iconPath?: vscode.ThemeIcon) {
+  constructor(label?: string, children?: ModificationTreeItem[], parentID?: string, iconPath?: vscode.ThemeIcon) {
     super(
       label!,
       children === undefined ? vscode.TreeItemCollapsibleState.None : vscode.TreeItemCollapsibleState.Collapsed,
@@ -132,7 +117,7 @@ class CampaignTreeItem extends vscode.TreeItem {
   }
 }
 
-export class ModificationItem extends CampaignTreeItem {
+export class ModificationItem extends ModificationTreeItem {
   constructor(
     public readonly id?: string,
     public readonly name?: string,
@@ -143,7 +128,7 @@ export class ModificationItem extends CampaignTreeItem {
     public readonly engine?: string,
     public readonly collapsibleState?: vscode.TreeItemCollapsibleState,
     public readonly campaignId?: number,
-    children?: CampaignTreeItem[],
+    children?: ModificationTreeItem[],
     parent?: any,
   ) {
     super(name!, children, parent);
@@ -156,7 +141,7 @@ export class ModificationItem extends CampaignTreeItem {
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-export class _CampaignItem extends CampaignTreeItem {
+export class _CampaignItem extends ModificationTreeItem {
   constructor(public readonly id?: string, public readonly name?: string, children?: ModificationItem[], parent?: any) {
     super(name!, children, parent);
     this.tooltip = `- id: ${this.id}`;
@@ -167,11 +152,11 @@ export class _CampaignItem extends CampaignTreeItem {
   contextValue = '_campaignItem';
 }
 
-class SimpleItem extends CampaignTreeItem {
+class SimpleModificationItem extends ModificationTreeItem {
   constructor(
     public readonly key?: string,
     public readonly value?: unknown,
-    children?: CampaignTreeItem[],
+    children?: ModificationTreeItem[],
     parent?: any,
   ) {
     super(key!, children, parent);

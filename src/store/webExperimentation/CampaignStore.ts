@@ -51,4 +51,27 @@ export class CampaignStore {
     }
     return cliResponse;
   }
+
+  async pullCampaignGlobalCode(
+    campaignId: number,
+    createFile?: boolean,
+    override?: boolean,
+    subFiles?: boolean,
+  ): Promise<any> {
+    const cliResponse = campaignId
+      ? await this.cli.PullCampaignGlobalCode(String(campaignId), createFile, override, subFiles)
+      : false;
+    if (cliResponse) {
+      vscode.window.showInformationMessage(`[AB Tasty] Campaign global code pulled successfully`);
+    }
+    return cliResponse;
+  }
+
+  async pushCampaignGlobalCode(campaignId: number, filepath?: string, code?: string): Promise<any> {
+    const cliResponse = campaignId ? await this.cli.PushCampaignGlobalCode(String(campaignId), filepath, code) : false;
+    if (cliResponse) {
+      vscode.window.showInformationMessage(`[AB Tasty] Campaign global code pushed successfully`);
+    }
+    return cliResponse;
+  }
 }

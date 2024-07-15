@@ -36,21 +36,15 @@ export class QuickAccessListProvider implements vscode.TreeDataProvider<vscode.T
 
   private async getLinkItems() {
     this.items.push(
-      new LinkItem(`Manage configurations`, NON_COLLAPSED, '', {
-        title: 'Credentials',
-        command: WEB_EXPERIMENTATION_SET_CREDENTIALS,
-      }),
-    );
-    this.items.push(
       new LinkItem(`Switch to Feature experimentation`, NON_COLLAPSED, '', {
         title: 'Change product',
         command: FEATURE_EXPERIMENTATION_SET_CREDENTIALS,
       }),
     );
     this.items.push(
-      new LinkItem(`Create Modification`, NON_COLLAPSED, '', {
-        title: 'Create Modification',
-        command: WEB_EXPERIMENTATION_CREATE_MODIFICATION,
+      new LinkItem(`Manage configurations`, NON_COLLAPSED, '', {
+        title: 'Credentials',
+        command: WEB_EXPERIMENTATION_SET_CREDENTIALS,
       }),
     );
     this.items.push(new LinkItem(`Documentation`, NON_COLLAPSED, DOCUMENT_URI));

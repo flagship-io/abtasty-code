@@ -6,6 +6,7 @@ import {
   WEB_EXPERIMENTATION_MODIFICATION_LIST_REFRESH,
   WEB_EXPERIMENTATION_QUICK_ACCESS_REFRESH,
   WEB_EXPERIMENTATION_SET_CREDENTIALS,
+  WEB_EXPERIMENTATION_VARIATION_LIST_REFRESH,
 } from './const';
 
 import { AuthenticationMenu } from '../menu/webExperimentation/AuthenticationMenu';
@@ -46,6 +47,7 @@ export default async function configureWebExperimentationCmd(context: vscode.Ext
 
           await Promise.all([
             vscode.commands.executeCommand(WEB_EXPERIMENTATION_MODIFICATION_LIST_REFRESH),
+            vscode.commands.executeCommand(WEB_EXPERIMENTATION_VARIATION_LIST_REFRESH),
             vscode.commands.executeCommand(WEB_EXPERIMENTATION_CAMPAIGN_LIST_REFRESH),
             vscode.commands.executeCommand(WEB_EXPERIMENTATION_QUICK_ACCESS_REFRESH),
           ]);

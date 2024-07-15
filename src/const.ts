@@ -5,3 +5,4 @@ export const PERMISSION_DENIED_PANEL = "You don't have the permission to use thi
 export const PERMISSION_DENIED = `[AB Tasty] ${PERMISSION_DENIED_PANEL} Contact your admin to enable the required scopes.`;
 
 export const SET_CAMPAIGN_ID_FOR_MODIFICATION = 'You have to set a campaign for modification';
+export const SET_CAMPAIGN_ID_FOR_VARIATION = 'You have to set a campaign for variation';

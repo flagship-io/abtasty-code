@@ -86,8 +86,6 @@ export class Cli {
         } -s ${authentication.client_secret} ${
           authentication.account_id ? `-a ${authentication.account_id}` : ``
         } --output-format json`;
-
-        console.log(command);
         const output = await this.exec(command, {});
         console.log(output);
 
@@ -113,7 +111,6 @@ export class Cli {
         return false;
       }
       const command = `${cliBin} feature-experimentation account use -i  ${authentication.account_id} --output-format json`;
-      console.log(command);
       const output = await this.exec(command, {});
       console.log(output);
 
@@ -224,7 +221,6 @@ export class Cli {
       }
 
       const command = `${cliBin} feature-experimentation authentication get -u ${username} --output-format json`;
-      console.log(command);
       const output = await this.exec(command, {});
       console.log(output);
       if (output.stderr) {
@@ -247,7 +243,6 @@ export class Cli {
       }
 
       const command = `${cliBin} feature-experimentation authentication current --output-format json`;
-      console.log(command);
       const output = await this.exec(command, {});
       console.log(output);
       if (output.stderr) {

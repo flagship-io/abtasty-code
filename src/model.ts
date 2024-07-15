@@ -77,6 +77,29 @@ export type CampaignWE = {
   sub_tests: CampaignWE[];
   labels: string[];
   variations: VariationWE[];
+  traffic: Traffic;
+  created_at: DateWE;
+  live_at: DateWE;
+  last_pause: DateWE;
+  last_play: DateWE;
+  start_on: DateWE;
+  stop_on: DateWE;
+  reset_at: DateWE;
+};
+
+export type Traffic = {
+  value: number;
+  last_increased_traffic: string;
+  visitors: number;
+  original_visitors: number;
+  visitor_limit: number;
+};
+
+export type DateWE = {
+  readable_date: string;
+  timestamp: number;
+  pattern: string;
+  timezone: string;
 };
 
 export type VariationWE = {

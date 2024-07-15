@@ -4,7 +4,14 @@ import { exec, ExecOptions } from 'child_process';
 import * as fs from 'fs';
 import { join } from 'path';
 import * as vscode from 'vscode';
-import { AccountWE, Authentication, CampaignWE, CurrentAuthentication, ModificationWE } from '../../../model';
+import {
+  AccountWE,
+  Authentication,
+  CampaignWE,
+  CurrentAuthentication,
+  ModificationWE,
+  VariationWE,
+} from '../../../model';
 import { CliVersion } from '../../cliDownloader';
 export class Cli {
   private context: vscode.ExtensionContext;
@@ -17,12 +24,16 @@ export class Cli {
 
   exec(command: string, options: ExecOptions): Promise<{ stdout: string; stderr: string }> {
     return new Promise<{ stdout: string; stderr: string }>((resolve, reject) => {
-      exec(command + ' --user-agent=abtasty-ext-vscode/v' + this.extensionVersion, options, (error, stdout, stderr) => {
-        if (error) {
-          reject({ error, stdout, stderr });
-        }
-        resolve({ stdout, stderr });
-      });
+      exec(
+        command + ' --user-agent=abtasty-ext-vscode/v' + this.extensionVersion,
+        { maxBuffer: 1024 * 1024 * 50 },
+        (error, stdout, stderr) => {
+          if (error) {
+            reject({ error, stdout, stderr });
+          }
+          resolve({ stdout, stderr });
+        },
+      );
     });
   }
 
@@ -76,7 +87,6 @@ export class Cli {
           authentication.account_id ? `-a ${authentication.account_id}` : ``
         } --output-format json`;
 
-        console.log(command);
         const output = await this.exec(command, {});
         console.log(output);
 
@@ -102,7 +112,6 @@ export class Cli {
         return false;
       }
       const command = `${cliBin} web-experimentation account use -i  ${accountId} --output-format json`;
-      console.log(command);
       const output = await this.exec(command, {});
       console.log(output);
 
@@ -126,7 +135,6 @@ export class Cli {
         return false;
       }
       const command = `${cliBin} web-experimentation working-directory set --path  ${authentication.working_dir} --output-format json`;
-      console.log(command);
       const output = await this.exec(command, {});
       console.log(output);
 
@@ -191,7 +199,6 @@ export class Cli {
       }
 
       const command = `${cliBin} web-experimentation authentication get -u ${username} --output-format json`;
-      console.log(command);
       const output = await this.exec(command, {});
       console.log(output);
       if (output.stderr) {
@@ -214,7 +221,6 @@ export class Cli {
       }
 
       const command = `${cliBin} web-experimentation authentication current --output-format json`;
-      console.log(command);
       const output = await this.exec(command, {});
       console.log(output);
       if (output.stderr) {
@@ -293,24 +299,24 @@ export class Cli {
     }
   }
 
-  async ListVariationWE(campaignId: string, variationId: string): Promise<ModificationWE[]> {
+  async ListVariationWE(campaignId: number, variationId: number): Promise<VariationWE> {
     try {
       const cliBin = await this.CliBin();
       if (!cliBin) {
-        return [];
+        return {} as VariationWE;
       }
-      const command = `${cliBin} web-experimentation variation list --campaign-id ${campaignId} -i  ${variationId} --output-format json`;
+      const command = `${cliBin} web-experimentation variation get --campaign-id ${campaignId} -i ${variationId} --output-format json`;
       const output = await this.exec(command, {});
       console.log(output);
       if (output.stderr) {
         vscode.window.showErrorMessage(output.stderr);
-        return [];
+        return {} as VariationWE;
       }
       return JSON.parse(output.stdout);
     } catch (err: any) {
       vscode.window.showErrorMessage(err.error);
       console.error(err);
-      return [];
+      return {} as VariationWE;
     }
   }
 
@@ -323,6 +329,29 @@ export class Cli {
       }
 
       command = `${cliBin} web-experimentation modification delete -i ${id} --campaign-id ${campaignId}`;
+      const output = await this.exec(command, {});
+      console.log(output);
+      if (output.stderr) {
+        vscode.window.showErrorMessage(output.stderr);
+        return false;
+      }
+      return true;
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return false;
+    }
+  }
+
+  async DeleteVariationWE(id: string, campaignId: string): Promise<boolean> {
+    try {
+      const cliBin = await this.CliBin();
+      let command: string;
+      if (!cliBin) {
+        return false;
+      }
+
+      command = `${cliBin} web-experimentation variation delete -i ${id} --campaign-id ${campaignId}`;
       const output = await this.exec(command, {});
       console.log(output);
       if (output.stderr) {
@@ -366,6 +395,54 @@ export class Cli {
         return false;
       }
       command = `${cliBin} web-experimentation campaign delete -i ${id}`;
+      const output = await this.exec(command, {});
+      console.log(output);
+      if (output.stderr) {
+        vscode.window.showErrorMessage(output.stderr);
+        return false;
+      }
+      return true;
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return false;
+    }
+  }
+
+  async PullCampaignGlobalCode(id: string, createFile?: boolean, override?: boolean, subFiles?: boolean): Promise<any> {
+    try {
+      const cliBin = await this.CliBin();
+      let command: string;
+      if (!cliBin) {
+        return false;
+      }
+      command = `${cliBin} web-experimentation campaign-global-code get -i ${id} ${createFile ? `--create-file` : ``} ${
+        subFiles ? `--create-subfiles` : ``
+      } ${override ? `--override` : ``}`;
+      const output = await this.exec(command, {});
+      console.log(output);
+      if (output.stderr) {
+        vscode.window.showErrorMessage(output.stderr);
+        return false;
+      }
+      return output.stdout;
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return false;
+    }
+  }
+
+  async PushCampaignGlobalCode(id: string, filepath?: string, code?: string): Promise<boolean> {
+    try {
+      const cliBin = await this.CliBin();
+      let command: string;
+      if (!cliBin) {
+        return false;
+      }
+      command = `${cliBin} web-experimentation campaign-global-code push -i ${id} ${code ? `--code ${code}` : ``} ${
+        filepath ? `--file ${filepath}` : ``
+      }`;
       const output = await this.exec(command, {});
       console.log(output);
       if (output.stderr) {

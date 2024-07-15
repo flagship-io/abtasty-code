@@ -130,6 +130,11 @@
           "id": "webExperimentation.variationList",
           "name": "Variation",
           "when": "abtasty:explorer == webExperimentation"
+        },
+        {
+          "id": "webExperimentation.treeCode",
+          "name": "Tree Code",
+          "when": "abtasty:explorer == webExperimentation"
         }
       ]
     },
@@ -305,6 +310,16 @@
         "icon": "$(refresh)"
       },
       {
+        "command": "webExperimentation.variationList.refresh",
+        "title": "Web Experimentation: Refresh variation panel",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "webExperimentation.treeCode.refresh",
+        "title": "Web Experimentation: Refresh Tree code panel",
+        "icon": "$(refresh)"
+      },
+      {
         "command": "webExperimentation.campaignList.refresh",
         "title": "Web Experimentation: Refresh campaign panel",
         "icon": "$(refresh)"
@@ -320,6 +335,11 @@
         "icon": "$(trash)"
       },
       {
+        "command": "webExperimentation.variationList.deleteVariation",
+        "title": "Web Experimentation: Remove the variation",
+        "icon": "$(trash)"
+      },
+      {
         "command": "webExperimentation.campaignList.deleteCampaign",
         "title": "Web Experimentation: Remove the goal",
         "icon": "$(trash)"
@@ -330,9 +350,23 @@
         "icon": "$(run)"
       },
       {
+        "command": "webExperimentation.campaignList.pullGlobalCode",
+        "title": "Pull campaign global code from the platform",
+        "icon": "$(run)"
+      },
+      {
+        "command": "webExperimentation.campaignList.pushGlobalCode",
+        "title": "Push campaign global code to the platform",
+        "icon": "$(run)"
+      },
+      {
         "command": "webExperimentation.accountList.selectAccount",
         "title": "Web Experimentation: select account",
         "icon": "$(run)"
+      },
+      {
+        "command": "webExperimentation.treeCode.openFile",
+        "title": "Web Experimentation: Open code file"
       }
     ],
     "menus": {
@@ -395,6 +429,16 @@
         {
           "command": "webExperimentation.modificationList.refresh",
           "when": "view == webExperimentation.modificationList",
+          "group": "navigation@0"
+        },
+        {
+          "command": "webExperimentation.variationList.refresh",
+          "when": "view == webExperimentation.variationList",
+          "group": "navigation@0"
+        },
+        {
+          "command": "webExperimentation.treeCode.refresh",
+          "when": "view == webExperimentation.treeCode",
           "group": "navigation@0"
         },
         {
@@ -495,6 +539,11 @@
           "group": "inline"
         },
         {
+          "command": "webExperimentation.variationList.deleteVariation",
+          "when": "view == webExperimentation.variationList && viewItem == variationWEItem",
+          "group": "inline"
+        },
+        {
           "command": "webExperimentation.campaignList.deleteCampaign",
           "when": "view == webExperimentation.campaignList && viewItem == campaignWEItem",
           "group": "inline"
@@ -505,9 +554,24 @@
           "group": "navigation"
         },
         {
+          "command": "webExperimentation.campaignList.pullGlobalCode",
+          "when": "view == webExperimentation.campaignList && viewItem == campaignWEItem",
+          "group": "navigation"
+        },
+        {
+          "command": "webExperimentation.campaignList.pushGlobalCode",
+          "when": "view == webExperimentation.campaignList && viewItem == campaignWEItem",
+          "group": "navigation"
+        },
+        {
           "command": "webExperimentation.accountList.selectAccount",
           "when": "view == webExperimentation.accountList && viewItem == accountWEItem",
           "group": "inline"
+        },
+        {
+          "command": "webExperimentation.treeCode.openFile",
+          "when": "view == webExperimentation.treeCode && viewItem == fileWEItem",
+          "group": "navigation"
         }
       ]
     },

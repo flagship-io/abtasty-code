@@ -209,7 +209,7 @@ export class AuthenticationMenu {
       step: 1,
       totalSteps: 1,
       placeholder: 'Pick an account',
-      items: accountList.map((i) => quickPickAccount(i)),
+      items: accountList.sort((a, b) => a.name.localeCompare(b.name)).map((i) => quickPickAccount(i)),
       buttons: [CreateAccountButton],
       shouldResume: this.shouldResume,
       ignoreFocusOut: true,
