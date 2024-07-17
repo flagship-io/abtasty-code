@@ -53,13 +53,13 @@ export class CampaignStore {
   }
 
   async pullCampaignGlobalCode(
-    campaignId: number,
+    campaignId: string,
     createFile?: boolean,
     override?: boolean,
     subFiles?: boolean,
   ): Promise<any> {
     const cliResponse = campaignId
-      ? await this.cli.PullCampaignGlobalCode(String(campaignId), createFile, override, subFiles)
+      ? await this.cli.PullCampaignGlobalCode(campaignId, createFile, override, subFiles)
       : false;
     if (cliResponse) {
       vscode.window.showInformationMessage(`[AB Tasty] Campaign global code pulled successfully`);
@@ -67,10 +67,75 @@ export class CampaignStore {
     return cliResponse;
   }
 
-  async pushCampaignGlobalCode(campaignId: number, filepath?: string, code?: string): Promise<any> {
-    const cliResponse = campaignId ? await this.cli.PushCampaignGlobalCode(String(campaignId), filepath, code) : false;
+  async pushCampaignGlobalCode(campaignId: string, filepath?: string, code?: string): Promise<any> {
+    const cliResponse = campaignId ? await this.cli.PushCampaignGlobalCode(campaignId, filepath, code) : false;
     if (cliResponse) {
       vscode.window.showInformationMessage(`[AB Tasty] Campaign global code pushed successfully`);
+    }
+    return cliResponse;
+  }
+
+  async pullVariationGlobalCodeJS(
+    variationId: string,
+    campaignId: string,
+    createFile?: boolean,
+    override?: boolean,
+    subFiles?: boolean,
+  ): Promise<any> {
+    const cliResponse =
+      campaignId && variationId
+        ? await this.cli.PullVariationGlobalCodeJS(variationId, campaignId, createFile, override, subFiles)
+        : false;
+    if (cliResponse) {
+      vscode.window.showInformationMessage(`[AB Tasty] Variation global code JS pulled successfully`);
+    }
+    return cliResponse;
+  }
+
+  async pushVariationGlobalCodeJS(
+    variationId: string,
+    campaignId: string,
+    filepath?: string,
+    code?: string,
+  ): Promise<any> {
+    console.log(variationId);
+    const cliResponse = campaignId
+      ? await this.cli.PushVariationGlobalCodeJS(variationId, campaignId, filepath, code)
+      : false;
+    if (cliResponse) {
+      vscode.window.showInformationMessage(`[AB Tasty] Variation global code JS pushed successfully`);
+    }
+    return cliResponse;
+  }
+
+  async pullVariationGlobalCodeCSS(
+    variationId: string,
+    campaignId: string,
+    createFile?: boolean,
+    override?: boolean,
+    subFiles?: boolean,
+  ): Promise<any> {
+    const cliResponse =
+      campaignId && variationId
+        ? await this.cli.PullVariationGlobalCodeCSS(variationId, campaignId, createFile, override, subFiles)
+        : false;
+    if (cliResponse) {
+      vscode.window.showInformationMessage(`[AB Tasty] Variation global code CSS pulled successfully`);
+    }
+    return cliResponse;
+  }
+
+  async pushVariationGlobalCodeCSS(
+    variationId: string,
+    campaignId: string,
+    filepath?: string,
+    code?: string,
+  ): Promise<any> {
+    const cliResponse = campaignId
+      ? await this.cli.PushVariationGlobalCodeCSS(variationId, campaignId, filepath, code)
+      : false;
+    if (cliResponse) {
+      vscode.window.showInformationMessage(`[AB Tasty] Variation global code CSS pushed successfully`);
     }
     return cliResponse;
   }

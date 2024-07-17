@@ -19,7 +19,7 @@ import {
   TARGET,
   WATCH,
 } from '../../icons';
-import { PERMISSION_DENIED_PANEL } from '../../const';
+import { NO_RESOURCE_FOUND, PERMISSION_DENIED_PANEL } from '../../const';
 import { Authentication, Configuration, Project } from '../../model';
 import { ProjectStore } from '../../store/featureExperimentation/ProjectStore';
 
@@ -81,7 +81,7 @@ export class ProjectListProvider implements vscode.TreeDataProvider<vscode.TreeI
     }
 
     if (element.children?.length === 0) {
-      return [new ProjectTreeItem('No resource found')];
+      return [new ProjectTreeItem(NO_RESOURCE_FOUND)];
     }
     return element.children;
   }

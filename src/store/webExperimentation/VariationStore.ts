@@ -19,7 +19,7 @@ export class VariationStore {
   async refreshVariation(campaignId: number, variationIds: number[]): Promise<VariationWE[]> {
     const variations = await Promise.all(
       variationIds.map(async (id) => {
-        return this.cli.ListVariationWE(campaignId, id);
+        return this.cli.GetVariationWE(campaignId, id);
       }),
     );
     await this.variationService.loadState(variations);

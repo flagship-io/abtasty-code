@@ -24,3 +24,4 @@ export const TEST_VIEW_ICON = new vscode.ThemeIcon('test-view-icon');
 export const BRACKET = new vscode.ThemeIcon('bracket');
 export const WATCH = new vscode.ThemeIcon('watch');
 export const TARGET = new vscode.ThemeIcon('target');
+export const FILE_CODE = new vscode.ThemeIcon('file-code');

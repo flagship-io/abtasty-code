@@ -7,7 +7,7 @@ import { CIRCLE_FILLED, ROCKET } from '../../icons';
 import { ItemResource, ModificationWE } from '../../model';
 import { CURRENT_SET_CAMPAIGN_ID } from '../../services/webExperimentation/const';
 import { ModificationStore } from '../../store/webExperimentation/ModificationStore';
-import { SET_CAMPAIGN_ID_FOR_MODIFICATION } from '../../const';
+import { NO_RESOURCE_FOUND, SET_CAMPAIGN_ID_FOR_MODIFICATION } from '../../const';
 
 export class ModificationListProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
   private _modifications: ModificationTreeItem = {
@@ -67,7 +67,7 @@ export class ModificationListProvider implements vscode.TreeDataProvider<vscode.
     }
 
     if (element.children?.length === 0) {
-      return [new ModificationTreeItem('No resource found')];
+      return [new ModificationTreeItem(NO_RESOURCE_FOUND)];
     }
     return element.children;
   }

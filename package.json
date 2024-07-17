@@ -120,21 +120,6 @@
           "id": "webExperimentation.campaignList",
           "name": "Campaign",
           "when": "abtasty:explorer == webExperimentation"
-        },
-        {
-          "id": "webExperimentation.modificationList",
-          "name": "Modification",
-          "when": "abtasty:explorer == webExperimentation"
-        },
-        {
-          "id": "webExperimentation.variationList",
-          "name": "Variation",
-          "when": "abtasty:explorer == webExperimentation"
-        },
-        {
-          "id": "webExperimentation.treeCode",
-          "name": "Tree Code",
-          "when": "abtasty:explorer == webExperimentation"
         }
       ]
     },
@@ -352,12 +337,32 @@
       {
         "command": "webExperimentation.campaignList.pullGlobalCode",
         "title": "Pull campaign global code from the platform",
-        "icon": "$(run)"
+        "icon": "$(repo-sync)"
       },
       {
         "command": "webExperimentation.campaignList.pushGlobalCode",
         "title": "Push campaign global code to the platform",
-        "icon": "$(run)"
+        "icon": "$(repo-push)"
+      },
+      {
+        "command": "webExperimentation.variationList.pullGlobalCodeJS",
+        "title": "Pull variation global code JS from the platform",
+        "icon": "$(repo-sync)"
+      },
+      {
+        "command": "webExperimentation.variationList.pushGlobalCodeJS",
+        "title": "Push variation global code JS to the platform",
+        "icon": "$(repo-push)"
+      },
+      {
+        "command": "webExperimentation.variationList.pullGlobalCodeCSS",
+        "title": "Pull variation global code CSS from the platform",
+        "icon": "$(repo-sync)"
+      },
+      {
+        "command": "webExperimentation.variationList.pushGlobalCodeCSS",
+        "title": "Push variation global code CSS to the platform",
+        "icon": "$(repo-push)"
       },
       {
         "command": "webExperimentation.accountList.selectAccount",
@@ -366,6 +371,10 @@
       },
       {
         "command": "webExperimentation.treeCode.openFile",
+        "title": "Web Experimentation: Open code file"
+      },
+      {
+        "command": "webExperimentation.campaignList.globalCodeOpenFile",
         "title": "Web Experimentation: Open code file"
       }
     ],
@@ -555,13 +564,33 @@
         },
         {
           "command": "webExperimentation.campaignList.pullGlobalCode",
-          "when": "view == webExperimentation.campaignList && viewItem == campaignWEItem",
-          "group": "navigation"
+          "when": "view == webExperimentation.campaignList && viewItem == globalCodeCampaignItem",
+          "group": "inline"
         },
         {
           "command": "webExperimentation.campaignList.pushGlobalCode",
-          "when": "view == webExperimentation.campaignList && viewItem == campaignWEItem",
-          "group": "navigation"
+          "when": "view == webExperimentation.campaignList && viewItem == globalCodeCampaignItem",
+          "group": "inline"
+        },
+        {
+          "command": "webExperimentation.variationList.pullGlobalCodeJS",
+          "when": "view == webExperimentation.campaignList && viewItem == globalCodeVariationJSItem",
+          "group": "inline"
+        },
+        {
+          "command": "webExperimentation.variationList.pushGlobalCodeJS",
+          "when": "view == webExperimentation.campaignList && viewItem == globalCodeVariationJSItem",
+          "group": "inline"
+        },
+        {
+          "command": "webExperimentation.variationList.pullGlobalCodeCSS",
+          "when": "view == webExperimentation.campaignList && viewItem == globalCodeVariationCSSItem",
+          "group": "inline"
+        },
+        {
+          "command": "webExperimentation.variationList.pushGlobalCodeCSS",
+          "when": "view == webExperimentation.campaignList && viewItem == globalCodeVariationCSSItem",
+          "group": "inline"
         },
         {
           "command": "webExperimentation.accountList.selectAccount",

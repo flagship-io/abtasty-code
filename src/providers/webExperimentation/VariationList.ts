@@ -6,7 +6,7 @@ import {
 import { CIRCLE_FILLED, CIRCLE_OUTLINE, ROCKET } from '../../icons';
 import { VariationWE } from '../../model';
 import { CURRENT_SET_CAMPAIGN_ID, CURRENT_SET_VARIATIONS_ID } from '../../services/webExperimentation/const';
-import { SET_CAMPAIGN_ID_FOR_VARIATION } from '../../const';
+import { NO_RESOURCE_FOUND, SET_CAMPAIGN_ID_FOR_VARIATION } from '../../const';
 import { VariationStore } from '../../store/webExperimentation/VariationStore';
 
 export class VariationListProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
@@ -70,7 +70,7 @@ export class VariationListProvider implements vscode.TreeDataProvider<vscode.Tre
     }
 
     if (element.children?.length === 0) {
-      return [new VariationTreeItem('No resource found')];
+      return [new VariationTreeItem(NO_RESOURCE_FOUND)];
     }
     return element.children;
   }

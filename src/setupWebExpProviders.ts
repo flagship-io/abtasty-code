@@ -6,6 +6,8 @@ import {
   SET_CONTEXT,
   WEB_EXPERIMENTATION_ACCOUNT_LIST_LOAD,
   WEB_EXPERIMENTATION_ACCOUNT_LIST_SELECT,
+  WEB_EXPERIMENTATION_CAMPAIGN_GET_VARIATION,
+  WEB_EXPERIMENTATION_CAMPAIGN_GLOBAL_CODE_OPEN_FILE,
   WEB_EXPERIMENTATION_CAMPAIGN_LIST_DELETE,
   WEB_EXPERIMENTATION_CAMPAIGN_LIST_LOAD,
   WEB_EXPERIMENTATION_CAMPAIGN_PULL_GLOBAL_CODE,
@@ -18,6 +20,10 @@ import {
   WEB_EXPERIMENTATION_VARIATION_LIST_DELETE,
   WEB_EXPERIMENTATION_VARIATION_LIST_LOAD,
   WEB_EXPERIMENTATION_VARIATION_LIST_REFRESH,
+  WEB_EXPERIMENTATION_VARIATION_PULL_GLOBAL_CODE_CSS,
+  WEB_EXPERIMENTATION_VARIATION_PULL_GLOBAL_CODE_JS,
+  WEB_EXPERIMENTATION_VARIATION_PUSH_GLOBAL_CODE_CSS,
+  WEB_EXPERIMENTATION_VARIATION_PUSH_GLOBAL_CODE_JS,
 } from './commands/const';
 import { selectAccountInputBox } from './menu/webExperimentation/AccountMenu';
 import {
@@ -27,7 +33,15 @@ import {
 } from './menu/webExperimentation/CampaignMenu';
 import { deleteModificationInputBox } from './menu/webExperimentation/ModificationMenu';
 import { AccountItem, AccountListProvider } from './providers/webExperimentation/AccountList';
-import { CampaignWEItem, CampaignListProvider, VariationWEItem } from './providers/webExperimentation/CampaignList';
+import {
+  CampaignWEItem,
+  CampaignListProvider,
+  VariationWEItem,
+  GlobalCodeCampaignItem,
+  GlobalCodeVariationJSItem,
+  GlobalCodeVariationCSSItem,
+  ResourceArgument,
+} from './providers/webExperimentation/CampaignList';
 import { ModificationItem, ModificationListProvider } from './providers/webExperimentation/ModificationList';
 import { QuickAccessListProvider } from './providers/webExperimentation/QuickAccessList';
 import {
@@ -43,6 +57,7 @@ import { VariationStore } from './store/webExperimentation/VariationStore';
 import { deleteVariationInputBox } from './menu/webExperimentation/VariationMenu';
 import { VariationItem, VariationListProvider } from './providers/webExperimentation/VariationList';
 import { FileStat, TreeCodeProvider } from './providers/webExperimentation/TreeCode';
+import { CampaignTreeView } from '../treeView/webExperimentation/campaignTreeView';
 
 export const rootPath =
   vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0
@@ -57,10 +72,14 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
   const campaignStore = new CampaignStore(context, cli);
   const accountStore = new AccountWEStore(context, cli);
   const authenticationStore = new AuthenticationStore(context, cli);
+
   if (configured === true) {
     await vscode.commands.executeCommand(SET_CONTEXT, 'abtasty:explorer', 'webExperimentation');
   }
 
+  const currentAccountId = (await authenticationStore.getCurrentAuthentication()).account_id;
+
+  const account = await accountStore.currentAccount();
   const fileExplorerProvider = new TreeCodeProvider(rootPath, campaignStore);
   vscode.window.registerTreeDataProvider('webExperimentation.treeCode', fileExplorerProvider);
 
@@ -68,20 +87,15 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
   const quickAccessProvider = vscode.window.registerTreeDataProvider('webExperimentation.quickAccess', quickAccessView);
 
   const modificationProvider = new ModificationListProvider(context, modificationStore);
-  const treeView = vscode.window.createTreeView('myTreeView', { treeDataProvider: modificationProvider });
-
-  treeView.onDidExpandElement(({ element }) => {
-    console.log('Element expanded:', element);
-    // Execute commands or logic when an element is expanded
-  });
-
-  //vscode.window.registerTreeDataProvider('webExperimentation.modificationList', modificationProvider);
+  vscode.window.registerTreeDataProvider('webExperimentation.modificationList', modificationProvider);
 
   const variationProvider = new VariationListProvider(context, variationStore);
   vscode.window.registerTreeDataProvider('webExperimentation.variationList', variationProvider);
 
-  const campaignProvider = new CampaignListProvider(context, campaignStore);
-  vscode.window.registerTreeDataProvider('webExperimentation.campaignList', campaignProvider);
+  const campaignProvider = new CampaignListProvider(context, campaignStore, account.account_id);
+  //vscode.window.registerTreeDataProvider('webExperimentation.campaignList', campaignProvider);
+
+  const campaignTreeView = new CampaignTreeView(context, campaignProvider, cli, rootPath, account.account_id);
 
   const accountProvider = new AccountListProvider(context, accountStore);
   vscode.window.registerTreeDataProvider('webExperimentation.accountList', accountProvider);
@@ -130,22 +144,64 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
       return;
     }),
 
-    vscode.commands.registerCommand(WEB_EXPERIMENTATION_CAMPAIGN_PULL_GLOBAL_CODE, async (campaign: CampaignWEItem) => {
-      await pullCampaignGlobalOperationInputBox(campaign, campaignStore);
-      return;
-    }),
+    vscode.commands.registerCommand(
+      WEB_EXPERIMENTATION_CAMPAIGN_PULL_GLOBAL_CODE,
+      async (fileItem: ResourceArgument) => {
+        await campaignStore.pullCampaignGlobalCode(fileItem.campaignId!, true, true, false);
+        return;
+      },
+    ),
 
-    vscode.commands.registerCommand(WEB_EXPERIMENTATION_CAMPAIGN_PUSH_GLOBAL_CODE, async (campaign: CampaignWEItem) => {
-      await pushCampaignGlobalCodeOperationInputBox(campaign, campaignStore);
-      return;
-    }),
+    vscode.commands.registerCommand(
+      WEB_EXPERIMENTATION_CAMPAIGN_PUSH_GLOBAL_CODE,
+      async (fileItem: ResourceArgument) => {
+        await campaignStore.pushCampaignGlobalCode(fileItem.campaignId!, fileItem.filePath);
+        return;
+      },
+    ),
 
-    vscode.commands.registerCommand(WEB_EXPERIMENTATION_TREE_CODE_OPEN_FILE, (fileItem: FileStat) => {
-      console.log(fileItem);
-      vscode.workspace.openTextDocument(fileItem.path).then((doc) => {
-        vscode.window.showTextDocument(doc);
-      });
-    }),
+    vscode.commands.registerCommand(
+      WEB_EXPERIMENTATION_VARIATION_PULL_GLOBAL_CODE_JS,
+      async (fileItem: ResourceArgument) => {
+        await campaignStore.pullVariationGlobalCodeJS(fileItem.variationId, fileItem.campaignId, true, true, false);
+        return;
+      },
+    ),
+
+    vscode.commands.registerCommand(
+      WEB_EXPERIMENTATION_VARIATION_PUSH_GLOBAL_CODE_JS,
+      async (fileItem: ResourceArgument) => {
+        await campaignStore.pushVariationGlobalCodeJS(fileItem.variationId, fileItem.campaignId, fileItem.filePath);
+        return;
+      },
+    ),
+
+    vscode.commands.registerCommand(
+      WEB_EXPERIMENTATION_VARIATION_PULL_GLOBAL_CODE_CSS,
+      async (fileItem: ResourceArgument) => {
+        console.log(fileItem);
+        await campaignStore.pullVariationGlobalCodeCSS(fileItem.variationId, fileItem.campaignId, true, true, false);
+        return;
+      },
+    ),
+
+    vscode.commands.registerCommand(
+      WEB_EXPERIMENTATION_VARIATION_PUSH_GLOBAL_CODE_CSS,
+      async (fileItem: ResourceArgument) => {
+        await campaignStore.pushVariationGlobalCodeCSS(fileItem.variationId, fileItem.campaignId, fileItem.filePath);
+        return;
+      },
+    ),
+
+    vscode.commands.registerCommand(
+      WEB_EXPERIMENTATION_CAMPAIGN_GLOBAL_CODE_OPEN_FILE,
+      (fileItem: ResourceArgument) => {
+        console.log(fileItem);
+        vscode.workspace.openTextDocument(fileItem.filePath).then((doc) => {
+          vscode.window.showTextDocument(doc);
+        });
+      },
+    ),
   ];
 
   const accountDisposables = [
@@ -165,8 +221,8 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
   ];
 
   context.subscriptions.push(
-    treeView,
     quickAccessProvider,
+    campaignTreeView,
     ...modificationDisposables,
     ...variationDisposables,
     ...campaignDisposables,

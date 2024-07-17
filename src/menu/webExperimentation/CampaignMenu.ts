@@ -32,8 +32,7 @@ export async function pullCampaignGlobalOperationInputBox(campaign: CampaignWEIt
   );
 
   if (picked === 'Pull the code in a file') {
-    const campaignId = Number(campaign.id!);
-    const code = await campaignStore.pullCampaignGlobalCode(campaignId);
+    const code = await campaignStore.pullCampaignGlobalCode(campaign.id!);
     const document = await vscode.workspace.openTextDocument({ content: code, language: 'javascript' });
     await vscode.window.showTextDocument(document);
     return;
@@ -45,14 +44,13 @@ export async function pullCampaignGlobalOperationInputBox(campaign: CampaignWEIt
       placeHolder: 'Do you confirm ?',
       ignoreFocusOut: true,
     });
-    const campaignId = Number(campaign.id!);
     if (confirmationPick === 'yes') {
-      await campaignStore.pullCampaignGlobalCode(campaignId, true, true);
+      await campaignStore.pullCampaignGlobalCode(campaign.id!, true, true);
       vscode.window.showInformationMessage(`[AB Tasty] File created and override! Check your workspace`);
       return;
     }
 
-    await campaignStore.pullCampaignGlobalCode(campaignId, true, false);
+    await campaignStore.pullCampaignGlobalCode(campaign.id!, true, false);
     vscode.window.showInformationMessage(`[AB Tasty] File created! Check your workspace`);
     return;
   }
@@ -63,14 +61,13 @@ export async function pullCampaignGlobalOperationInputBox(campaign: CampaignWEIt
       placeHolder: 'Do you confirm ?',
       ignoreFocusOut: true,
     });
-    const campaignId = Number(campaign.id!);
     if (confirmationPick === 'yes') {
-      await campaignStore.pullCampaignGlobalCode(campaignId, false, true, true);
+      await campaignStore.pullCampaignGlobalCode(campaign.id!, false, true, true);
       vscode.window.showInformationMessage(`[AB Tasty] File and sub files created and override! Check your workspace`);
       return;
     }
 
-    await campaignStore.pullCampaignGlobalCode(campaignId, false, false, true);
+    await campaignStore.pullCampaignGlobalCode(campaign.id!, false, false, true);
     vscode.window.showInformationMessage(`[AB Tasty] File created! Check your workspace`);
     return;
   }
@@ -93,13 +90,12 @@ export async function pushCampaignGlobalCodeOperationInputBox(campaign: Campaign
 
   if (uriFile) {
     const uri = vscode.workspace.workspaceFolders?.[0].uri;
-    const campaignId = Number(campaign.id!);
     const pathConfig =
       process.platform.toString() === 'win32'
         ? path.resolve(uri!.path, uriFile![0].path).replace(/\\/g, '/').replace('C:/', '')
         : uriFile![0].path;
 
-    await campaignStore.pushCampaignGlobalCode(campaignId, pathConfig);
+    await campaignStore.pushCampaignGlobalCode(campaign.id!, pathConfig);
   }
   return;
 }

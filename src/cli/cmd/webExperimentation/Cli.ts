@@ -299,7 +299,7 @@ export class Cli {
     }
   }
 
-  async ListVariationWE(campaignId: number, variationId: number): Promise<VariationWE> {
+  async GetVariationWE(campaignId: number, variationId: number): Promise<VariationWE> {
     try {
       const cliBin = await this.CliBin();
       if (!cliBin) {
@@ -443,6 +443,114 @@ export class Cli {
       command = `${cliBin} web-experimentation campaign-global-code push -i ${id} ${code ? `--code ${code}` : ``} ${
         filepath ? `--file ${filepath}` : ``
       }`;
+      const output = await this.exec(command, {});
+      console.log(output);
+      if (output.stderr) {
+        vscode.window.showErrorMessage(output.stderr);
+        return false;
+      }
+      return true;
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return false;
+    }
+  }
+
+  async PullVariationGlobalCodeJS(
+    id: string,
+    campaignId: string,
+    createFile?: boolean,
+    override?: boolean,
+    subFiles?: boolean,
+  ): Promise<any> {
+    try {
+      const cliBin = await this.CliBin();
+      let command: string;
+      if (!cliBin) {
+        return false;
+      }
+      command = `${cliBin} web-experimentation variation-global-code get-js -i ${id} --campaign-id ${campaignId} ${
+        createFile ? `--create-file` : ``
+      } ${subFiles ? `--create-subfiles` : ``} ${override ? `--override` : ``}`;
+      const output = await this.exec(command, {});
+      console.log(output);
+      if (output.stderr) {
+        vscode.window.showErrorMessage(output.stderr);
+        return false;
+      }
+      return output.stdout;
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return false;
+    }
+  }
+
+  async PushVariationGlobalCodeJS(id: string, campaignId: string, filepath?: string, code?: string): Promise<boolean> {
+    try {
+      const cliBin = await this.CliBin();
+      let command: string;
+      if (!cliBin) {
+        return false;
+      }
+      command = `${cliBin} web-experimentation variation-global-code push-js -i ${id} --campaign-id ${campaignId} ${
+        code ? `--code ${code}` : ``
+      } ${filepath ? `--file ${filepath}` : ``}`;
+      const output = await this.exec(command, {});
+      console.log(output);
+      if (output.stderr) {
+        vscode.window.showErrorMessage(output.stderr);
+        return false;
+      }
+      return true;
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return false;
+    }
+  }
+
+  async PullVariationGlobalCodeCSS(
+    id: string,
+    campaignId: string,
+    createFile?: boolean,
+    override?: boolean,
+    subFiles?: boolean,
+  ): Promise<any> {
+    try {
+      const cliBin = await this.CliBin();
+      let command: string;
+      if (!cliBin) {
+        return false;
+      }
+      command = `${cliBin} web-experimentation variation-global-code get-css -i ${id} --campaign-id ${campaignId} ${
+        createFile ? `--create-file` : ``
+      } ${subFiles ? `--create-subfiles` : ``} ${override ? `--override` : ``}`;
+      const output = await this.exec(command, {});
+      console.log(output);
+      if (output.stderr) {
+        vscode.window.showErrorMessage(output.stderr);
+        return false;
+      }
+      return output.stdout;
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return false;
+    }
+  }
+
+  async PushVariationGlobalCodeCSS(id: string, campaignId: string, filepath?: string, code?: string): Promise<boolean> {
+    try {
+      const cliBin = await this.CliBin();
+      let command: string;
+      if (!cliBin) {
+        return false;
+      }
+      command = `${cliBin} web-experimentation variation-global-code push-css -i ${id} --campaign-id ${campaignId} ${
+        code ? `--code ${code}` : ``
+      } ${filepath ? `--file ${filepath}` : ``}`;
       const output = await this.exec(command, {});
       console.log(output);
       if (output.stderr) {

@@ -6,3 +6,6 @@ export const PERMISSION_DENIED = `[AB Tasty] ${PERMISSION_DENIED_PANEL} Contact 
 
 export const SET_CAMPAIGN_ID_FOR_MODIFICATION = 'You have to set a campaign for modification';
 export const SET_CAMPAIGN_ID_FOR_VARIATION = 'You have to set a campaign for variation';
+
+export const NO_RESOURCE_FOUND = 'No resource found';
+export const NO_GLOBAL_CODE_FOUND = 'No global code found';
