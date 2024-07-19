@@ -476,7 +476,7 @@ export class Cli {
       const output = await this.exec(command, {});
       console.log(output);
       if (output.stderr) {
-        vscode.window.showErrorMessage(output.stderr);
+        //vscode.window.showErrorMessage(output.stderr);
         return false;
       }
       return output.stdout;
@@ -530,7 +530,7 @@ export class Cli {
       const output = await this.exec(command, {});
       console.log(output);
       if (output.stderr) {
-        vscode.window.showErrorMessage(output.stderr);
+        //vscode.window.showErrorMessage(output.stderr);
         return false;
       }
       return output.stdout;

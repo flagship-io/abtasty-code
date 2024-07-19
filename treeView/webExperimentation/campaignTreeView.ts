@@ -45,13 +45,8 @@ export class CampaignTreeView {
     this.treeView.onDidExpandElement(async ({ element }) => {
       if (element instanceof GlobalCodeCampaign) {
         const campaignId = String((element.parent as Parent).id);
-        const campaignGlobalCodePath = `${workspaceABTasty}/abtasty/${currentAccountId}/${campaignId}/campaignGlobalCode.js`;
-        if (
-          element.children?.length === 0 ||
-          element.children![0].label === NO_RESOURCE_FOUND ||
-          element.children![0].label === NO_GLOBAL_CODE_FOUND
-        ) {
-          console.log('API called campaign');
+        const campaignGlobalCodePath = `${workspaceABTasty}/.abtasty/${currentAccountId}/${campaignId}/campaignGlobalCode.js`;
+        if (element.children?.length === 0 || element.children![0].label === NO_RESOURCE_FOUND) {
           await cli.PullCampaignGlobalCode(campaignId, true, true, false);
         }
 
@@ -70,14 +65,13 @@ export class CampaignTreeView {
         const variationId = String((element.parent as Parent).id);
         const campaignId = String(((element.parent as Parent).parent as Parent).id);
         console.log(element);
-        const variationGlobalCodeJSPath = `${workspaceABTasty}/abtasty/${currentAccountId}/${campaignId}/${variationId}/variationGlobalCode.js`;
-        const variationGlobalCodeCSSPath = `${workspaceABTasty}/abtasty/${currentAccountId}/${campaignId}/${variationId}/variationGlobalCode.css`;
+        const variationGlobalCodeJSPath = `${workspaceABTasty}/.abtasty/${currentAccountId}/${campaignId}/${variationId}/variationGlobalCode.js`;
+        const variationGlobalCodeCSSPath = `${workspaceABTasty}/.abtasty/${currentAccountId}/${campaignId}/${variationId}/variationGlobalCode.css`;
         if (
           element.children?.length === 0 ||
           element.children![0].label === NO_RESOURCE_FOUND ||
           element.children![0].label === NO_GLOBAL_CODE_FOUND
         ) {
-          console.log('API called variation');
           await cli.PullVariationGlobalCodeJS(variationId, campaignId, true, true, false);
           await cli.PullVariationGlobalCodeCSS(variationId, campaignId, true, true, false);
         }

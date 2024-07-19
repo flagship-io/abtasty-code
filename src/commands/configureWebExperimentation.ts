@@ -2,6 +2,8 @@ import * as vscode from 'vscode';
 import { Cli } from '../cli/cmd/webExperimentation/Cli';
 import {
   SET_CONTEXT,
+  WEB_EXPERIMENTATION_ACCOUNT_LIST_LOAD,
+  WEB_EXPERIMENTATION_ACCOUNT_LIST_REFRESH,
   WEB_EXPERIMENTATION_CAMPAIGN_LIST_REFRESH,
   WEB_EXPERIMENTATION_MODIFICATION_LIST_REFRESH,
   WEB_EXPERIMENTATION_QUICK_ACCESS_REFRESH,
@@ -45,13 +47,19 @@ export default async function configureWebExperimentationCmd(context: vscode.Ext
 
           updateStatusBarItem(updatedCurrentConfiguration.username);
 
-          await Promise.all([
-            vscode.commands.executeCommand(WEB_EXPERIMENTATION_MODIFICATION_LIST_REFRESH),
-            vscode.commands.executeCommand(WEB_EXPERIMENTATION_VARIATION_LIST_REFRESH),
-            vscode.commands.executeCommand(WEB_EXPERIMENTATION_CAMPAIGN_LIST_REFRESH),
-            vscode.commands.executeCommand(WEB_EXPERIMENTATION_QUICK_ACCESS_REFRESH),
-          ]);
-          return;
+          const progressIndicator = showIndefiniteProgress('Fetching Resources');
+          try {
+            await Promise.all([
+              vscode.commands.executeCommand(WEB_EXPERIMENTATION_CAMPAIGN_LIST_REFRESH),
+              vscode.commands.executeCommand(WEB_EXPERIMENTATION_QUICK_ACCESS_REFRESH),
+              vscode.commands.executeCommand(WEB_EXPERIMENTATION_ACCOUNT_LIST_REFRESH),
+            ]);
+          } catch (error: any) {
+            vscode.window.showErrorMessage(`Failed to fetch accounts: ${error.message}`);
+          } finally {
+            progressIndicator.done();
+            return;
+          }
         }
 
         if (!currentAuthentication.username) {
@@ -83,4 +91,35 @@ function updateStatusBarItem(currName?: string) {
   }
   currentConfigurationNameStatusBar.hide();
   return;
+}
+
+export function showIndefiniteProgress(title: string): { done: () => void } {
+  let progressResolve: () => void = () => {
+    console.warn('Attempted to resolve progress before it was properly initialized.');
+  };
+
+  const promise = new Promise<void>((resolve) => {
+    // Properly assign the function to resolve the promise.
+    progressResolve = resolve;
+  });
+
+  vscode.window.withProgress(
+    {
+      location: vscode.ProgressLocation.Notification,
+      title: title,
+      cancellable: true,
+    },
+    (progress, token) => {
+      token.onCancellationRequested(() => {
+        console.log('User canceled the operation');
+        progressResolve(); // Now safely callable
+      });
+
+      return promise;
+    },
+  );
+
+  return {
+    done: progressResolve,
+  };
 }

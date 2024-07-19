@@ -1,17 +1,15 @@
 import * as vscode from 'vscode';
-import { VariationStore } from '../../store/webExperimentation/VariationStore';
 import { VariationItem } from '../../providers/webExperimentation/VariationList';
+import { Cli } from '../../cli/cmd/webExperimentation/Cli';
 
-export async function deleteVariationInputBox(variation: VariationItem, variationStore: VariationStore) {
+export async function deleteVariationInputBox(variation: VariationItem, cli: Cli) {
   const picked = await vscode.window.showQuickPick(['yes', 'no'], {
     title: `Delete the variation ${variation.label}`,
     placeHolder: 'Do you confirm ?',
     ignoreFocusOut: true,
   });
   if (picked === 'yes') {
-    const variationId = Number(variation.id!);
-    const campaignId = Number(variation.campaignId!);
-    await variationStore.deleteVariation(variationId, campaignId);
+    await cli.DeleteVariationWE(variation.id!, String(variation.campaignId!));
     return;
   }
   return;

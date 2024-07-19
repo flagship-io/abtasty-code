@@ -4,7 +4,6 @@ import {
   WEB_EXPERIMENTATION_CAMPAIGN_GLOBAL_CODE_OPEN_FILE,
   WEB_EXPERIMENTATION_CAMPAIGN_LIST_LOAD,
   WEB_EXPERIMENTATION_CAMPAIGN_LIST_REFRESH,
-  WEB_EXPERIMENTATION_TREE_CODE_OPEN_FILE,
 } from '../../commands/const';
 import {
   CIRCLE_FILLED,
@@ -19,6 +18,7 @@ import {
 import { CampaignWE, ItemResource } from '../../model';
 import { CampaignStore } from '../../store/webExperimentation/CampaignStore';
 import { NO_GLOBAL_CODE_FOUND, NO_RESOURCE_FOUND } from '../../const';
+import { CampaignTreeView } from '../../../treeView/webExperimentation/campaignTreeView';
 
 export type Parent = {
   id: number;
@@ -59,8 +59,16 @@ export class CampaignListProvider implements vscode.TreeDataProvider<vscode.Tree
     this._onDidChangeTreeData.fire();
   }
 
+  async fire() {
+    this._onDidChangeTreeData.fire();
+  }
+
   async getTreeItem(element: vscode.TreeItem): Promise<vscode.TreeItem> {
     return element;
+  }
+
+  getParent(element: GlobalCodeCampaign): vscode.TreeItem | null {
+    return element.parent || null;
   }
 
   getChildren(element?: CampaignTreeItem): vscode.ProviderResult<vscode.TreeItem[]> {
@@ -153,7 +161,7 @@ export class CampaignListProvider implements vscode.TreeDataProvider<vscode.Tree
           const variationGlobalCode = new GlobalCodeVariation(
             'Variation Global Code',
             v.id,
-            [new CampaignTreeItem(NO_GLOBAL_CODE_FOUND, 0, undefined)],
+            [new CampaignTreeItem(NO_RESOURCE_FOUND, 0, undefined)],
             variationParent,
           );
           return new VariationWEItem(v.name, v.id, [variationDetails, variationGlobalCode], campaignParent);
@@ -180,7 +188,7 @@ export class CampaignListProvider implements vscode.TreeDataProvider<vscode.Tree
         new GlobalCodeCampaign(
           'Campaign Global Code',
           c.id,
-          [new CampaignTreeItem(NO_GLOBAL_CODE_FOUND, 0, undefined)],
+          [new CampaignTreeItem(NO_RESOURCE_FOUND, 0, undefined)],
           campaignParent,
         ),
       );
@@ -274,7 +282,7 @@ export class CampaignListProvider implements vscode.TreeDataProvider<vscode.Tree
       );
     }
 
-    if (subSegmentCampaigns.length !== 0) {
+    if (false && subSegmentCampaigns.length !== 0) {
       campaignTreeList.push(
         new CampaignTreeItem(`Sub Segment - ${subSegmentCampaigns.length} campaign(s)`, undefined, subSegmentCampaigns),
       );
@@ -409,6 +417,7 @@ export class GlobalCodeCampaign extends vscode.TreeItem {
   children: CampaignTreeItem[] | undefined;
   parent: any;
   resourceId: number | undefined;
+  treeView?: CampaignTreeView;
 
   constructor(
     label?: string,
@@ -416,6 +425,7 @@ export class GlobalCodeCampaign extends vscode.TreeItem {
     children?: CampaignTreeItem[],
     parent?: any,
     iconPath?: vscode.ThemeIcon,
+    treeView?: CampaignTreeView,
   ) {
     super(
       label!,
@@ -425,6 +435,8 @@ export class GlobalCodeCampaign extends vscode.TreeItem {
     this.parent = parent;
     this.iconPath = iconPath;
     this.resourceId = resourceId;
+    this.contextValue = 'globalCodeCampaign';
+    this.treeView = treeView;
   }
 }
 
@@ -470,6 +482,7 @@ export class GlobalCodeVariation extends vscode.TreeItem {
     this.parent = parent;
     this.iconPath = iconPath;
     this.resourceId = resourceId;
+    this.contextValue = 'globalCodeVariation';
   }
 }
 

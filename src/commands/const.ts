@@ -90,11 +90,9 @@ export const WEB_EXPERIMENTATION_CAMPAIGN_LIST_DELETE = 'webExperimentation.camp
 export const WEB_EXPERIMENTATION_CAMPAIGN_SET_CAMPAIGN = 'webExperimentation.campaignList.setCampaign';
 export const WEB_EXPERIMENTATION_CAMPAIGN_PULL_GLOBAL_CODE = 'webExperimentation.campaignList.pullGlobalCode';
 export const WEB_EXPERIMENTATION_CAMPAIGN_PUSH_GLOBAL_CODE = 'webExperimentation.campaignList.pushGlobalCode';
+export const WEB_EXPERIMENTATION_CAMPAIGN_ADD_GLOBAL_CODE = 'webExperimentation.campaignList.addGlobalCode';
 export const WEB_EXPERIMENTATION_CAMPAIGN_GLOBAL_CODE_OPEN_FILE = 'webExperimentation.campaignList.globalCodeOpenFile';
 
 export const WEB_EXPERIMENTATION_ACCOUNT_LIST_REFRESH = 'webExperimentation.accountList.refresh';
 export const WEB_EXPERIMENTATION_ACCOUNT_LIST_LOAD = 'webExperimentation.accountList.load';
 export const WEB_EXPERIMENTATION_ACCOUNT_LIST_SELECT = 'webExperimentation.accountList.selectAccount';
-
-export const WEB_EXPERIMENTATION_TREE_CODE_REFRESH = 'webExperimentation.treeCode.refresh';
-export const WEB_EXPERIMENTATION_TREE_CODE_OPEN_FILE = 'webExperimentation.treeCode.openFile';

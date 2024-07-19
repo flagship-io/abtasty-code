@@ -1,17 +1,15 @@
 import * as vscode from 'vscode';
 import { ModificationItem } from '../../providers/webExperimentation/ModificationList';
-import { ModificationStore } from '../../store/webExperimentation/ModificationStore';
+import { Cli } from '../../cli/cmd/webExperimentation/Cli';
 
-export async function deleteModificationInputBox(modification: ModificationItem, modificationStore: ModificationStore) {
+export async function deleteModificationInputBox(modification: ModificationItem, cli: Cli) {
   const picked = await vscode.window.showQuickPick(['yes', 'no'], {
     title: `Delete the modification ${modification.label}`,
     placeHolder: 'Do you confirm ?',
     ignoreFocusOut: true,
   });
   if (picked === 'yes') {
-    const modificationId = Number(modification.id!);
-    const campaignId = Number(modification.campaignId!);
-    await modificationStore.deleteModification(modificationId, campaignId);
+    await cli.DeleteModification(modification.id!, String(modification.campaignId!));
     return;
   }
   return;

@@ -1,6 +1,5 @@
 import * as vscode from 'vscode';
 import { Cli } from '../../cli/cmd/webExperimentation/Cli';
-import { ModificationDataService } from '../../services/webExperimentation/ModificationDataService';
 import { CampaignWE, ModificationWE } from '../../model';
 import { CampaignDataService } from '../../services/webExperimentation/CampaignDataService';
 
