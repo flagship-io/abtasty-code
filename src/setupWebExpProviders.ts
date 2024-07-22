@@ -6,7 +6,7 @@ import {
   WEB_EXPERIMENTATION_ACCOUNT_LIST_LOAD,
   WEB_EXPERIMENTATION_ACCOUNT_LIST_SELECT,
   WEB_EXPERIMENTATION_CAMPAIGN_ADD_GLOBAL_CODE,
-  WEB_EXPERIMENTATION_CAMPAIGN_GLOBAL_CODE_OPEN_FILE,
+  WEB_EXPERIMENTATION_GLOBAL_CODE_OPEN_FILE,
   WEB_EXPERIMENTATION_CAMPAIGN_LIST_DELETE,
   WEB_EXPERIMENTATION_CAMPAIGN_LIST_LOAD,
   WEB_EXPERIMENTATION_CAMPAIGN_PULL_GLOBAL_CODE,
@@ -22,11 +22,14 @@ import {
   WEB_EXPERIMENTATION_VARIATION_PULL_GLOBAL_CODE_JS,
   WEB_EXPERIMENTATION_VARIATION_PUSH_GLOBAL_CODE_CSS,
   WEB_EXPERIMENTATION_VARIATION_PUSH_GLOBAL_CODE_JS,
+  WEB_EXPERIMENTATION_ACCOUNT_ADD_GLOBAL_CODE,
+  WEB_EXPERIMENTATION_ACCOUNT_PUSH_GLOBAL_CODE,
+  WEB_EXPERIMENTATION_ACCOUNT_PULL_GLOBAL_CODE,
 } from './commands/const';
 import { selectAccountInputBox } from './menu/webExperimentation/AccountMenu';
 import { deleteCampaignInputBox } from './menu/webExperimentation/CampaignMenu';
 import { deleteModificationInputBox } from './menu/webExperimentation/ModificationMenu';
-import { AccountItem, AccountListProvider } from './providers/webExperimentation/AccountList';
+import { AccountItem, AccountListProvider, GlobalCodeAccount } from './providers/webExperimentation/AccountList';
 import {
   CampaignWEItem,
   CampaignListProvider,
@@ -45,6 +48,7 @@ import { CampaignStore } from './store/webExperimentation/CampaignStore';
 
 import { CampaignTreeView } from '../treeView/webExperimentation/campaignTreeView';
 import { showIndefiniteProgress } from './commands/configureWebExperimentation';
+import { AccountTreeView } from '../treeView/webExperimentation/accountTreeView';
 
 export const rootPath =
   vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0
@@ -68,11 +72,10 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
   const quickAccessProvider = vscode.window.registerTreeDataProvider('webExperimentation.quickAccess', quickAccessView);
 
   const campaignProvider = new CampaignListProvider(context, campaignStore, account.account_id);
-
   const campaignTreeView = new CampaignTreeView(context, campaignProvider, cli, rootPath, account.account_id);
 
   const accountProvider = new AccountListProvider(context, accountStore);
-  vscode.window.registerTreeDataProvider('webExperimentation.accountList', accountProvider);
+  const accountTreeView = new AccountTreeView(context, accountProvider, cli, rootPath, account.account_id);
 
   const progressIndicator = showIndefiniteProgress('Fetching Resources');
 
@@ -168,15 +171,12 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
       },
     ),
 
-    vscode.commands.registerCommand(
-      WEB_EXPERIMENTATION_CAMPAIGN_GLOBAL_CODE_OPEN_FILE,
-      (fileItem: ResourceArgument) => {
-        console.log(fileItem);
-        vscode.workspace.openTextDocument(fileItem.filePath).then((doc) => {
-          vscode.window.showTextDocument(doc);
-        });
-      },
-    ),
+    vscode.commands.registerCommand(WEB_EXPERIMENTATION_GLOBAL_CODE_OPEN_FILE, (fileItem: ResourceArgument) => {
+      console.log(fileItem);
+      vscode.workspace.openTextDocument(fileItem.filePath).then((doc) => {
+        vscode.window.showTextDocument(doc);
+      });
+    }),
   ];
 
   const accountDisposables = [
@@ -194,7 +194,49 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
         progressIndicator.done();
       }
     }),
+
+    vscode.commands.registerCommand(
+      WEB_EXPERIMENTATION_ACCOUNT_PULL_GLOBAL_CODE,
+      async (fileItem: ResourceArgument) => {
+        await accountStore.pullAccountGlobalCode(fileItem.accountId!, true, true);
+        return;
+      },
+    ),
+
+    vscode.commands.registerCommand(
+      WEB_EXPERIMENTATION_ACCOUNT_PUSH_GLOBAL_CODE,
+      async (fileItem: ResourceArgument) => {
+        await accountStore.pushAccountGlobalCode(fileItem.accountId!, fileItem.filePath);
+        return;
+      },
+    ),
+
+    vscode.commands.registerCommand(
+      WEB_EXPERIMENTATION_ACCOUNT_ADD_GLOBAL_CODE,
+      async (fileItem: GlobalCodeAccount) => {
+        const accountPath = `${rootPath}/.abtasty/${fileItem.resourceId}`;
+
+        if (!fs.existsSync(accountPath)) {
+          fs.mkdirSync(accountPath);
+          const filePath = `${accountPath}/accountGlobalCode.js`;
+          const createStream = fs.createWriteStream(filePath);
+          createStream.end();
+          vscode.window.showInformationMessage(`[AB Tasty] File created at ${accountPath}`);
+          vscode.workspace.openTextDocument(filePath).then((doc) => {
+            vscode.window.showTextDocument(doc);
+          });
+          vscode.commands.executeCommand('list.collapseAllToFocus');
+        }
+        return;
+      },
+    ),
   ];
 
-  context.subscriptions.push(quickAccessProvider, campaignTreeView, ...campaignDisposables, ...accountDisposables);
+  context.subscriptions.push(
+    quickAccessProvider,
+    campaignTreeView,
+    accountTreeView,
+    ...campaignDisposables,
+    ...accountDisposables,
+  );
 }

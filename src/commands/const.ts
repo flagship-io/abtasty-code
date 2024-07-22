@@ -91,8 +91,12 @@ export const WEB_EXPERIMENTATION_CAMPAIGN_SET_CAMPAIGN = 'webExperimentation.cam
 export const WEB_EXPERIMENTATION_CAMPAIGN_PULL_GLOBAL_CODE = 'webExperimentation.campaignList.pullGlobalCode';
 export const WEB_EXPERIMENTATION_CAMPAIGN_PUSH_GLOBAL_CODE = 'webExperimentation.campaignList.pushGlobalCode';
 export const WEB_EXPERIMENTATION_CAMPAIGN_ADD_GLOBAL_CODE = 'webExperimentation.campaignList.addGlobalCode';
-export const WEB_EXPERIMENTATION_CAMPAIGN_GLOBAL_CODE_OPEN_FILE = 'webExperimentation.campaignList.globalCodeOpenFile';
+export const WEB_EXPERIMENTATION_GLOBAL_CODE_OPEN_FILE = 'webExperimentation.campaignList.globalCodeOpenFile';
+export const WEB_EXPERIMENTATION_ACCOUNT_GLOBAL_CODE_OPEN_FILE = 'webExperimentation.accountList.globalCodeOpenFile';
 
 export const WEB_EXPERIMENTATION_ACCOUNT_LIST_REFRESH = 'webExperimentation.accountList.refresh';
 export const WEB_EXPERIMENTATION_ACCOUNT_LIST_LOAD = 'webExperimentation.accountList.load';
 export const WEB_EXPERIMENTATION_ACCOUNT_LIST_SELECT = 'webExperimentation.accountList.selectAccount';
+export const WEB_EXPERIMENTATION_ACCOUNT_PULL_GLOBAL_CODE = 'webExperimentation.accountList.pullGlobalCode';
+export const WEB_EXPERIMENTATION_ACCOUNT_PUSH_GLOBAL_CODE = 'webExperimentation.accountList.pushGlobalCode';
+export const WEB_EXPERIMENTATION_ACCOUNT_ADD_GLOBAL_CODE = 'webExperimentation.accountList.addGlobalCode';

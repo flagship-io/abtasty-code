@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import {
   WEB_EXPERIMENTATION_CAMPAIGN_GET_VARIATION,
-  WEB_EXPERIMENTATION_CAMPAIGN_GLOBAL_CODE_OPEN_FILE,
+  WEB_EXPERIMENTATION_GLOBAL_CODE_OPEN_FILE,
   WEB_EXPERIMENTATION_CAMPAIGN_LIST_LOAD,
   WEB_EXPERIMENTATION_CAMPAIGN_LIST_REFRESH,
 } from '../../commands/const';
@@ -26,6 +26,7 @@ export type Parent = {
 };
 
 export type ResourceArgument = {
+  accountId: string;
   variationId: string;
   campaignId: string;
   modificationId: string;
@@ -454,7 +455,7 @@ export class GlobalCodeCampaignItem extends CampaignTreeItem {
     this.contextValue = 'globalCodeCampaignItem';
     this.command = {
       title: 'Open File',
-      command: WEB_EXPERIMENTATION_CAMPAIGN_GLOBAL_CODE_OPEN_FILE,
+      command: WEB_EXPERIMENTATION_GLOBAL_CODE_OPEN_FILE,
       arguments: [{ campaignId: campaignId, filePath: filePath } as ResourceArgument],
     };
 
@@ -502,7 +503,7 @@ export class GlobalCodeVariationJSItem extends CampaignTreeItem {
     this.contextValue = 'globalCodeVariationJSItem';
     this.command = {
       title: 'Open File',
-      command: WEB_EXPERIMENTATION_CAMPAIGN_GLOBAL_CODE_OPEN_FILE,
+      command: WEB_EXPERIMENTATION_GLOBAL_CODE_OPEN_FILE,
       arguments: [{ variationId: variationId, campaignId: campaignId, filePath } as ResourceArgument],
     };
 
@@ -526,7 +527,7 @@ export class GlobalCodeVariationCSSItem extends CampaignTreeItem {
     this.contextValue = 'globalCodeVariationCSSItem';
     this.command = {
       title: 'Open File',
-      command: WEB_EXPERIMENTATION_CAMPAIGN_GLOBAL_CODE_OPEN_FILE,
+      command: WEB_EXPERIMENTATION_GLOBAL_CODE_OPEN_FILE,
       arguments: [{ variationId: variationId, campaignId: campaignId, filePath } as ResourceArgument],
     };
 

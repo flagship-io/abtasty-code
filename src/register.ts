@@ -12,8 +12,13 @@ import { WEB_EXPERIMENTATION } from './services/webExperimentation/const';
 import { webExpExtensionReload } from './webExpExtensionReload';
 
 export async function register(context: vscode.ExtensionContext, stateConfig: StateConfiguration): Promise<void> {
+  const outputChannel = vscode.window.createOutputChannel('AB Tasty', { log: true });
+
   const cliFE = new FEATURE_EXPERIMENTATION_CLI(context);
-  const cliWE = new WEB_EXPERIMENTATION_CLI(context);
+  const cliWE = new WEB_EXPERIMENTATION_CLI(context, outputChannel);
+  outputChannel.show(true);
+
+  context.subscriptions.push(outputChannel);
 
   await Promise.all([clearConfigCmd(context, stateConfig), checkCliVersionCmd(context, cliFE)]);
 

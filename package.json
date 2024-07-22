@@ -335,6 +335,21 @@
         "icon": "$(repo-push)"
       },
       {
+        "command": "webExperimentation.accountList.pullGlobalCode",
+        "title": "Pull account global code from the platform",
+        "icon": "$(repo-sync)"
+      },
+      {
+        "command": "webExperimentation.accountList.addGlobalCode",
+        "title": "Add account global code",
+        "icon": "$(add)"
+      },
+      {
+        "command": "webExperimentation.accountList.pushGlobalCode",
+        "title": "Push account global code to the platform",
+        "icon": "$(repo-push)"
+      },
+      {
         "command": "webExperimentation.variationList.pullGlobalCodeJS",
         "title": "Pull variation global code JS from the platform",
         "icon": "$(repo-sync)"
@@ -546,6 +561,21 @@
         {
           "command": "webExperimentation.campaignList.pushGlobalCode",
           "when": "view == webExperimentation.campaignList && viewItem == globalCodeCampaignItem",
+          "group": "inline"
+        },
+        {
+          "command": "webExperimentation.accountList.pullGlobalCode",
+          "when": "view == webExperimentation.accountList && viewItem == globalCodeAccountItem",
+          "group": "inline"
+        },
+        {
+          "command": "webExperimentation.accountList.addGlobalCode",
+          "when": "view == webExperimentation.accountList && viewItem == globalCodeAccount",
+          "group": "inline"
+        },
+        {
+          "command": "webExperimentation.accountList.pushGlobalCode",
+          "when": "view == webExperimentation.accountList && viewItem == globalCodeAccountItem",
           "group": "inline"
         },
         {

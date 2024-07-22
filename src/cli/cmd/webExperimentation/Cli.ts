@@ -13,13 +13,23 @@ import {
   VariationWE,
 } from '../../../model';
 import { CliVersion } from '../../cliDownloader';
+
+const MAX_LINE_LENGTH = 1000; // Set to a safe value below the maxTokenizationLineLength
+
+function logMessage(outputChannel: vscode.LogOutputChannel, message: string) {
+  let chunk = message.substring(0, MAX_LINE_LENGTH);
+  outputChannel.trace(chunk);
+}
+
 export class Cli {
   private context: vscode.ExtensionContext;
   private extensionVersion: string;
+  private outputChannel: vscode.LogOutputChannel;
 
-  constructor(context: vscode.ExtensionContext) {
+  constructor(context: vscode.ExtensionContext, outputChannel: vscode.LogOutputChannel) {
     this.extensionVersion = vscode.extensions.getExtension('ABTasty.abtasty-code')?.packageJSON.version;
     this.context = context;
+    this.outputChannel = outputChannel;
   }
 
   exec(command: string, options: ExecOptions): Promise<{ stdout: string; stderr: string }> {
@@ -62,7 +72,10 @@ export class Cli {
       const command = `${cliBin} version`;
       const output = await this.exec(command, {});
       console.log(output);
+      this.outputChannel.trace(command);
+      logMessage(this.outputChannel, output.stdout);
       if (output.stderr) {
+        this.outputChannel.error(output.stderr);
         vscode.window.showErrorMessage(output.stderr);
         return '';
       }
@@ -89,8 +102,10 @@ export class Cli {
 
         const output = await this.exec(command, {});
         console.log(output);
-
+        this.outputChannel.trace(command);
+        logMessage(this.outputChannel, output.stdout);
         if (output.stderr) {
+          this.outputChannel.error(output.stderr);
           vscode.window.showErrorMessage(output.stderr);
           return false;
         }
@@ -114,8 +129,10 @@ export class Cli {
       const command = `${cliBin} web-experimentation account use -i  ${accountId} --output-format json`;
       const output = await this.exec(command, {});
       console.log(output);
-
+      this.outputChannel.trace(command);
+      logMessage(this.outputChannel, output.stdout);
       if (output.stderr) {
+        this.outputChannel.error(output.stderr);
         vscode.window.showErrorMessage(output.stderr);
         return false;
       }
@@ -137,8 +154,10 @@ export class Cli {
       const command = `${cliBin} web-experimentation working-directory set --path  ${authentication.working_dir} --output-format json`;
       const output = await this.exec(command, {});
       console.log(output);
-
+      this.outputChannel.trace(command);
+      logMessage(this.outputChannel, output.stdout);
       if (output.stderr) {
+        this.outputChannel.error(output.stderr);
         vscode.window.showErrorMessage(output.stderr);
         return false;
       }
@@ -161,6 +180,8 @@ export class Cli {
       let command = `${cliBin} web-experimentation auth delete -u ${username}`;
       const output = await this.exec(command, {});
       console.log(output);
+      this.outputChannel.trace(command);
+      logMessage(this.outputChannel, output.stdout);
       return true;
     } catch (err: any) {
       vscode.window.showErrorMessage(err.error);
@@ -178,7 +199,10 @@ export class Cli {
       const command = `${cliBin} web-experimentation authentication list --output-format json`;
       const output = await this.exec(command, {});
       console.log(output);
+      this.outputChannel.trace(command);
+      logMessage(this.outputChannel, output.stdout);
       if (output.stderr) {
+        this.outputChannel.error(output.stderr);
         vscode.window.showErrorMessage(output.stderr);
         return [];
       }
@@ -201,7 +225,10 @@ export class Cli {
       const command = `${cliBin} web-experimentation authentication get -u ${username} --output-format json`;
       const output = await this.exec(command, {});
       console.log(output);
+      this.outputChannel.trace(command);
+      logMessage(this.outputChannel, output.stdout);
       if (output.stderr) {
+        this.outputChannel.error(output.stderr);
         vscode.window.showErrorMessage(output.stderr);
         return {} as Authentication;
       }
@@ -223,7 +250,10 @@ export class Cli {
       const command = `${cliBin} web-experimentation authentication current --output-format json`;
       const output = await this.exec(command, {});
       console.log(output);
+      this.outputChannel.trace(command);
+      logMessage(this.outputChannel, output.stdout);
       if (output.stderr) {
+        this.outputChannel.error(output.stderr);
         vscode.window.showErrorMessage(output.stderr);
         return {} as CurrentAuthentication;
       }
@@ -245,7 +275,10 @@ export class Cli {
       const command = `${cliBin} web-experimentation account list --output-format json`;
       const output = await this.exec(command, {});
       console.log(output);
+      this.outputChannel.trace(command);
+      logMessage(this.outputChannel, output.stdout);
       if (output.stderr) {
+        this.outputChannel.error(output.stderr);
         vscode.window.showErrorMessage(output.stderr);
         return [];
       }
@@ -266,7 +299,10 @@ export class Cli {
       const command = `${cliBin} web-experimentation account current --output-format json`;
       const output = await this.exec(command, {});
       console.log(output);
+      this.outputChannel.trace(command);
+      logMessage(this.outputChannel, output.stdout);
       if (output.stderr) {
+        this.outputChannel.error(output.stderr);
         vscode.window.showErrorMessage(output.stderr);
         return {} as CurrentAuthentication;
       }
@@ -287,7 +323,10 @@ export class Cli {
       const command = `${cliBin} web-experimentation modification list --campaign-id ${campaignId} --output-format json`;
       const output = await this.exec(command, {});
       console.log(output);
+      this.outputChannel.trace(command);
+      logMessage(this.outputChannel, output.stdout);
       if (output.stderr) {
+        this.outputChannel.error(output.stderr);
         vscode.window.showErrorMessage(output.stderr);
         return [];
       }
@@ -308,7 +347,10 @@ export class Cli {
       const command = `${cliBin} web-experimentation variation get --campaign-id ${campaignId} -i ${variationId} --output-format json`;
       const output = await this.exec(command, {});
       console.log(output);
+      this.outputChannel.trace(command);
+      logMessage(this.outputChannel, output.stdout);
       if (output.stderr) {
+        this.outputChannel.error(output.stderr);
         vscode.window.showErrorMessage(output.stderr);
         return {} as VariationWE;
       }
@@ -331,7 +373,10 @@ export class Cli {
       command = `${cliBin} web-experimentation modification delete -i ${id} --campaign-id ${campaignId}`;
       const output = await this.exec(command, {});
       console.log(output);
+      this.outputChannel.trace(command);
+      logMessage(this.outputChannel, output.stdout);
       if (output.stderr) {
+        this.outputChannel.error(output.stderr);
         vscode.window.showErrorMessage(output.stderr);
         return false;
       }
@@ -354,7 +399,10 @@ export class Cli {
       command = `${cliBin} web-experimentation variation delete -i ${id} --campaign-id ${campaignId}`;
       const output = await this.exec(command, {});
       console.log(output);
+      this.outputChannel.trace(command);
+      logMessage(this.outputChannel, output.stdout);
       if (output.stderr) {
+        this.outputChannel.error(output.stderr);
         vscode.window.showErrorMessage(output.stderr);
         return false;
       }
@@ -375,7 +423,10 @@ export class Cli {
       const command = `${cliBin} web-experimentation campaign list --output-format json`;
       const output = await this.exec(command, {});
       console.log(output);
+      this.outputChannel.trace(command);
+      logMessage(this.outputChannel, output.stdout);
       if (output.stderr) {
+        this.outputChannel.error(output.stderr);
         vscode.window.showErrorMessage(output.stderr);
         return [];
       }
@@ -397,7 +448,65 @@ export class Cli {
       command = `${cliBin} web-experimentation campaign delete -i ${id}`;
       const output = await this.exec(command, {});
       console.log(output);
+      this.outputChannel.trace(command);
+      logMessage(this.outputChannel, output.stdout);
       if (output.stderr) {
+        this.outputChannel.error(output.stderr);
+        vscode.window.showErrorMessage(output.stderr);
+        return false;
+      }
+      return true;
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return false;
+    }
+  }
+
+  async PullAccountGlobalCode(id: string, createFile?: boolean, override?: boolean, subFiles?: boolean): Promise<any> {
+    try {
+      const cliBin = await this.CliBin();
+      let command: string;
+      if (!cliBin) {
+        return false;
+      }
+      command = `${cliBin} web-experimentation account-global-code get -i ${id} ${createFile ? `--create-file` : ``} ${
+        subFiles ? `--create-subfiles` : ``
+      } ${override ? `--override` : ``}`;
+      const output = await this.exec(command, {});
+      console.log(output);
+      this.outputChannel.trace(command);
+      logMessage(this.outputChannel, output.stdout);
+      if (output.stderr) {
+        this.outputChannel.error(output.stderr);
+        vscode.window.showErrorMessage(output.stderr);
+        return false;
+      }
+      return output.stdout;
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return false;
+    }
+  }
+
+  async PushAccountGlobalCode(id: string, filepath?: string, code?: string): Promise<boolean> {
+    try {
+      const cliBin = await this.CliBin();
+      let command: string;
+      if (!cliBin) {
+        return false;
+      }
+      command = `${cliBin} web-experimentation account-global-code push -i ${id} ${code ? `--code ${code}` : ``} ${
+        filepath ? `--file ${filepath}` : ``
+      }`;
+
+      const output = await this.exec(command, {});
+      console.log(output);
+      this.outputChannel.trace(command);
+      logMessage(this.outputChannel, output.stdout);
+      if (output.stderr) {
+        this.outputChannel.error(output.stderr);
         vscode.window.showErrorMessage(output.stderr);
         return false;
       }
@@ -421,7 +530,10 @@ export class Cli {
       } ${override ? `--override` : ``}`;
       const output = await this.exec(command, {});
       console.log(output);
+      this.outputChannel.trace(command);
+      logMessage(this.outputChannel, output.stdout);
       if (output.stderr) {
+        this.outputChannel.error(output.stderr);
         vscode.window.showErrorMessage(output.stderr);
         return false;
       }
@@ -445,7 +557,10 @@ export class Cli {
       }`;
       const output = await this.exec(command, {});
       console.log(output);
+      this.outputChannel.trace(command);
+      logMessage(this.outputChannel, output.stdout);
       if (output.stderr) {
+        this.outputChannel.error(output.stderr);
         vscode.window.showErrorMessage(output.stderr);
         return false;
       }
@@ -475,8 +590,10 @@ export class Cli {
       } ${subFiles ? `--create-subfiles` : ``} ${override ? `--override` : ``}`;
       const output = await this.exec(command, {});
       console.log(output);
+      this.outputChannel.trace(command);
+      logMessage(this.outputChannel, output.stdout);
       if (output.stderr) {
-        //vscode.window.showErrorMessage(output.stderr);
+        this.outputChannel.error(output.stderr); //vscode.window.showErrorMessage(output.stderr);
         return false;
       }
       return output.stdout;
@@ -499,7 +616,10 @@ export class Cli {
       } ${filepath ? `--file ${filepath}` : ``}`;
       const output = await this.exec(command, {});
       console.log(output);
+      this.outputChannel.trace(command);
+      logMessage(this.outputChannel, output.stdout);
       if (output.stderr) {
+        this.outputChannel.error(output.stderr);
         vscode.window.showErrorMessage(output.stderr);
         return false;
       }
@@ -529,8 +649,10 @@ export class Cli {
       } ${subFiles ? `--create-subfiles` : ``} ${override ? `--override` : ``}`;
       const output = await this.exec(command, {});
       console.log(output);
+      this.outputChannel.trace(command);
+      logMessage(this.outputChannel, output.stdout);
       if (output.stderr) {
-        //vscode.window.showErrorMessage(output.stderr);
+        this.outputChannel.error(output.stderr); //vscode.window.showErrorMessage(output.stderr);
         return false;
       }
       return output.stdout;
@@ -553,7 +675,10 @@ export class Cli {
       } ${filepath ? `--file ${filepath}` : ``}`;
       const output = await this.exec(command, {});
       console.log(output);
+      this.outputChannel.trace(command);
+      logMessage(this.outputChannel, output.stdout);
       if (output.stderr) {
+        this.outputChannel.error(output.stderr);
         vscode.window.showErrorMessage(output.stderr);
         return false;
       }

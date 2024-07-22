@@ -30,4 +30,20 @@ export class AccountWEStore {
   async currentAccount() {
     return await this.cli.CurrentAccountWE();
   }
+
+  async pullAccountGlobalCode(accountId: string, createFile?: boolean, override?: boolean): Promise<any> {
+    const cliResponse = accountId ? await this.cli.PullAccountGlobalCode(accountId, createFile, override) : false;
+    if (cliResponse) {
+      vscode.window.showInformationMessage(`[AB Tasty] Account global code pulled successfully`);
+    }
+    return cliResponse;
+  }
+
+  async pushAccountGlobalCode(accountId: string, filepath?: string, code?: string): Promise<any> {
+    const cliResponse = accountId ? await this.cli.PushAccountGlobalCode(accountId, filepath, code) : false;
+    if (cliResponse) {
+      vscode.window.showInformationMessage(`[AB Tasty] Account global code pushed successfully`);
+    }
+    return cliResponse;
+  }
 }

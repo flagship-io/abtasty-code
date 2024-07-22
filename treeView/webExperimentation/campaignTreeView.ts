@@ -16,7 +16,7 @@ import {
 import { Cli } from '../../src/cli/cmd/webExperimentation/Cli';
 import { NO_GLOBAL_CODE_FOUND, NO_RESOURCE_FOUND } from '../../src/const';
 
-function findAbtastyFolder(rootPath: string) {
+export function findAbtastyFolder(rootPath: string) {
   const dirs = fs.readdirSync(rootPath).filter((file) => fs.statSync(path.join(rootPath, file)).isDirectory());
   const abtastyDir = dirs.find((dir) => dir.toLowerCase() === 'abtasty');
   return abtastyDir ? path.join(rootPath, abtastyDir) : null;
