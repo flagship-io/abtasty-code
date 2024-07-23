@@ -79,11 +79,10 @@ export class CampaignStore {
     campaignId: string,
     createFile?: boolean,
     override?: boolean,
-    subFiles?: boolean,
   ): Promise<any> {
     const cliResponse =
       campaignId && variationId
-        ? await this.cli.PullVariationGlobalCodeJS(variationId, campaignId, createFile, override, subFiles)
+        ? await this.cli.PullVariationGlobalCodeJS(variationId, campaignId, createFile, override)
         : false;
     if (cliResponse) {
       vscode.window.showInformationMessage(`[AB Tasty] Variation global code JS pulled successfully`);
@@ -97,7 +96,6 @@ export class CampaignStore {
     filepath?: string,
     code?: string,
   ): Promise<any> {
-    console.log(variationId);
     const cliResponse = campaignId
       ? await this.cli.PushVariationGlobalCodeJS(variationId, campaignId, filepath, code)
       : false;
@@ -112,11 +110,10 @@ export class CampaignStore {
     campaignId: string,
     createFile?: boolean,
     override?: boolean,
-    subFiles?: boolean,
   ): Promise<any> {
     const cliResponse =
       campaignId && variationId
-        ? await this.cli.PullVariationGlobalCodeCSS(variationId, campaignId, createFile, override, subFiles)
+        ? await this.cli.PullVariationGlobalCodeCSS(variationId, campaignId, createFile, override)
         : false;
     if (cliResponse) {
       vscode.window.showInformationMessage(`[AB Tasty] Variation global code CSS pulled successfully`);

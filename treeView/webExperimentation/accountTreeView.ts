@@ -41,7 +41,6 @@ export class AccountTreeView {
 
     this.treeView.onDidExpandElement(async ({ element }) => {
       if (element instanceof GlobalCodeAccount) {
-        console.log(element);
         const accountId = String(element.resourceId);
         const accountGlobalCodePath = `${workspaceABTasty}/.abtasty/${accountId}/accountGlobalCode.js`;
         if (element.children?.length === 0 || element.children![0].label === NO_RESOURCE_FOUND) {

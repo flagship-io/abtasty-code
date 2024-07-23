@@ -370,6 +370,26 @@
         "icon": "$(repo-push)"
       },
       {
+        "command": "webExperimentation.variationList.addGlobalCode",
+        "title": "Add variation global code",
+        "icon": "$(add)"
+      },
+      {
+        "command": "webExperimentation.modificationList.pullCode",
+        "title": "Pull modification code from the platform",
+        "icon": "$(repo-sync)"
+      },
+      {
+        "command": "webExperimentation.modificationList.pushCode",
+        "title": "Push modification code to the platform",
+        "icon": "$(repo-push)"
+      },
+      {
+        "command": "webExperimentation.modificationList.addGlobalCode",
+        "title": "Add modification code",
+        "icon": "$(add)"
+      },
+      {
         "command": "webExperimentation.accountList.selectAccount",
         "title": "Web Experimentation: select account",
         "icon": "$(run)"
@@ -596,6 +616,16 @@
         {
           "command": "webExperimentation.variationList.pushGlobalCodeCSS",
           "when": "view == webExperimentation.campaignList && viewItem == globalCodeVariationCSSItem",
+          "group": "inline"
+        },
+        {
+          "command": "webExperimentation.variationList.addGlobalCode",
+          "when": "view == webExperimentation.campaignList && viewItem == globalCodeVariation",
+          "group": "inline"
+        },
+        {
+          "command": "webExperimentation.modificationList.addGlobalCode",
+          "when": "view == webExperimentation.campaignList && viewItem == codeModification",
           "group": "inline"
         },
         {

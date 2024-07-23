@@ -15,7 +15,7 @@ import {
   MILESTONE_PAUSED,
   ROCKET,
 } from '../../icons';
-import { CampaignWE, ItemResource } from '../../model';
+import { CampaignWE, ItemResource, ModificationWE } from '../../model';
 import { CampaignStore } from '../../store/webExperimentation/CampaignStore';
 import { NO_GLOBAL_CODE_FOUND, NO_RESOURCE_FOUND } from '../../const';
 import { CampaignTreeView } from '../../../treeView/webExperimentation/campaignTreeView';
@@ -181,6 +181,15 @@ export class CampaignListProvider implements vscode.TreeDataProvider<vscode.Tree
         campaignData.push(new CampaignTreeItem('Variations', undefined, variations));
       }
 
+      campaignData.push(
+        new ModificationWETree(
+          'Modifications',
+          undefined,
+          [new CampaignTreeItem(NO_RESOURCE_FOUND, 0, undefined)],
+          campaignParent,
+        ),
+      );
+
       if (subTests.length !== 0) {
         campaignData.push(new CampaignTreeItem('Sub Tests', undefined, subTests));
       }
@@ -319,7 +328,7 @@ export class CampaignListProvider implements vscode.TreeDataProvider<vscode.Tree
   }
 }
 
-class CampaignTreeItem extends vscode.TreeItem {
+export class CampaignTreeItem extends vscode.TreeItem {
   children: CampaignTreeItem[] | undefined;
   parent: any;
   resourceId: number | undefined;
@@ -343,6 +352,7 @@ class CampaignTreeItem extends vscode.TreeItem {
 }
 
 export class CampaignWEItem extends CampaignTreeItem {
+  modifications: ModificationWE[] | undefined;
   constructor(
     public readonly name?: string,
     resourceId?: number,
@@ -351,10 +361,12 @@ export class CampaignWEItem extends CampaignTreeItem {
     public readonly variationIds?: number[],
     children?: CampaignTreeItem[],
     parent?: any,
+    modifications?: ModificationWE[],
   ) {
     super(name!, resourceId!, children, parent);
     this.tooltip = `Type: ${this.resourceId}`;
     this.description = `- id: ${this.resourceId}`;
+    this.modifications = modifications;
 
     switch (state) {
       case 'play':
@@ -456,7 +468,7 @@ export class GlobalCodeCampaignItem extends CampaignTreeItem {
     this.command = {
       title: 'Open File',
       command: WEB_EXPERIMENTATION_GLOBAL_CODE_OPEN_FILE,
-      arguments: [{ campaignId: campaignId, filePath: filePath } as ResourceArgument],
+      arguments: [{ campaignId, filePath } as ResourceArgument],
     };
 
     this.iconPath = FILE_CODE;
@@ -533,4 +545,77 @@ export class GlobalCodeVariationCSSItem extends CampaignTreeItem {
 
     this.iconPath = FILE_CODE;
   }
+}
+
+export class CodeModification extends vscode.TreeItem {
+  children: CampaignTreeItem[] | undefined;
+  resourceId: number | undefined;
+  campaignId: number | undefined;
+  variationId: number | undefined;
+  parent: any;
+
+  constructor(
+    label?: string,
+    resourceId?: number,
+    children?: CampaignTreeItem[],
+    campaignId?: number,
+    variationId?: number,
+    parent?: any,
+    iconPath?: vscode.ThemeIcon,
+  ) {
+    super(
+      label!,
+      children === undefined ? vscode.TreeItemCollapsibleState.None : vscode.TreeItemCollapsibleState.Collapsed,
+    );
+    this.children = children;
+    this.campaignId = campaignId;
+    this.variationId = variationId;
+    this.iconPath = iconPath;
+    this.resourceId = resourceId;
+    this.contextValue = 'codeModification';
+  }
+}
+
+export class CodeModificationItem extends CampaignTreeItem {
+  filePath: string;
+  type: string | undefined;
+  variationId: string | undefined;
+  campaignId: string | undefined;
+  modificationId: string | undefined;
+
+  constructor(label: string, filePath: string, campaignId: string, variationId: string, modificationId: string) {
+    super(label);
+
+    this.filePath = filePath;
+    this.variationId = variationId;
+    this.campaignId = campaignId;
+    this.modificationId = modificationId;
+
+    this.contextValue = 'codeModificationItem';
+    this.command = {
+      title: 'Open File',
+      command: WEB_EXPERIMENTATION_GLOBAL_CODE_OPEN_FILE,
+      arguments: [{ modificationId, variationId, campaignId, filePath } as ResourceArgument],
+    };
+
+    this.iconPath = FILE_CODE;
+  }
+}
+
+export class ModificationWEItem extends CampaignTreeItem {
+  constructor(public readonly name?: string, resourceId?: number, children?: CampaignTreeItem[], parent?: any) {
+    super(name!, resourceId, children, parent);
+    this.tooltip = `- id: ${this.resourceId}`;
+    this.description = `- id: ${this.resourceId}`;
+  }
+
+  contextValue = 'modificationWEItem';
+}
+
+export class ModificationWETree extends CampaignTreeItem {
+  constructor(public readonly name?: string, resourceId?: number, children?: CampaignTreeItem[], parent?: any) {
+    super(name!, resourceId, children, parent);
+  }
+
+  contextValue = 'modificationWE';
 }

@@ -314,7 +314,7 @@ export class Cli {
     }
   }
 
-  async ListModificationWE(campaignId: number): Promise<ModificationWE[]> {
+  async ListModificationWE(campaignId: string): Promise<ModificationWE[]> {
     try {
       const cliBin = await this.CliBin();
       if (!cliBin) {
@@ -577,7 +577,6 @@ export class Cli {
     campaignId: string,
     createFile?: boolean,
     override?: boolean,
-    subFiles?: boolean,
   ): Promise<any> {
     try {
       const cliBin = await this.CliBin();
@@ -587,7 +586,7 @@ export class Cli {
       }
       command = `${cliBin} web-experimentation variation-global-code get-js -i ${id} --campaign-id ${campaignId} ${
         createFile ? `--create-file` : ``
-      } ${subFiles ? `--create-subfiles` : ``} ${override ? `--override` : ``}`;
+      } ${override ? `--override` : ``}`;
       const output = await this.exec(command, {});
       console.log(output);
       this.outputChannel.trace(command);
@@ -636,7 +635,6 @@ export class Cli {
     campaignId: string,
     createFile?: boolean,
     override?: boolean,
-    subFiles?: boolean,
   ): Promise<any> {
     try {
       const cliBin = await this.CliBin();
@@ -646,7 +644,7 @@ export class Cli {
       }
       command = `${cliBin} web-experimentation variation-global-code get-css -i ${id} --campaign-id ${campaignId} ${
         createFile ? `--create-file` : ``
-      } ${subFiles ? `--create-subfiles` : ``} ${override ? `--override` : ``}`;
+      } ${override ? `--override` : ``}`;
       const output = await this.exec(command, {});
       console.log(output);
       this.outputChannel.trace(command);
@@ -671,6 +669,65 @@ export class Cli {
         return false;
       }
       command = `${cliBin} web-experimentation variation-global-code push-css -i ${id} --campaign-id ${campaignId} ${
+        code ? `--code ${code}` : ``
+      } ${filepath ? `--file ${filepath}` : ``}`;
+      const output = await this.exec(command, {});
+      console.log(output);
+      this.outputChannel.trace(command);
+      logMessage(this.outputChannel, output.stdout);
+      if (output.stderr) {
+        this.outputChannel.error(output.stderr);
+        vscode.window.showErrorMessage(output.stderr);
+        return false;
+      }
+      return true;
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return false;
+    }
+  }
+
+  async PullModificationCode(id: string, campaignId: string, createFile?: boolean, override?: boolean): Promise<any> {
+    try {
+      const cliBin = await this.CliBin();
+      let command: string;
+      if (!cliBin) {
+        return false;
+      }
+      command = `${cliBin} web-experimentation modification-code get -i ${id} --campaign-id ${campaignId} ${
+        createFile ? `--create-file` : ``
+      } ${override ? `--override` : ``}`;
+      const output = await this.exec(command, {});
+      console.log(output);
+      this.outputChannel.trace(command);
+      logMessage(this.outputChannel, output.stdout);
+      if (output.stderr) {
+        this.outputChannel.error(output.stderr); //vscode.window.showErrorMessage(output.stderr);
+        return false;
+      }
+      return output.stdout;
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return false;
+    }
+  }
+
+  async PushModificationCode(
+    id: string,
+    campaignId: string,
+    variationId: string,
+    filepath?: string,
+    code?: string,
+  ): Promise<boolean> {
+    try {
+      const cliBin = await this.CliBin();
+      let command: string;
+      if (!cliBin) {
+        return false;
+      }
+      command = `${cliBin} web-experimentation modification-code push -i ${id} --campaign-id ${campaignId} --variation-id ${variationId} ${
         code ? `--code ${code}` : ``
       } ${filepath ? `--file ${filepath}` : ``}`;
       const output = await this.exec(command, {});

@@ -75,6 +75,7 @@ export const WEB_EXPERIMENTATION_VARIATION_LIST_REFRESH = 'webExperimentation.va
 export const WEB_EXPERIMENTATION_VARIATION_LIST_LOAD = 'webExperimentation.variationList.load';
 export const WEB_EXPERIMENTATION_VARIATION_LIST_EDIT = 'webExperimentation.variationList.editVariation';
 export const WEB_EXPERIMENTATION_VARIATION_LIST_DELETE = 'webExperimentation.variationList.deleteVariation';
+export const WEB_EXPERIMENTATION_VARIATION_ADD_GLOBAL_CODE = 'webExperimentation.variationList.addGlobalCode';
 export const WEB_EXPERIMENTATION_VARIATION_PULL_GLOBAL_CODE_JS = 'webExperimentation.variationList.pullGlobalCodeJS';
 export const WEB_EXPERIMENTATION_VARIATION_PUSH_GLOBAL_CODE_JS = 'webExperimentation.variationList.pushGlobalCodeJS';
 export const WEB_EXPERIMENTATION_VARIATION_PULL_GLOBAL_CODE_CSS = 'webExperimentation.variationList.pullGlobalCodeCSS';

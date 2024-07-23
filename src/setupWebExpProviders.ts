@@ -25,6 +25,7 @@ import {
   WEB_EXPERIMENTATION_ACCOUNT_ADD_GLOBAL_CODE,
   WEB_EXPERIMENTATION_ACCOUNT_PUSH_GLOBAL_CODE,
   WEB_EXPERIMENTATION_ACCOUNT_PULL_GLOBAL_CODE,
+  WEB_EXPERIMENTATION_VARIATION_ADD_GLOBAL_CODE,
 } from './commands/const';
 import { selectAccountInputBox } from './menu/webExperimentation/AccountMenu';
 import { deleteCampaignInputBox } from './menu/webExperimentation/CampaignMenu';
@@ -35,6 +36,7 @@ import {
   CampaignListProvider,
   ResourceArgument,
   GlobalCodeCampaign,
+  GlobalCodeVariation,
 } from './providers/webExperimentation/CampaignList';
 import { QuickAccessListProvider } from './providers/webExperimentation/QuickAccessList';
 import {
@@ -121,15 +123,13 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
       async (fileItem: GlobalCodeCampaign) => {
         console.log(fileItem);
         const campaignPath = `${rootPath}/.abtasty/${account.account_id}/${fileItem.resourceId}`;
-        console.log(campaignPath);
-
-        if (!fs.existsSync(campaignPath)) {
-          fs.mkdirSync(campaignPath);
-          const filePath = `${campaignPath}/campaignGlobalCode.js`;
-          const createStream = fs.createWriteStream(filePath);
+        const campaignFilePath = `${campaignPath}/campaignGlobalCode.js`;
+        if (!fs.existsSync(campaignFilePath)) {
+          fs.mkdirSync(campaignPath, { recursive: true });
+          const createStream = fs.createWriteStream(campaignFilePath);
           createStream.end();
-          vscode.window.showInformationMessage(`[AB Tasty] File created at ${campaignPath}`);
-          vscode.workspace.openTextDocument(filePath).then((doc) => {
+          vscode.window.showInformationMessage(`[AB Tasty] File created at ${campaignFilePath}`);
+          vscode.workspace.openTextDocument(campaignFilePath).then((doc) => {
             vscode.window.showTextDocument(doc);
           });
           vscode.commands.executeCommand('list.collapseAllToFocus');
@@ -141,7 +141,7 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
     vscode.commands.registerCommand(
       WEB_EXPERIMENTATION_VARIATION_PULL_GLOBAL_CODE_JS,
       async (fileItem: ResourceArgument) => {
-        await campaignStore.pullVariationGlobalCodeJS(fileItem.variationId, fileItem.campaignId, true, true, false);
+        await campaignStore.pullVariationGlobalCodeJS(fileItem.variationId, fileItem.campaignId, true, true);
         return;
       },
     ),
@@ -157,8 +157,7 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
     vscode.commands.registerCommand(
       WEB_EXPERIMENTATION_VARIATION_PULL_GLOBAL_CODE_CSS,
       async (fileItem: ResourceArgument) => {
-        console.log(fileItem);
-        await campaignStore.pullVariationGlobalCodeCSS(fileItem.variationId, fileItem.campaignId, true, true, false);
+        await campaignStore.pullVariationGlobalCodeCSS(fileItem.variationId, fileItem.campaignId, true, true);
         return;
       },
     ),
@@ -171,8 +170,44 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
       },
     ),
 
+    vscode.commands.registerCommand(
+      WEB_EXPERIMENTATION_VARIATION_ADD_GLOBAL_CODE,
+      async (fileItem: GlobalCodeVariation) => {
+        console.log(fileItem);
+        const variationGlobalCodeJSPath = `${rootPath}/.abtasty/${account.account_id}/${fileItem.parent.parent.id}/${fileItem.parent.id}`;
+        const variationGlobalCodeCSSPath = `${rootPath}/.abtasty/${account.account_id}/${fileItem.parent.parent.id}/${fileItem.parent.id}`;
+
+        const variationGlobalCodeJSFilePath = `${variationGlobalCodeJSPath}/variationGlobalCode.js`;
+        const variationGlobalCodeCSSFilePath = `${variationGlobalCodeCSSPath}/variationGlobalCode.css`;
+
+        if (!fs.existsSync(variationGlobalCodeJSFilePath)) {
+          fs.mkdirSync(variationGlobalCodeJSPath, { recursive: true });
+
+          const createStream = fs.createWriteStream(variationGlobalCodeJSFilePath);
+          createStream.end();
+          vscode.window.showInformationMessage(`[AB Tasty] File created at ${variationGlobalCodeJSFilePath}`);
+          vscode.workspace.openTextDocument(variationGlobalCodeJSFilePath).then((doc) => {
+            vscode.window.showTextDocument(doc);
+          });
+          vscode.commands.executeCommand('list.collapseAllToFocus');
+        }
+
+        if (!fs.existsSync(variationGlobalCodeCSSFilePath)) {
+          fs.mkdirSync(variationGlobalCodeCSSPath, { recursive: true });
+
+          const createStream = fs.createWriteStream(variationGlobalCodeCSSFilePath);
+          createStream.end();
+          vscode.window.showInformationMessage(`[AB Tasty] File created at ${variationGlobalCodeCSSFilePath}`);
+          vscode.workspace.openTextDocument(variationGlobalCodeCSSFilePath).then((doc) => {
+            vscode.window.showTextDocument(doc);
+          });
+          vscode.commands.executeCommand('list.collapseAllToFocus');
+        }
+        return;
+      },
+    ),
+
     vscode.commands.registerCommand(WEB_EXPERIMENTATION_GLOBAL_CODE_OPEN_FILE, (fileItem: ResourceArgument) => {
-      console.log(fileItem);
       vscode.workspace.openTextDocument(fileItem.filePath).then((doc) => {
         vscode.window.showTextDocument(doc);
       });
@@ -215,14 +250,14 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
       WEB_EXPERIMENTATION_ACCOUNT_ADD_GLOBAL_CODE,
       async (fileItem: GlobalCodeAccount) => {
         const accountPath = `${rootPath}/.abtasty/${fileItem.resourceId}`;
+        const accountFilePath = `${rootPath}/.abtasty/${fileItem.resourceId}/accountGlobalCode.js`;
 
-        if (!fs.existsSync(accountPath)) {
-          fs.mkdirSync(accountPath);
-          const filePath = `${accountPath}/accountGlobalCode.js`;
-          const createStream = fs.createWriteStream(filePath);
+        if (!fs.existsSync(accountFilePath)) {
+          fs.mkdirSync(accountPath, { recursive: true });
+          const createStream = fs.createWriteStream(accountFilePath);
           createStream.end();
           vscode.window.showInformationMessage(`[AB Tasty] File created at ${accountPath}`);
-          vscode.workspace.openTextDocument(filePath).then((doc) => {
+          vscode.workspace.openTextDocument(accountFilePath).then((doc) => {
             vscode.window.showTextDocument(doc);
           });
           vscode.commands.executeCommand('list.collapseAllToFocus');
