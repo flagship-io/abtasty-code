@@ -1,18 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
-import {
-  CampaignListProvider,
-  CampaignWEItem,
-  GlobalCodeCampaign,
-  GlobalCodeCampaignItem,
-  GlobalCodeVariation,
-  GlobalCodeVariationCSSItem,
-  GlobalCodeVariationJSItem,
-  Parent,
-  SimpleItem,
-  VariationWEItem,
-} from '../../src/providers/webExperimentation/CampaignList';
 import { Cli } from '../../src/cli/cmd/webExperimentation/Cli';
 import { NO_GLOBAL_CODE_FOUND, NO_RESOURCE_FOUND } from '../../src/const';
 import {
