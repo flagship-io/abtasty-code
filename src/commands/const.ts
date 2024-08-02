@@ -69,6 +69,14 @@ export const WEB_EXPERIMENTATION_MODIFICATION_LIST_REFRESH = 'webExperimentation
 export const WEB_EXPERIMENTATION_MODIFICATION_LIST_LOAD = 'webExperimentation.modificationList.load';
 export const WEB_EXPERIMENTATION_MODIFICATION_LIST_EDIT = 'webExperimentation.modificationList.editModification';
 export const WEB_EXPERIMENTATION_MODIFICATION_LIST_DELETE = 'webExperimentation.modificationList.deleteModification';
+export const WEB_EXPERIMENTATION_MODIFICATION_PULL_CODE = 'webExperimentation.modificationList.pullCode';
+export const WEB_EXPERIMENTATION_MODIFICATION_PUSH_CODE = 'webExperimentation.modificationList.pushCode';
+export const WEB_EXPERIMENTATION_MODIFICATION_ADD_MODIFICATION = 'webExperimentation.modificationList.addModification';
+export const WEB_EXPERIMENTATION_MODIFICATION_REFRESH_MODIFICATION =
+  'webExperimentation.modificationList.refreshModification';
+
+export const WEB_EXPERIMENTATION_MODIFICATION_DELETE_MODIFICATION =
+  'webExperimentation.modificationList.deleteModification';
 
 export const WEB_EXPERIMENTATION_CREATE_VARIATION = 'webExperimentation.createVariation';
 export const WEB_EXPERIMENTATION_VARIATION_LIST_REFRESH = 'webExperimentation.variationList.refresh';

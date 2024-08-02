@@ -135,4 +135,36 @@ export class CampaignStore {
     }
     return cliResponse;
   }
+
+  async pullModificationCode(
+    modificationId: string,
+    campaignId: string,
+    createFile?: boolean,
+    override?: boolean,
+  ): Promise<any> {
+    const cliResponse =
+      campaignId && modificationId
+        ? await this.cli.PullModificationCode(modificationId, campaignId, createFile, override)
+        : false;
+    if (cliResponse) {
+      vscode.window.showInformationMessage(`[AB Tasty] Modification code pulled successfully`);
+    }
+    return cliResponse;
+  }
+
+  async pushModificationCode(
+    modificationId: string,
+    campaignId: string,
+    variationId: string,
+    filepath?: string,
+    code?: string,
+  ): Promise<any> {
+    const cliResponse = campaignId
+      ? await this.cli.PushModificationCode(modificationId, variationId, campaignId, filepath, code)
+      : false;
+    if (cliResponse) {
+      vscode.window.showInformationMessage(`[AB Tasty] Modification code pushed successfully`);
+    }
+    return cliResponse;
+  }
 }

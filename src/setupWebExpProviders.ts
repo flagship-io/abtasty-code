@@ -26,10 +26,15 @@ import {
   WEB_EXPERIMENTATION_ACCOUNT_PUSH_GLOBAL_CODE,
   WEB_EXPERIMENTATION_ACCOUNT_PULL_GLOBAL_CODE,
   WEB_EXPERIMENTATION_VARIATION_ADD_GLOBAL_CODE,
+  WEB_EXPERIMENTATION_MODIFICATION_PULL_CODE,
+  WEB_EXPERIMENTATION_MODIFICATION_PUSH_CODE,
+  WEB_EXPERIMENTATION_MODIFICATION_ADD_MODIFICATION,
+  WEB_EXPERIMENTATION_MODIFICATION_REFRESH_MODIFICATION,
+  WEB_EXPERIMENTATION_MODIFICATION_DELETE_MODIFICATION,
 } from './commands/const';
 import { selectAccountInputBox } from './menu/webExperimentation/AccountMenu';
 import { deleteCampaignInputBox } from './menu/webExperimentation/CampaignMenu';
-import { deleteModificationInputBox } from './menu/webExperimentation/ModificationMenu';
+import { addModificationInputBox, deleteModificationInputBox } from './menu/webExperimentation/ModificationMenu';
 import { AccountItem, AccountListProvider, GlobalCodeAccount } from './providers/webExperimentation/AccountList';
 import {
   CampaignWEItem,
@@ -37,6 +42,8 @@ import {
   ResourceArgument,
   GlobalCodeCampaign,
   GlobalCodeVariation,
+  ModificationWETree,
+  ModificationWEItem,
 } from './providers/webExperimentation/CampaignList';
 import { QuickAccessListProvider } from './providers/webExperimentation/QuickAccessList';
 import {
@@ -73,8 +80,8 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
   const quickAccessView = new QuickAccessListProvider();
   const quickAccessProvider = vscode.window.registerTreeDataProvider('webExperimentation.quickAccess', quickAccessView);
 
-  const campaignProvider = new CampaignListProvider(context, campaignStore, account.account_id);
-  const campaignTreeView = new CampaignTreeView(context, campaignProvider, cli, rootPath, account.account_id);
+  const campaignProvider = new CampaignListProvider(context, campaignStore, accountStore, account.account_id);
+  const campaignTreeView = new CampaignTreeView(context, campaignProvider, cli, rootPath);
 
   const accountProvider = new AccountListProvider(context, accountStore);
   const accountTreeView = new AccountTreeView(context, accountProvider, cli, rootPath, account.account_id);
@@ -82,7 +89,7 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
   const progressIndicator = showIndefiniteProgress('Fetching Resources');
 
   try {
-    await Promise.all([quickAccessView.refresh(), accountProvider.refresh(), campaignProvider.refresh()]);
+    await Promise.all([quickAccessView.refresh(), accountProvider.refresh(), campaignTreeView.refresh()]);
   } catch (error: any) {
     vscode.window.showErrorMessage(`Failed to fetch accounts: ${error.message}`);
   } finally {
@@ -96,16 +103,18 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
       return;
     }),
 
-    vscode.commands.registerCommand(WEB_EXPERIMENTATION_CAMPAIGN_SET_CAMPAIGN, async (campaign: CampaignWEItem) => {
-      await context.globalState.update(CURRENT_SET_CAMPAIGN_ID, campaign.id);
-      await context.globalState.update(CURRENT_SET_VARIATIONS_ID, campaign.variationIds);
-      return;
-    }),
-
     vscode.commands.registerCommand(
       WEB_EXPERIMENTATION_CAMPAIGN_PULL_GLOBAL_CODE,
       async (fileItem: ResourceArgument) => {
-        await campaignStore.pullCampaignGlobalCode(fileItem.campaignId!, true, true, false);
+        const picked = await vscode.window.showQuickPick(['yes', 'no'], {
+          title: `Pull campaign global code for the ID ${fileItem.campaignId}`,
+          placeHolder: 'Do you confirm ?',
+          ignoreFocusOut: true,
+        });
+
+        if (picked === 'yes') {
+          await campaignStore.pullCampaignGlobalCode(fileItem.campaignId!, true, true, false);
+        }
         return;
       },
     ),
@@ -113,7 +122,15 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
     vscode.commands.registerCommand(
       WEB_EXPERIMENTATION_CAMPAIGN_PUSH_GLOBAL_CODE,
       async (fileItem: ResourceArgument) => {
-        await campaignStore.pushCampaignGlobalCode(fileItem.campaignId!, fileItem.filePath);
+        const picked = await vscode.window.showQuickPick(['yes', 'no'], {
+          title: `Push campaign global code for the ID ${fileItem.campaignId}`,
+          placeHolder: 'Do you confirm ?',
+          ignoreFocusOut: true,
+        });
+
+        if (picked === 'yes') {
+          await campaignStore.pushCampaignGlobalCode(fileItem.campaignId!, fileItem.filePath);
+        }
         return;
       },
     ),
@@ -121,7 +138,7 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
     vscode.commands.registerCommand(
       WEB_EXPERIMENTATION_CAMPAIGN_ADD_GLOBAL_CODE,
       async (fileItem: GlobalCodeCampaign) => {
-        console.log(fileItem);
+        const account = await accountStore.currentAccount();
         const campaignPath = `${rootPath}/.abtasty/${account.account_id}/${fileItem.resourceId}`;
         const campaignFilePath = `${campaignPath}/campaignGlobalCode.js`;
         if (!fs.existsSync(campaignFilePath)) {
@@ -132,7 +149,10 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
           vscode.workspace.openTextDocument(campaignFilePath).then((doc) => {
             vscode.window.showTextDocument(doc);
           });
+
+          campaignTreeView.reveal(fileItem, { select: true, focus: true, expand: false });
           vscode.commands.executeCommand('list.collapseAllToFocus');
+          campaignTreeView.reveal(fileItem, { select: true, focus: true, expand: true });
         }
         return;
       },
@@ -141,7 +161,15 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
     vscode.commands.registerCommand(
       WEB_EXPERIMENTATION_VARIATION_PULL_GLOBAL_CODE_JS,
       async (fileItem: ResourceArgument) => {
-        await campaignStore.pullVariationGlobalCodeJS(fileItem.variationId, fileItem.campaignId, true, true);
+        const picked = await vscode.window.showQuickPick(['yes', 'no'], {
+          title: `Pull variation global code js for the ID ${fileItem.variationId}`,
+          placeHolder: 'Do you confirm ?',
+          ignoreFocusOut: true,
+        });
+
+        if (picked === 'yes') {
+          await campaignStore.pullVariationGlobalCodeJS(fileItem.variationId, fileItem.campaignId, true, true);
+        }
         return;
       },
     ),
@@ -149,7 +177,15 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
     vscode.commands.registerCommand(
       WEB_EXPERIMENTATION_VARIATION_PUSH_GLOBAL_CODE_JS,
       async (fileItem: ResourceArgument) => {
-        await campaignStore.pushVariationGlobalCodeJS(fileItem.variationId, fileItem.campaignId, fileItem.filePath);
+        const picked = await vscode.window.showQuickPick(['yes', 'no'], {
+          title: `Push variation global code js for the ID ${fileItem.variationId}`,
+          placeHolder: 'Do you confirm ?',
+          ignoreFocusOut: true,
+        });
+
+        if (picked === 'yes') {
+          await campaignStore.pushVariationGlobalCodeJS(fileItem.variationId, fileItem.campaignId, fileItem.filePath);
+        }
         return;
       },
     ),
@@ -157,7 +193,15 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
     vscode.commands.registerCommand(
       WEB_EXPERIMENTATION_VARIATION_PULL_GLOBAL_CODE_CSS,
       async (fileItem: ResourceArgument) => {
-        await campaignStore.pullVariationGlobalCodeCSS(fileItem.variationId, fileItem.campaignId, true, true);
+        const picked = await vscode.window.showQuickPick(['yes', 'no'], {
+          title: `Pull variation global code css for the ID ${fileItem.variationId}`,
+          placeHolder: 'Do you confirm ?',
+          ignoreFocusOut: true,
+        });
+
+        if (picked === 'yes') {
+          await campaignStore.pullVariationGlobalCodeCSS(fileItem.variationId, fileItem.campaignId, true, true);
+        }
         return;
       },
     ),
@@ -165,7 +209,15 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
     vscode.commands.registerCommand(
       WEB_EXPERIMENTATION_VARIATION_PUSH_GLOBAL_CODE_CSS,
       async (fileItem: ResourceArgument) => {
-        await campaignStore.pushVariationGlobalCodeCSS(fileItem.variationId, fileItem.campaignId, fileItem.filePath);
+        const picked = await vscode.window.showQuickPick(['yes', 'no'], {
+          title: `Push variation global code css for the ID ${fileItem.variationId}`,
+          placeHolder: 'Do you confirm ?',
+          ignoreFocusOut: true,
+        });
+
+        if (picked === 'yes') {
+          await campaignStore.pushVariationGlobalCodeCSS(fileItem.variationId, fileItem.campaignId, fileItem.filePath);
+        }
         return;
       },
     ),
@@ -173,7 +225,7 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
     vscode.commands.registerCommand(
       WEB_EXPERIMENTATION_VARIATION_ADD_GLOBAL_CODE,
       async (fileItem: GlobalCodeVariation) => {
-        console.log(fileItem);
+        const account = await accountStore.currentAccount();
         const variationGlobalCodeJSPath = `${rootPath}/.abtasty/${account.account_id}/${fileItem.parent.parent.id}/${fileItem.parent.id}`;
         const variationGlobalCodeCSSPath = `${rootPath}/.abtasty/${account.account_id}/${fileItem.parent.parent.id}/${fileItem.parent.id}`;
 
@@ -189,7 +241,10 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
           vscode.workspace.openTextDocument(variationGlobalCodeJSFilePath).then((doc) => {
             vscode.window.showTextDocument(doc);
           });
+
+          campaignTreeView.reveal(fileItem, { select: true, focus: true, expand: false });
           vscode.commands.executeCommand('list.collapseAllToFocus');
+          campaignTreeView.reveal(fileItem, { select: true, focus: true, expand: true });
         }
 
         if (!fs.existsSync(variationGlobalCodeCSSFilePath)) {
@@ -201,7 +256,10 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
           vscode.workspace.openTextDocument(variationGlobalCodeCSSFilePath).then((doc) => {
             vscode.window.showTextDocument(doc);
           });
+
+          campaignTreeView.reveal(fileItem, { select: true, focus: true, expand: false });
           vscode.commands.executeCommand('list.collapseAllToFocus');
+          campaignTreeView.reveal(fileItem, { select: true, focus: true, expand: true });
         }
         return;
       },
@@ -212,6 +270,71 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
         vscode.window.showTextDocument(doc);
       });
     }),
+
+    vscode.commands.registerCommand(WEB_EXPERIMENTATION_MODIFICATION_PULL_CODE, async (fileItem: ResourceArgument) => {
+      const picked = await vscode.window.showQuickPick(['yes', 'no'], {
+        title: `Pull modification code for the ID ${fileItem.modificationId}`,
+        placeHolder: 'Do you confirm ?',
+        ignoreFocusOut: true,
+      });
+
+      if (picked === 'yes') {
+        await campaignStore.pullModificationCode(fileItem.modificationId, fileItem.campaignId, true, true);
+      }
+      return;
+    }),
+
+    vscode.commands.registerCommand(
+      WEB_EXPERIMENTATION_MODIFICATION_REFRESH_MODIFICATION,
+      async (resource: ModificationWETree) => {
+        resource.children?.splice(0);
+        campaignTreeView._modificationByCampaigns = campaignTreeView._modificationByCampaigns.filter(
+          (m) => m.campaignId === resource.parent.parent.id,
+        );
+
+        campaignTreeView.reveal(resource, { select: true, focus: true, expand: false });
+        await vscode.commands.executeCommand('list.collapseAllToFocus');
+        campaignTreeView.reveal(resource, { select: true, focus: true, expand: true });
+        return;
+      },
+    ),
+
+    vscode.commands.registerCommand(
+      WEB_EXPERIMENTATION_MODIFICATION_ADD_MODIFICATION,
+      async (resource: ModificationWETree) => {
+        await addModificationInputBox(resource, cli);
+        return;
+      },
+    ),
+
+    vscode.commands.registerCommand(
+      WEB_EXPERIMENTATION_MODIFICATION_DELETE_MODIFICATION,
+      async (resource: ModificationWEItem) => {
+        await deleteModificationInputBox(resource, cli);
+        await vscode.commands.executeCommand(
+          WEB_EXPERIMENTATION_MODIFICATION_REFRESH_MODIFICATION,
+          resource.modificationTree!,
+        );
+      },
+    ),
+
+    vscode.commands.registerCommand(WEB_EXPERIMENTATION_MODIFICATION_PUSH_CODE, async (fileItem: ResourceArgument) => {
+      const picked = await vscode.window.showQuickPick(['yes', 'no'], {
+        title: `Push modification code for the ID ${fileItem.modificationId}`,
+        placeHolder: 'Do you confirm ?',
+        ignoreFocusOut: true,
+      });
+
+      if (picked === 'yes') {
+        await campaignStore.pushModificationCode(
+          fileItem.modificationId,
+          fileItem.variationId,
+          fileItem.campaignId,
+          fileItem.filePath,
+        );
+      }
+      return;
+    }),
   ];
 
   const accountDisposables = [
@@ -220,8 +343,11 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
 
       const progressIndicator = showIndefiniteProgress('Fetching Resources');
       try {
-        await Promise.all([quickAccessView.refresh(), campaignProvider.refresh()]);
-        await vscode.commands.executeCommand(WEB_EXPERIMENTATION_ACCOUNT_LIST_LOAD);
+        await Promise.all([
+          quickAccessView.refresh(),
+          campaignTreeView.refresh(),
+          vscode.commands.executeCommand(WEB_EXPERIMENTATION_ACCOUNT_LIST_LOAD),
+        ]);
         return;
       } catch (error: any) {
         vscode.window.showErrorMessage(`Failed to fetch accounts: ${error.message}`);
@@ -260,7 +386,10 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
           vscode.workspace.openTextDocument(accountFilePath).then((doc) => {
             vscode.window.showTextDocument(doc);
           });
+
+          campaignTreeView.reveal(fileItem, { select: true, focus: true, expand: false });
           vscode.commands.executeCommand('list.collapseAllToFocus');
+          campaignTreeView.reveal(fileItem, { select: true, focus: true, expand: true });
         }
         return;
       },

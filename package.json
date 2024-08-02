@@ -5,7 +5,7 @@
   "publisher": "ABTasty",
   "license": "SEE LICENSE IN LICENSE.md",
   "repository": "https://github.com/flagship-io/abtasty-code",
-  "version": "0.2.0",
+  "version": "0.1.0",
   "engines": {
     "vscode": "^1.72.0"
   },
@@ -385,13 +385,18 @@
         "icon": "$(repo-push)"
       },
       {
-        "command": "webExperimentation.modificationList.addGlobalCode",
-        "title": "Add modification code",
+        "command": "webExperimentation.modificationList.addModification",
+        "title": "Web Experimentation: Add modification",
         "icon": "$(add)"
       },
       {
+        "command": "webExperimentation.modificationList.refreshModification",
+        "title": "Web Experimentation: Refresh modifications",
+        "icon": "$(refresh)"
+      },
+      {
         "command": "webExperimentation.accountList.selectAccount",
-        "title": "Web Experimentation: select account",
+        "title": "Web Experimentation: Select account",
         "icon": "$(run)"
       },
       {
@@ -555,7 +560,7 @@
         },
         {
           "command": "webExperimentation.modificationList.deleteModification",
-          "when": "view == webExperimentation.modificationList && viewItem == modificationWEItem",
+          "when": "view == webExperimentation.campaignList && viewItem == modificationWEItem",
           "group": "inline"
         },
         {
@@ -619,13 +624,28 @@
           "group": "inline"
         },
         {
+          "command": "webExperimentation.modificationList.pullCode",
+          "when": "view == webExperimentation.campaignList && viewItem == codeModificationItem",
+          "group": "inline"
+        },
+        {
+          "command": "webExperimentation.modificationList.pushCode",
+          "when": "view == webExperimentation.campaignList && viewItem == codeModificationItem",
+          "group": "inline"
+        },
+        {
           "command": "webExperimentation.variationList.addGlobalCode",
           "when": "view == webExperimentation.campaignList && viewItem == globalCodeVariation",
           "group": "inline"
         },
         {
-          "command": "webExperimentation.modificationList.addGlobalCode",
-          "when": "view == webExperimentation.campaignList && viewItem == codeModification",
+          "command": "webExperimentation.modificationList.addModification",
+          "when": "view == webExperimentation.campaignList && viewItem == modificationWE",
+          "group": "inline"
+        },
+        {
+          "command": "webExperimentation.modificationList.refreshModification",
+          "when": "view == webExperimentation.campaignList && viewItem == modificationWE",
           "group": "inline"
         },
         {

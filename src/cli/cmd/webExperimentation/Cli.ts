@@ -746,4 +746,29 @@ export class Cli {
       return false;
     }
   }
+
+  async CreateModification(name: string, selector: string, campaignId: string, variationId: string): Promise<boolean> {
+    try {
+      const cliBin = await this.CliBin();
+      let command: string;
+      if (!cliBin) {
+        return false;
+      }
+      command = `${cliBin} web-experimentation modification create --campaign-id ${campaignId} --data-raw '{"input_type":"modification","name":"${name}","value":"","selector":"${selector}","type":"customScriptNew","variation_id": ${variationId},"engine":"engine"}'`;
+      const output = await this.exec(command, {});
+      console.log(output);
+      this.outputChannel.trace(command);
+      logMessage(this.outputChannel, output.stdout);
+      if (output.stderr) {
+        this.outputChannel.error(output.stderr);
+        vscode.window.showErrorMessage(output.stderr);
+        return false;
+      }
+      return true;
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return false;
+    }
+  }
 }
