@@ -19,6 +19,7 @@ import { CampaignWE, ItemResource, ModificationWE } from '../../model';
 import { CampaignStore } from '../../store/webExperimentation/CampaignStore';
 import { NO_GLOBAL_CODE_FOUND, NO_RESOURCE_FOUND } from '../../const';
 import { CampaignTreeView } from '../../../treeView/webExperimentation/campaignTreeView';
+import { AccountWEStore } from '../../store/webExperimentation/AccountStore';
 
 export type Parent = {
   id: number;
@@ -36,26 +37,37 @@ export type ResourceArgument = {
 export class CampaignListProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
   private _tree: CampaignTreeItem[] = [];
   private campaignStore: CampaignStore;
-  private currentAccountId: string | undefined;
+  private accountStore: AccountWEStore;
+  public currentAccountId: string | undefined;
 
   _onDidChangeTreeData: vscode.EventEmitter<vscode.TreeItem | undefined | void> = new vscode.EventEmitter<
     vscode.TreeItem | undefined | void
   >();
   readonly onDidChangeTreeData: vscode.Event<vscode.TreeItem | undefined | void> = this._onDidChangeTreeData.event;
 
-  public constructor(private context: vscode.ExtensionContext, campaignStore: CampaignStore, currentAccountId: string) {
+  public constructor(
+    private context: vscode.ExtensionContext,
+    campaignStore: CampaignStore,
+    accountStore: AccountWEStore,
+    currentAccountId: string,
+  ) {
     this.campaignStore = campaignStore;
+    this.accountStore = accountStore;
     this.currentAccountId = currentAccountId;
     vscode.commands.registerCommand(WEB_EXPERIMENTATION_CAMPAIGN_LIST_REFRESH, async () => await this.refresh());
     vscode.commands.registerCommand(WEB_EXPERIMENTATION_CAMPAIGN_LIST_LOAD, () => this.load());
   }
 
   async refresh() {
+    const account = await this.accountStore.currentAccount();
+    this.currentAccountId = account.account_id;
     await this.getRefreshedCampaigns();
     this._onDidChangeTreeData.fire();
   }
 
   async load() {
+    const account = await this.accountStore.currentAccount();
+    this.currentAccountId = account.account_id;
     this.getLoadedCampaigns();
     this._onDidChangeTreeData.fire();
   }
@@ -150,6 +162,16 @@ export class CampaignListProvider implements vscode.TreeDataProvider<vscode.Tree
           return new SimpleItem(key, undefined, value, undefined, undefined);
         });
 
+      const campaignWEItem = new CampaignWEItem(
+        c.name,
+        c.id,
+        c.type,
+        c.state,
+        c.variations.flatMap((v) => v.id),
+        campaignData,
+        accountParent,
+      );
+
       if (c.variations) {
         variations = c.variations.map((v) => {
           const vData = Object.entries(v)
@@ -165,7 +187,22 @@ export class CampaignListProvider implements vscode.TreeDataProvider<vscode.Tree
             [new CampaignTreeItem(NO_RESOURCE_FOUND, 0, undefined)],
             variationParent,
           );
-          return new VariationWEItem(v.name, v.id, [variationDetails, variationGlobalCode], campaignParent);
+          return new VariationWEItem(
+            v.name,
+            v.id,
+            [
+              variationDetails,
+              variationGlobalCode,
+              new ModificationWETree(
+                'Modifications',
+                undefined,
+                [new CampaignTreeItem(NO_RESOURCE_FOUND, 0, undefined)],
+                variationParent,
+              ),
+            ],
+            campaignParent,
+            campaignWEItem.modifications,
+          );
         });
       }
 
@@ -181,15 +218,6 @@ export class CampaignListProvider implements vscode.TreeDataProvider<vscode.Tree
         campaignData.push(new CampaignTreeItem('Variations', undefined, variations));
       }
 
-      campaignData.push(
-        new ModificationWETree(
-          'Modifications',
-          undefined,
-          [new CampaignTreeItem(NO_RESOURCE_FOUND, 0, undefined)],
-          campaignParent,
-        ),
-      );
-
       if (subTests.length !== 0) {
         campaignData.push(new CampaignTreeItem('Sub Tests', undefined, subTests));
       }
@@ -203,32 +231,16 @@ export class CampaignListProvider implements vscode.TreeDataProvider<vscode.Tree
         ),
       );
 
+      /* campaignWEItem.variationIds = c.variations.flatMap((v) => v.id);
+      campaignWEItem.children = campaignData;
+      campaignWEItem.parent = accountParent; */
+
       switch (c.type) {
         case 'ab':
-          abCampaigns.push(
-            new CampaignWEItem(
-              c.name,
-              c.id,
-              c.type,
-              c.state,
-              c.variations.flatMap((v) => v.id),
-              campaignData,
-              accountParent,
-            ),
-          );
+          abCampaigns.push(campaignWEItem);
           break;
         case 'mastersegment':
-          masterSegmentCampaigns.push(
-            new CampaignWEItem(
-              c.name,
-              c.id,
-              c.type,
-              c.state,
-              c.variations.flatMap((v) => v.id),
-              campaignData,
-              accountParent,
-            ),
-          );
+          masterSegmentCampaigns.push(campaignWEItem);
           break;
 
         case 'subsegment':
@@ -329,9 +341,9 @@ export class CampaignListProvider implements vscode.TreeDataProvider<vscode.Tree
 }
 
 export class CampaignTreeItem extends vscode.TreeItem {
-  children: CampaignTreeItem[] | undefined;
-  parent: any;
-  resourceId: number | undefined;
+  public children: CampaignTreeItem[] | undefined;
+  public parent: any;
+  public resourceId: number | undefined;
 
   constructor(
     label?: string,
@@ -352,13 +364,17 @@ export class CampaignTreeItem extends vscode.TreeItem {
 }
 
 export class CampaignWEItem extends CampaignTreeItem {
-  modifications: ModificationWE[] | undefined;
+  public modifications: ModificationWE[] | undefined;
+  public variationIds?: number[] | undefined;
+  public children: CampaignTreeItem[] | undefined;
+  public parent: any;
+
   constructor(
     public readonly name?: string,
     resourceId?: number,
     public readonly type?: string,
     public readonly state?: string,
-    public readonly variationIds?: number[],
+    variationIds?: number[],
     children?: CampaignTreeItem[],
     parent?: any,
     modifications?: ModificationWE[],
@@ -367,6 +383,9 @@ export class CampaignWEItem extends CampaignTreeItem {
     this.tooltip = `Type: ${this.resourceId}`;
     this.description = `- id: ${this.resourceId}`;
     this.modifications = modifications;
+    this.variationIds = variationIds;
+    this.children = children;
+    this.parent = parent;
 
     switch (state) {
       case 'play':
@@ -388,10 +407,18 @@ export class CampaignWEItem extends CampaignTreeItem {
 }
 
 export class VariationWEItem extends CampaignTreeItem {
-  constructor(public readonly name?: string, resourceId?: number, children?: CampaignTreeItem[], parent?: any) {
+  public modifications: ModificationWE[] | undefined;
+  constructor(
+    public readonly name?: string,
+    resourceId?: number,
+    children?: CampaignTreeItem[],
+    parent?: any,
+    modifications?: ModificationWE[],
+  ) {
     super(name!, resourceId, children, parent);
     this.tooltip = `- id: ${this.resourceId}`;
     this.description = `- id: ${this.resourceId}`;
+    this.modifications = modifications;
   }
   iconPath = CIRCLE_OUTLINE;
 
@@ -552,6 +579,7 @@ export class CodeModification extends vscode.TreeItem {
   resourceId: number | undefined;
   campaignId: number | undefined;
   variationId: number | undefined;
+  accountId: number | undefined;
   parent: any;
 
   constructor(
@@ -560,6 +588,7 @@ export class CodeModification extends vscode.TreeItem {
     children?: CampaignTreeItem[],
     campaignId?: number,
     variationId?: number,
+    accountId?: number,
     parent?: any,
     iconPath?: vscode.ThemeIcon,
   ) {
@@ -570,6 +599,7 @@ export class CodeModification extends vscode.TreeItem {
     this.children = children;
     this.campaignId = campaignId;
     this.variationId = variationId;
+    this.accountId = accountId;
     this.iconPath = iconPath;
     this.resourceId = resourceId;
     this.contextValue = 'codeModification';
@@ -603,10 +633,18 @@ export class CodeModificationItem extends CampaignTreeItem {
 }
 
 export class ModificationWEItem extends CampaignTreeItem {
-  constructor(public readonly name?: string, resourceId?: number, children?: CampaignTreeItem[], parent?: any) {
+  modificationTree: ModificationWETree | undefined;
+  constructor(
+    public readonly name?: string,
+    resourceId?: number,
+    children?: CampaignTreeItem[],
+    parent?: any,
+    modificationTree?: ModificationWETree,
+  ) {
     super(name!, resourceId, children, parent);
     this.tooltip = `- id: ${this.resourceId}`;
     this.description = `- id: ${this.resourceId}`;
+    this.modificationTree = modificationTree;
   }
 
   contextValue = 'modificationWEItem';
