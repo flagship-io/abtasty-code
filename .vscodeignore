@@ -4,6 +4,7 @@ out/**
 node_modules/**
 src/**
 flagship/**
+abtasty-cli/**
 *.vsix
 tsconfig.json
 webpack.config.js

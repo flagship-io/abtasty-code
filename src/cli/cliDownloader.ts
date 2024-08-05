@@ -8,11 +8,11 @@ import axios from 'axios';
 import { rimraf } from 'rimraf';
 import { createGunzip } from 'zlib';
 
-export const CliVersion = '1.0.2';
+export const CliVersion = '1.0.6';
 
 export async function CliDownloader(context: vscode.ExtensionContext, binaryDir: string) {
-  const flagshipDir = context.asAbsolutePath('flagship');
-  const cliTar = context.asAbsolutePath(`flagship/flagship-${CliVersion}.tar.gz`);
+  const abtastyDir = context.asAbsolutePath('abtasty-cli');
+  const cliTar = context.asAbsolutePath(`abtasty-cli/abtasty-cli-${CliVersion}.tar.gz`);
 
   async function installDir(): Promise<void> {
     let platform = process.platform.toString();
@@ -21,8 +21,8 @@ export async function CliDownloader(context: vscode.ExtensionContext, binaryDir:
     const file = fs.createWriteStream(cliTar);
     const unzip = createGunzip();
 
-    if (!fs.existsSync(flagshipDir)) {
-      fs.mkdirSync(flagshipDir);
+    if (!fs.existsSync(abtastyDir)) {
+      fs.mkdirSync(abtastyDir);
     }
     if (!fs.existsSync(binaryDir)) {
       fs.mkdirSync(binaryDir);
@@ -44,9 +44,9 @@ export async function CliDownloader(context: vscode.ExtensionContext, binaryDir:
     }
 
     if (platform === 'darwin') {
-      cliUrl = `https://github.com/flagship-io/flagship/releases/download/v${CliVersion}/flagship_${CliVersion}_darwin_all.tar.gz`;
+      cliUrl = `https://github.com/flagship-io/abtasty-cli/releases/download/v${CliVersion}/abtasty-cli_${CliVersion}_darwin_all.tar.gz`;
     } else {
-      cliUrl = `https://github.com/flagship-io/flagship/releases/download/v${CliVersion}/flagship_${CliVersion}_${platform}_${arch}.tar.gz`;
+      cliUrl = `https://github.com/flagship-io/abtasty-cli/releases/download/v${CliVersion}/abtasty-cli_${CliVersion}_${platform}_${arch}.tar.gz`;
     }
 
     try {
@@ -73,7 +73,7 @@ export async function CliDownloader(context: vscode.ExtensionContext, binaryDir:
 
   async function download(): Promise<void> {
     try {
-      await rimraf(`${flagshipDir}/*`);
+      await rimraf(`${abtastyDir}/*`);
     } catch (err) {
       console.error(err);
     }

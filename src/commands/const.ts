@@ -1,57 +1,111 @@
-export const FLAG_IN_FILE_REFRESH = 'flagsInFile.refresh';
+// FEATURE EXP
 
-export const FLAGSHIP_OPEN_BROWSER = 'flagship.openBrowser';
-export const FLAGSHIP_GET_TOKEN_SCOPE = 'flagship.getTokenScope';
-export const QUICK_ACCESS_REFRESH = 'quickAccess.refresh';
-export const CHECK_CLI_VERSION = 'flagship.checkCliVersion';
-export const CLEAR_CONFIG = 'flagship.clearConfig';
-export const SET_CREDENTIALS = 'flagship.setCredentials';
+export const FEATURE_EXPERIMENTATION_FLAG_IN_FILE_REFRESH = 'featureExperimentation.flagsInFile.refresh';
+
+export const FEATURE_EXPERIMENTATION_OPEN_BROWSER = 'featureExperimentation.openBrowser';
+export const FEATURE_EXPERIMENTATION_GET_TOKEN_SCOPE = 'featureExperimentation.getTokenScope';
+export const FEATURE_EXPERIMENTATION_QUICK_ACCESS_REFRESH = 'featureExperimentation.quickAccess.refresh';
+export const CHECK_CLI_VERSION = 'abtasty.checkCliVersion';
+export const FEATURE_EXPERIMENTATION_CLEAR_CONFIG = 'featureExperimentation.clearConfig';
+export const FEATURE_EXPERIMENTATION_SET_CREDENTIALS = 'featureExperimentation.setCredentials';
 export const SET_CONTEXT = 'setContext';
 
-export const FLAGSHIP_CREATE_PROJECT = 'flagship.createProject';
-export const PROJECT_LIST_COPY = 'projectList.copyProject';
-export const PROJECT_LIST_REFRESH = 'projectList.refresh';
-export const PROJECT_LIST_LOAD = 'projectList.load';
-export const PROJECT_LIST_EDIT = 'projectList.editProject';
-export const PROJECT_LIST_DELETE = 'projectList.deleteProject';
+export const FEATURE_EXPERIMENTATION_CREATE_PROJECT = 'featureExperimentation.createProject';
+export const FEATURE_EXPERIMENTATION_PROJECT_LIST_COPY = 'featureExperimentation.projectList.copyProject';
+export const FEATURE_EXPERIMENTATION_PROJECT_LIST_REFRESH = 'featureExperimentation.projectList.refresh';
+export const FEATURE_EXPERIMENTATION_PROJECT_LIST_LOAD = 'featureExperimentation.projectList.load';
+export const FEATURE_EXPERIMENTATION_PROJECT_LIST_EDIT = 'featureExperimentation.projectList.editProject';
+export const FEATURE_EXPERIMENTATION_PROJECT_LIST_DELETE = 'featureExperimentation.projectList.deleteProject';
 
-//export const CAMPAIGN_LIST_ADD_CAMPAIGN = 'campaignList.addCampaign';
-//export const CAMPAIGN_LIST_EDIT_CAMPAIGN = 'campaignList.editCampaign';
-export const CAMPAIGN_LIST_OPEN_IN_BROWSER = 'campaignList.openInBrowser';
-export const CAMPAIGN_LIST_DELETE = 'campaignList.deleteCampaign';
-export const CAMPAIGN_LIST_COPY = 'campaignList.copyCampaign';
+export const FEATURE_EXPERIMENTATION_CAMPAIGN_LIST_OPEN_IN_BROWSER =
+  'featureExperimentation.campaignList.openInBrowser';
+export const FEATURE_EXPERIMENTATION_CAMPAIGN_LIST_DELETE = 'featureExperimentation.campaignList.deleteCampaign';
+export const FEATURE_EXPERIMENTATION_CAMPAIGN_LIST_COPY = 'featureExperimentation.campaignList.copyCampaign';
 
-//export const VARIATION_GROUP_LIST_ADD = 'variationGroupList.addVariationGroup';
-//export const VARIATION_GROUP_LIST_EDIT = 'variationGroupList.editVariationGroup';
-export const VARIATION_GROUP_LIST_DELETE = 'variationGroupList.deleteVariationGroup';
-export const VARIATION_GROUP_LIST_COPY = 'variationGroupList.copyVariationGroup';
+export const FEATURE_EXPERIMENTATION_VARIATION_GROUP_LIST_DELETE =
+  'featureExperimentation.variationGroupList.deleteVariationGroup';
+export const FEATURE_EXPERIMENTATION_VARIATION_GROUP_LIST_COPY =
+  'featureExperimentation.variationGroupList.copyVariationGroup';
 
-//export const VARIATION_LIST_ADD = 'variationList.addVariation';
-//export const VARIATION_LIST_EDIT = 'variationList.editVariation';
-export const VARIATION_LIST_DELETE = 'variationList.deleteVariation';
-export const VARIATION_LIST_COPY = 'variationList.copyVariation';
+export const FEATURE_EXPERIMENTATION_VARIATION_LIST_DELETE = 'featureExperimentation.variationList.deleteVariation';
+export const FEATURE_EXPERIMENTATION_VARIATION_LIST_COPY = 'featureExperimentation.variationList.copyVariation';
 
-export const FLAGSHIP_CREATE_FLAG = 'flagship.createFlag';
-export const FLAG_LIST_REFRESH = 'flagList.refresh';
-export const FLAG_LIST_LOAD = 'flagList.load';
-export const FLAG_LIST_EDIT = 'flagList.editFlag';
-export const FLAG_LIST_DELETE = 'flagList.deleteFlag';
-export const FLAG_LIST_COPY = 'flagList.copyFlag';
-export const FLAG_LIST_OPEN_IN_BROWSER = 'flagList.openInBrowser';
-export const TRIGGER_FLAG_COMPLETION = 'flagship.triggerFlagCompletion';
+export const FEATURE_EXPERIMENTATION_CREATE_FLAG = 'featureExperimentation.createFlag';
+export const FEATURE_EXPERIMENTATION_FLAG_LIST_REFRESH = 'featureExperimentation.flagList.refresh';
+export const FEATURE_EXPERIMENTATION_FLAG_LIST_LOAD = 'featureExperimentation.flagList.load';
+export const FEATURE_EXPERIMENTATION_FLAG_LIST_EDIT = 'featureExperimentation.flagList.editFlag';
+export const FEATURE_EXPERIMENTATION_FLAG_LIST_DELETE = 'featureExperimentation.flagList.deleteFlag';
+export const FEATURE_EXPERIMENTATION_FLAG_LIST_COPY = 'featureExperimentation.flagList.copyFlag';
+export const FEATURE_EXPERIMENTATION_FLAG_LIST_OPEN_IN_BROWSER = 'featureExperimentation.flagList.openInBrowser';
+export const FEATURE_EXPERIMENTATION_TRIGGER_FLAG_COMPLETION = 'featureExperimentation.triggerFlagCompletion';
 
-export const FLAGSHIP_CREATE_TARGETING_KEY = 'flagship.createTargetingKey';
-export const TARGETING_KEY_LIST_REFRESH = 'targetingKeyList.refresh';
-export const TARGETING_KEY_LIST_LOAD = 'targetingKeyList.load';
-export const TARGETING_KEY_LIST_EDIT = 'targetingKeyList.editTargetingKey';
-export const TARGETING_KEY_LIST_DELETE = 'targetingKeyList.deleteTargetingKey';
+export const FEATURE_EXPERIMENTATION_CREATE_TARGETING_KEY = 'featureExperimentation.createTargetingKey';
+export const FEATURE_EXPERIMENTATION_TARGETING_KEY_LIST_REFRESH = 'featureExperimentation.targetingKeyList.refresh';
+export const FEATURE_EXPERIMENTATION_TARGETING_KEY_LIST_LOAD = 'featureExperimentation.targetingKeyList.load';
+export const FEATURE_EXPERIMENTATION_TARGETING_KEY_LIST_EDIT =
+  'featureExperimentation.targetingKeyList.editTargetingKey';
+export const FEATURE_EXPERIMENTATION_TARGETING_KEY_LIST_DELETE =
+  'featureExperimentation.targetingKeyList.deleteTargetingKey';
 
-export const FLAGSHIP_CREATE_GOAL = 'flagship.createGoal';
-export const GOAL_LIST_REFRESH = 'goalList.refresh';
-export const GOAL_LIST_LOAD = 'goalList.load';
-export const GOAL_LIST_EDIT = 'goalList.editGoal';
-export const GOAL_LIST_DELETE = 'goalList.deleteGoal';
+export const FEATURE_EXPERIMENTATION_CREATE_GOAL = 'featureExperimentation.createGoal';
+export const FEATURE_EXPERIMENTATION_GOAL_LIST_REFRESH = 'featureExperimentation.goalList.refresh';
+export const FEATURE_EXPERIMENTATION_GOAL_LIST_LOAD = 'featureExperimentation.goalList.load';
+export const FEATURE_EXPERIMENTATION_GOAL_LIST_EDIT = 'featureExperimentation.goalList.editGoal';
+export const FEATURE_EXPERIMENTATION_GOAL_LIST_DELETE = 'featureExperimentation.goalList.deleteGoal';
 
-export const FIND_IN_FILE = 'flagsInFile.findInFile';
-export const ADD_FLAG = 'flagsInFile.addFlag';
-export const LIST_FLAG_IN_WORKSPACE = 'flagsInFile.listFlagInWorkspace';
+export const FEATURE_EXPERIMENTATION_FIND_IN_FILE = 'featureExperimentation.flagsInFile.findInFile';
+export const FEATURE_EXPERIMENTATION_ADD_FLAG = 'featureExperimentation.flagsInFile.addFlag';
+export const FEATURE_EXPERIMENTATION_LIST_FLAG_IN_WORKSPACE = 'featureExperimentation.flagsInFile.listFlagInWorkspace';
+
+// WEB EXP
+
+export const WEB_EXPERIMENTATION_CLEAR_CONFIG = 'webExperimentation.clearConfig';
+export const WEB_EXPERIMENTATION_SET_CREDENTIALS = 'webExperimentation.setCredentials';
+
+export const WEB_EXPERIMENTATION_QUICK_ACCESS_REFRESH = 'webExperimentation.quickAccess.refresh';
+
+export const WEB_EXPERIMENTATION_CREATE_MODIFICATION = 'webExperimentation.createModification';
+export const WEB_EXPERIMENTATION_MODIFICATION_LIST_REFRESH = 'webExperimentation.modificationList.refresh';
+export const WEB_EXPERIMENTATION_MODIFICATION_LIST_LOAD = 'webExperimentation.modificationList.load';
+export const WEB_EXPERIMENTATION_MODIFICATION_LIST_EDIT = 'webExperimentation.modificationList.editModification';
+export const WEB_EXPERIMENTATION_MODIFICATION_LIST_DELETE = 'webExperimentation.modificationList.deleteModification';
+export const WEB_EXPERIMENTATION_MODIFICATION_PULL_CODE = 'webExperimentation.modificationList.pullCode';
+export const WEB_EXPERIMENTATION_MODIFICATION_PUSH_CODE = 'webExperimentation.modificationList.pushCode';
+export const WEB_EXPERIMENTATION_MODIFICATION_ADD_MODIFICATION = 'webExperimentation.modificationList.addModification';
+export const WEB_EXPERIMENTATION_MODIFICATION_REFRESH_MODIFICATION =
+  'webExperimentation.modificationList.refreshModification';
+
+export const WEB_EXPERIMENTATION_MODIFICATION_DELETE_MODIFICATION =
+  'webExperimentation.modificationList.deleteModification';
+
+export const WEB_EXPERIMENTATION_CREATE_VARIATION = 'webExperimentation.createVariation';
+export const WEB_EXPERIMENTATION_VARIATION_LIST_REFRESH = 'webExperimentation.variationList.refresh';
+export const WEB_EXPERIMENTATION_VARIATION_LIST_LOAD = 'webExperimentation.variationList.load';
+export const WEB_EXPERIMENTATION_VARIATION_LIST_EDIT = 'webExperimentation.variationList.editVariation';
+export const WEB_EXPERIMENTATION_VARIATION_LIST_DELETE = 'webExperimentation.variationList.deleteVariation';
+export const WEB_EXPERIMENTATION_VARIATION_ADD_GLOBAL_CODE = 'webExperimentation.variationList.addGlobalCode';
+export const WEB_EXPERIMENTATION_VARIATION_PULL_GLOBAL_CODE_JS = 'webExperimentation.variationList.pullGlobalCodeJS';
+export const WEB_EXPERIMENTATION_VARIATION_PUSH_GLOBAL_CODE_JS = 'webExperimentation.variationList.pushGlobalCodeJS';
+export const WEB_EXPERIMENTATION_VARIATION_PULL_GLOBAL_CODE_CSS = 'webExperimentation.variationList.pullGlobalCodeCSS';
+export const WEB_EXPERIMENTATION_VARIATION_PUSH_GLOBAL_CODE_CSS = 'webExperimentation.variationList.pushGlobalCodeCSS';
+
+export const WEB_EXPERIMENTATION_CREATE_CAMPAIGN = 'webExperimentation.createCampaign';
+export const WEB_EXPERIMENTATION_CAMPAIGN_LIST_REFRESH = 'webExperimentation.campaignList.refresh';
+export const WEB_EXPERIMENTATION_CAMPAIGN_LIST_LOAD = 'webExperimentation.campaignList.load';
+export const WEB_EXPERIMENTATION_CAMPAIGN_GET_VARIATION = 'webExperimentation.campaignList.getVariation';
+export const WEB_EXPERIMENTATION_CAMPAIGN_GET_MODIFICATION = 'webExperimentation.campaignList.getModification';
+export const WEB_EXPERIMENTATION_CAMPAIGN_LIST_EDIT = 'webExperimentation.campaignList.editCampaign';
+export const WEB_EXPERIMENTATION_CAMPAIGN_LIST_DELETE = 'webExperimentation.campaignList.deleteCampaign';
+export const WEB_EXPERIMENTATION_CAMPAIGN_SET_CAMPAIGN = 'webExperimentation.campaignList.setCampaign';
+export const WEB_EXPERIMENTATION_CAMPAIGN_PULL_GLOBAL_CODE = 'webExperimentation.campaignList.pullGlobalCode';
+export const WEB_EXPERIMENTATION_CAMPAIGN_PUSH_GLOBAL_CODE = 'webExperimentation.campaignList.pushGlobalCode';
+export const WEB_EXPERIMENTATION_CAMPAIGN_ADD_GLOBAL_CODE = 'webExperimentation.campaignList.addGlobalCode';
+export const WEB_EXPERIMENTATION_GLOBAL_CODE_OPEN_FILE = 'webExperimentation.campaignList.globalCodeOpenFile';
+export const WEB_EXPERIMENTATION_ACCOUNT_GLOBAL_CODE_OPEN_FILE = 'webExperimentation.accountList.globalCodeOpenFile';
+
+export const WEB_EXPERIMENTATION_ACCOUNT_LIST_REFRESH = 'webExperimentation.accountList.refresh';
+export const WEB_EXPERIMENTATION_ACCOUNT_LIST_LOAD = 'webExperimentation.accountList.load';
+export const WEB_EXPERIMENTATION_ACCOUNT_LIST_SELECT = 'webExperimentation.accountList.selectAccount';
+export const WEB_EXPERIMENTATION_ACCOUNT_PULL_GLOBAL_CODE = 'webExperimentation.accountList.pullGlobalCode';
+export const WEB_EXPERIMENTATION_ACCOUNT_PUSH_GLOBAL_CODE = 'webExperimentation.accountList.pushGlobalCode';
+export const WEB_EXPERIMENTATION_ACCOUNT_ADD_GLOBAL_CODE = 'webExperimentation.accountList.addGlobalCode';

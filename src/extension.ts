@@ -2,7 +2,7 @@
 import * as fs from 'fs';
 import * as vscode from 'vscode';
 import { CliDownloader, CliVersion } from './cli/cliDownloader';
-import { FLAG_IN_FILE_REFRESH } from './commands/const';
+import { FEATURE_EXPERIMENTATION_CLEAR_CONFIG, FEATURE_EXPERIMENTATION_FLAG_IN_FILE_REFRESH } from './commands/const';
 import { StateConfiguration } from './stateConfiguration';
 import { register as registerCommands } from './register';
 
@@ -18,9 +18,12 @@ async function handleActiveTextEditorChange() {
     const activeEditor = vscode.window.activeTextEditor;
 
     if (activeEditor) {
-      await vscode.commands.executeCommand(FLAG_IN_FILE_REFRESH, activeEditor?.document.uri.path);
+      await vscode.commands.executeCommand(
+        FEATURE_EXPERIMENTATION_FLAG_IN_FILE_REFRESH,
+        activeEditor?.document.uri.path,
+      );
     } else {
-      await vscode.commands.executeCommand(FLAG_IN_FILE_REFRESH);
+      await vscode.commands.executeCommand(FEATURE_EXPERIMENTATION_FLAG_IN_FILE_REFRESH);
     }
   }, 100);
 }
@@ -28,7 +31,7 @@ async function handleActiveTextEditorChange() {
 export async function activate(context: vscode.ExtensionContext) {
   const stateConfig = new StateConfiguration(context);
 
-  const binaryDir = `${context.asAbsolutePath('flagship')}/${CliVersion}`;
+  const binaryDir = `${context.asAbsolutePath('abtasty-cli')}/${CliVersion}`;
 
   fs.access(binaryDir, fs.constants.F_OK, async (err) => {
     if (err) {

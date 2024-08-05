@@ -115,6 +115,9 @@ export class MultiStepInput {
               reject(shouldResume && (await shouldResume()) ? InputFlowAction.resume : InputFlowAction.cancel);
             })().catch(reject);
           }),
+          input.onDidChangeValue((value) => {
+            input.items = items.filter((item) => item.label.toLowerCase().includes(value.toLowerCase()));
+          }),
         );
         if (this.current) {
           this.current.dispose();
