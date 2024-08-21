@@ -4,7 +4,7 @@ import {
   WEB_EXPERIMENTATION_ACCOUNT_LIST_REFRESH,
   WEB_EXPERIMENTATION_GLOBAL_CODE_OPEN_FILE,
 } from '../../commands/const';
-import { ACCOUNT, CIRCLE_FILLED, CURRENT_ACCOUNT, FILE_CODE } from '../../icons';
+import { ACCOUNT, CIRCLE_FILLED, CODE, CURRENT_ACCOUNT, FILE_CODE, INFO } from '../../icons';
 import { AccountWE, ItemResource } from '../../model';
 import { AccountWEStore } from '../../store/webExperimentation/AccountStore';
 import { ResourceArgument } from './CampaignList';
@@ -88,11 +88,17 @@ export class AccountListProvider implements vscode.TreeDataProvider<vscode.TreeI
         });
 
       if (accountDetails.length !== 0) {
-        accountData.push(new AccountTreeItem('Info/Details', undefined, accountDetails));
+        accountData.push(new AccountTreeItem('Info/Details', undefined, accountDetails, undefined, INFO));
       }
 
       accountData.push(
-        new GlobalCodeAccount('Account Global Code', a.id, [new AccountTreeItem(NO_RESOURCE_FOUND, 0, undefined)]),
+        new GlobalCodeAccount(
+          'Account Global Code',
+          a.id,
+          [new AccountTreeItem(NO_RESOURCE_FOUND, 0, undefined)],
+          undefined,
+          CODE,
+        ),
       );
 
       const account = new AccountItem(a.name, a.id, currentAuth, a.identifier, accountData, undefined);
