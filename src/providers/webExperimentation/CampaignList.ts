@@ -6,14 +6,26 @@ import {
   WEB_EXPERIMENTATION_CAMPAIGN_LIST_REFRESH,
 } from '../../commands/const';
 import {
+  BEAKER,
+  BEAKER_ACTIVE,
+  BEAKER_INTERRUPTED,
+  BEAKER_PAUSED,
+  BREAKPOINTS_ACTIVATE,
   CIRCLE_FILLED,
   CIRCLE_OUTLINE,
+  CODE,
   FILE_CODE,
+  INFO,
   MILESTONE,
   MILESTONE_ACTIVE,
   MILESTONE_INTERRUPTED,
   MILESTONE_PAUSED,
+  PENCIL,
   ROCKET,
+  TARGET,
+  TARGET_ACTIVE,
+  TARGET_INTERRUPTED,
+  TARGET_PAUSED,
 } from '../../icons';
 import { CampaignWE, ItemResource, ModificationWE } from '../../model';
 import { CampaignStore } from '../../store/webExperimentation/CampaignStore';
@@ -99,13 +111,8 @@ export class CampaignListProvider implements vscode.TreeDataProvider<vscode.Tree
     return element.children;
   }
 
-  private mappingTree(campaignList: CampaignWE[]) {
+  private mappingCampaign(campaignList: CampaignWE[]): CampaignTreeItem[] {
     const campaignTreeList: CampaignTreeItem[] = [];
-    const abCampaigns: CampaignTreeItem[] = [];
-    const masterSegmentCampaigns: CampaignTreeItem[] = [];
-    const subSegmentCampaigns: CampaignTreeItem[] = [];
-    const multiPageCampaigns: CampaignTreeItem[] = [];
-    const multiVariateCampaigns: CampaignTreeItem[] = [];
 
     const accountParent = { id: Number(this.currentAccountId) } as Parent;
 
@@ -115,49 +122,58 @@ export class CampaignListProvider implements vscode.TreeDataProvider<vscode.Tree
       const campaignData: CampaignTreeItem[] = [];
       let subTests: CampaignTreeItem[] = [];
       const campaignDetails = Object.entries(c)
-        .filter(([key, value]) => key !== 'variations' && key !== 'global_code' && key !== 'source_code')
+        .filter(
+          ([key, value]) =>
+            key !== 'variations' &&
+            key !== 'global_code' &&
+            key !== 'source_code' &&
+            key !== 'sub_tests' &&
+            value !== null,
+        )
         .map(([key, value]) => {
           if (key === 'traffic') {
-            const traffic = Object.entries(c.traffic).map(([key, value]) => {
-              return new SimpleItem(key, undefined, value, undefined, undefined);
-            });
-            return new SimpleItem(key, undefined, value, traffic, undefined);
+            const traffic = Object.entries(c.traffic)
+              .filter(([key, value]) => key === 'value')
+              .map(([key, value]) => {
+                return new SimpleItem(key, undefined, value, undefined, undefined);
+              });
+            return new SimpleItem(key, undefined, undefined, traffic, undefined);
           }
           if (key === 'created_at') {
-            const traffic = Object.entries(c.created_at).map(([key, value]) => {
+            const createdAt = Object.entries(c.created_at).map(([key, value]) => {
               return new SimpleItem(key, undefined, value, undefined, undefined);
             });
-            return new SimpleItem(key, undefined, value, traffic, undefined);
+            return new SimpleItem(key, undefined, undefined, createdAt, undefined);
           }
           if (key === 'live_at') {
-            const traffic = Object.entries(c.live_at).map(([key, value]) => {
+            const liveAt = Object.entries(c.live_at).map(([key, value]) => {
               return new SimpleItem(key, undefined, value, undefined, undefined);
             });
-            return new SimpleItem(key, undefined, value, traffic, undefined);
+            return new SimpleItem(key, undefined, undefined, liveAt, undefined);
           }
           if (key === 'last_pause') {
-            const traffic = Object.entries(c.last_pause).map(([key, value]) => {
+            const lastPause = Object.entries(c.last_pause).map(([key, value]) => {
               return new SimpleItem(key, undefined, value, undefined, undefined);
             });
-            return new SimpleItem(key, undefined, value, traffic, undefined);
+            return new SimpleItem(key, undefined, undefined, lastPause, undefined);
           }
           if (key === 'last_play') {
-            const traffic = Object.entries(c.last_play).map(([key, value]) => {
+            const lastPlay = Object.entries(c.last_play).map(([key, value]) => {
               return new SimpleItem(key, undefined, value, undefined, undefined);
             });
-            return new SimpleItem(key, undefined, value, traffic, undefined);
+            return new SimpleItem(key, undefined, undefined, lastPlay, undefined);
           }
           if (key === 'start_on') {
-            const traffic = Object.entries(c.start_on).map(([key, value]) => {
+            const startOn = Object.entries(c.start_on).map(([key, value]) => {
               return new SimpleItem(key, undefined, value, undefined, undefined);
             });
-            return new SimpleItem(key, undefined, value, traffic, undefined);
+            return new SimpleItem(key, undefined, undefined, startOn, undefined);
           }
           if (key === 'reset_at') {
-            const traffic = Object.entries(c.reset_at).map(([key, value]) => {
+            const resetAt = Object.entries(c.reset_at).map(([key, value]) => {
               return new SimpleItem(key, undefined, value, undefined, undefined);
             });
-            return new SimpleItem(key, undefined, value, traffic, undefined);
+            return new SimpleItem(key, undefined, undefined, resetAt, undefined);
           }
           return new SimpleItem(key, undefined, value, undefined, undefined);
         });
@@ -170,22 +186,32 @@ export class CampaignListProvider implements vscode.TreeDataProvider<vscode.Tree
         c.variations.flatMap((v) => v.id),
         campaignData,
         accountParent,
+        [],
+        !!c.master,
       );
 
       if (c.variations) {
         variations = c.variations.map((v) => {
           const vData = Object.entries(v)
-            .filter(([key, value]) => key !== 'components')
+            .filter(
+              ([key, value]) =>
+                key !== 'components' &&
+                key !== 'description' &&
+                key !== 'type' &&
+                key !== 'visual_editor' &&
+                key !== 'code_editor',
+            )
             .map(([key, value]) => {
               return new SimpleItem(key, undefined, value, undefined, undefined);
             });
           const variationParent = { id: v.id, parent: campaignParent } as Parent;
-          const variationDetails = new CampaignTreeItem('Info/Details', undefined, [...vData]);
+          const variationDetails = new CampaignTreeItem('Info/Details', undefined, [...vData], undefined, INFO);
           const variationGlobalCode = new GlobalCodeVariation(
             'Variation Global Code',
             v.id,
             [new CampaignTreeItem(NO_RESOURCE_FOUND, 0, undefined)],
             variationParent,
+            CODE,
           );
           return new VariationWEItem(
             v.name,
@@ -194,7 +220,7 @@ export class CampaignListProvider implements vscode.TreeDataProvider<vscode.Tree
               variationDetails,
               variationGlobalCode,
               new ModificationWETree(
-                'Modifications',
+                'Element JS',
                 undefined,
                 [new CampaignTreeItem(NO_RESOURCE_FOUND, 0, undefined)],
                 variationParent,
@@ -207,121 +233,93 @@ export class CampaignListProvider implements vscode.TreeDataProvider<vscode.Tree
       }
 
       if (c.sub_tests) {
-        subTests = this.mappingTree(c.sub_tests);
+        subTests = this.mappingCampaign(c.sub_tests);
       }
 
       if (campaignDetails.length !== 0) {
-        campaignData.push(new CampaignTreeItem('Info/Details', undefined, campaignDetails));
+        campaignData.push(new CampaignTreeItem('Info/Details', undefined, campaignDetails, undefined, INFO));
       }
 
-      if (variations.length !== 0) {
-        campaignData.push(new CampaignTreeItem('Variations', undefined, variations));
+      if (variations.length !== 0 && subTests.length === 0) {
+        campaignData.push(new CampaignTreeItem('Variations', undefined, variations, undefined, BREAKPOINTS_ACTIVATE));
       }
 
       if (subTests.length !== 0) {
-        campaignData.push(new CampaignTreeItem('Sub Tests', undefined, subTests));
+        campaignData.push(new CampaignTreeItem('Sub Tests', undefined, subTests, undefined, BEAKER));
       }
 
-      campaignData.push(
-        new GlobalCodeCampaign(
-          'Campaign Global Code',
-          c.id,
-          [new CampaignTreeItem(NO_RESOURCE_FOUND, 0, undefined)],
-          campaignParent,
-        ),
-      );
-
-      /* campaignWEItem.variationIds = c.variations.flatMap((v) => v.id);
-      campaignWEItem.children = campaignData;
-      campaignWEItem.parent = accountParent; */
-
-      switch (c.type) {
-        case 'ab':
-          abCampaigns.push(campaignWEItem);
-          break;
-        case 'mastersegment':
-          masterSegmentCampaigns.push(campaignWEItem);
-          break;
-
-        case 'subsegment':
-          subSegmentCampaigns.push(
-            new CampaignWEItem(
-              c.name,
-              c.id,
-              c.type,
-              c.state,
-              c.variations.flatMap((v) => v.id),
-              campaignData,
-              accountParent,
-            ),
-          );
-          break;
-
-        case 'multipage':
-          multiPageCampaigns.push(
-            new CampaignWEItem(
-              c.name,
-              c.id,
-              c.type,
-              c.state,
-              c.variations.flatMap((v) => v.id),
-              campaignData,
-              accountParent,
-            ),
-          );
-          break;
-
-        case 'multivariate':
-          multiVariateCampaigns.push(
-            new CampaignWEItem(
-              c.name,
-              c.id,
-              c.type,
-              c.state,
-              c.variations.flatMap((v) => v.id),
-              campaignData,
-              accountParent,
-            ),
-          );
-          break;
+      if (subTests.length === 0) {
+        campaignData.push(
+          new GlobalCodeCampaign(
+            'Campaign Global Code',
+            c.id,
+            [new CampaignTreeItem(NO_RESOURCE_FOUND, 0, undefined)],
+            campaignParent,
+            CODE,
+          ),
+        );
       }
+
+      campaignTreeList.push(campaignWEItem);
       return;
     });
 
-    if (abCampaigns.length !== 0) {
-      campaignTreeList.push(
-        new CampaignTreeItem(`AB Test - ${abCampaigns.length} campaign(s)`, undefined, abCampaigns),
-      );
-    }
+    return campaignTreeList;
+  }
 
-    if (masterSegmentCampaigns.length !== 0) {
+  private mappingTree(campaignList: CampaignWE[]) {
+    const campaignTreeList: CampaignTreeItem[] = [];
+    const webExperimentationTreeList: CampaignTreeItem[] = [];
+    const personalizationTreeList: CampaignTreeItem[] = [];
+    const subSegmentCampaigns: CampaignTreeItem[] = [];
+
+    const campaignWEItem = this.mappingCampaign(campaignList);
+    campaignWEItem.map((c: CampaignTreeItem) => {
+      if (c instanceof CampaignWEItem && !c.hasMaster) {
+        switch (c.type) {
+          case 'ab':
+            webExperimentationTreeList.push(c);
+            break;
+
+          case 'mastersegment':
+            personalizationTreeList.push(c);
+            break;
+
+          case 'subsegment':
+            subSegmentCampaigns.push(c);
+            break;
+
+          case 'multipage':
+            webExperimentationTreeList.push(c);
+            break;
+
+          case 'multivariate':
+            webExperimentationTreeList.push(c);
+            break;
+        }
+      }
+    });
+
+    if (webExperimentationTreeList.length !== 0) {
       campaignTreeList.push(
         new CampaignTreeItem(
-          `Master Segment - ${masterSegmentCampaigns.length} campaign(s)`,
+          `Web experimentation - ${webExperimentationTreeList.length} campaign(s)`,
           undefined,
-          masterSegmentCampaigns,
+          webExperimentationTreeList,
+          undefined,
+          BEAKER,
         ),
       );
     }
 
-    if (false && subSegmentCampaigns.length !== 0) {
-      campaignTreeList.push(
-        new CampaignTreeItem(`Sub Segment - ${subSegmentCampaigns.length} campaign(s)`, undefined, subSegmentCampaigns),
-      );
-    }
-
-    if (false && multiPageCampaigns.length !== 0) {
-      campaignTreeList.push(
-        new CampaignTreeItem(`Multi Page - ${multiPageCampaigns.length} campaign(s)`, undefined, multiPageCampaigns),
-      );
-    }
-
-    if (false && multiVariateCampaigns.length !== 0) {
+    if (personalizationTreeList.length !== 0) {
       campaignTreeList.push(
         new CampaignTreeItem(
-          `Multi Variate - ${multiVariateCampaigns.length} campaign(s)`,
+          `Personalization - ${personalizationTreeList.length} campaign(s)`,
           undefined,
-          multiVariateCampaigns,
+          personalizationTreeList,
+          undefined,
+          TARGET,
         ),
       );
     }
@@ -331,11 +329,13 @@ export class CampaignListProvider implements vscode.TreeDataProvider<vscode.Tree
 
   private async getRefreshedCampaigns() {
     const campaignList = await this.campaignStore.refreshCampaign();
+    campaignList.sort((a, b) => b.id - a.id);
     this._tree = this.mappingTree(campaignList);
   }
 
   private getLoadedCampaigns() {
     const campaignList = this.campaignStore.loadCampaign();
+    campaignList.sort((a, b) => b.id - a.id);
     this._tree = this.mappingTree(campaignList);
   }
 }
@@ -368,6 +368,7 @@ export class CampaignWEItem extends CampaignTreeItem {
   public variationIds?: number[] | undefined;
   public children: CampaignTreeItem[] | undefined;
   public parent: any;
+  public hasMaster: any;
 
   constructor(
     public readonly name?: string,
@@ -378,6 +379,7 @@ export class CampaignWEItem extends CampaignTreeItem {
     children?: CampaignTreeItem[],
     parent?: any,
     modifications?: ModificationWE[],
+    hasMaster?: boolean,
   ) {
     super(name!, resourceId!, children, parent);
     this.tooltip = `Type: ${this.resourceId}`;
@@ -386,20 +388,38 @@ export class CampaignWEItem extends CampaignTreeItem {
     this.variationIds = variationIds;
     this.children = children;
     this.parent = parent;
+    this.hasMaster = hasMaster;
 
-    switch (state) {
-      case 'play':
-        this.iconPath = MILESTONE_ACTIVE;
-        break;
-      case 'pause':
-        this.iconPath = MILESTONE_PAUSED;
-        break;
-      case 'interrupt':
-        this.iconPath = MILESTONE_INTERRUPTED;
-        break;
-      default:
-        this.iconPath = MILESTONE;
-        break;
+    if (type === 'mastersegment') {
+      switch (state) {
+        case 'play':
+          this.iconPath = TARGET_ACTIVE;
+          break;
+        case 'pause':
+          this.iconPath = TARGET_PAUSED;
+          break;
+        case 'interrupt':
+          this.iconPath = TARGET_INTERRUPTED;
+          break;
+        default:
+          this.iconPath = TARGET;
+          break;
+      }
+    } else {
+      switch (state) {
+        case 'play':
+          this.iconPath = BEAKER_ACTIVE;
+          break;
+        case 'pause':
+          this.iconPath = BEAKER_PAUSED;
+          break;
+        case 'interrupt':
+          this.iconPath = BEAKER_INTERRUPTED;
+          break;
+        default:
+          this.iconPath = BEAKER;
+          break;
+      }
     }
   }
 
@@ -645,6 +665,7 @@ export class ModificationWEItem extends CampaignTreeItem {
     this.tooltip = `- id: ${this.resourceId}`;
     this.description = `- id: ${this.resourceId}`;
     this.modificationTree = modificationTree;
+    this.iconPath = PENCIL;
   }
 
   contextValue = 'modificationWEItem';
@@ -653,6 +674,7 @@ export class ModificationWEItem extends CampaignTreeItem {
 export class ModificationWETree extends CampaignTreeItem {
   constructor(public readonly name?: string, resourceId?: number, children?: CampaignTreeItem[], parent?: any) {
     super(name!, resourceId, children, parent);
+    this.iconPath = PENCIL;
   }
 
   contextValue = 'modificationWE';
