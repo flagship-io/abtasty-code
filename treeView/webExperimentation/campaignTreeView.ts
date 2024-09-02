@@ -21,6 +21,7 @@ import {
 import { Cli } from '../../src/cli/cmd/webExperimentation/Cli';
 import { NO_GLOBAL_CODE_FOUND, NO_RESOURCE_FOUND } from '../../src/const';
 import { ModificationWE } from '../../src/model';
+import { CODE, INFO } from '../../src/icons';
 
 export function findAbtastyFolder(rootPath: string) {
   const dirs = fs.readdirSync(rootPath).filter((file) => fs.statSync(path.join(rootPath, file)).isDirectory());
@@ -87,7 +88,7 @@ export class CampaignTreeView {
                 m.name,
                 m.id,
                 [
-                  new CampaignTreeItem('Info/Details', undefined, modificationDetails, campaignId),
+                  new CampaignTreeItem('Info/Details', undefined, modificationDetails, campaignId, INFO),
                   new CodeModification(
                     'Modification code',
                     m.id,
@@ -95,6 +96,8 @@ export class CampaignTreeView {
                     (element.parent as Parent).parent.id,
                     m.variation_id,
                     (element.parent as Parent).parent.parent.id,
+                    undefined,
+                    CODE,
                   ),
                 ],
                 campaignId,

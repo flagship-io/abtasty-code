@@ -11,13 +11,6 @@ import {
   WEB_EXPERIMENTATION_CAMPAIGN_LIST_LOAD,
   WEB_EXPERIMENTATION_CAMPAIGN_PULL_GLOBAL_CODE,
   WEB_EXPERIMENTATION_CAMPAIGN_PUSH_GLOBAL_CODE,
-  WEB_EXPERIMENTATION_CAMPAIGN_SET_CAMPAIGN,
-  WEB_EXPERIMENTATION_MODIFICATION_LIST_DELETE,
-  WEB_EXPERIMENTATION_MODIFICATION_LIST_LOAD,
-  WEB_EXPERIMENTATION_MODIFICATION_LIST_REFRESH,
-  WEB_EXPERIMENTATION_VARIATION_LIST_DELETE,
-  WEB_EXPERIMENTATION_VARIATION_LIST_LOAD,
-  WEB_EXPERIMENTATION_VARIATION_LIST_REFRESH,
   WEB_EXPERIMENTATION_VARIATION_PULL_GLOBAL_CODE_CSS,
   WEB_EXPERIMENTATION_VARIATION_PULL_GLOBAL_CODE_JS,
   WEB_EXPERIMENTATION_VARIATION_PUSH_GLOBAL_CODE_CSS,
@@ -359,7 +352,16 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
     vscode.commands.registerCommand(
       WEB_EXPERIMENTATION_ACCOUNT_PULL_GLOBAL_CODE,
       async (fileItem: ResourceArgument) => {
-        await accountStore.pullAccountGlobalCode(fileItem.accountId!, true, true);
+        const picked = await vscode.window.showQuickPick(['yes', 'no'], {
+          title: `Pull account global code for the ID ${fileItem.accountId!}`,
+          placeHolder: 'Do you confirm ?',
+          ignoreFocusOut: true,
+        });
+
+        if (picked === 'yes') {
+          await accountStore.pullAccountGlobalCode(fileItem.accountId!, true, true);
+        }
+
         return;
       },
     ),
@@ -367,7 +369,16 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
     vscode.commands.registerCommand(
       WEB_EXPERIMENTATION_ACCOUNT_PUSH_GLOBAL_CODE,
       async (fileItem: ResourceArgument) => {
-        await accountStore.pushAccountGlobalCode(fileItem.accountId!, fileItem.filePath);
+        const picked = await vscode.window.showQuickPick(['yes', 'no'], {
+          title: `Push account global code for the ID ${fileItem.accountId!}`,
+          placeHolder: 'Do you confirm ?',
+          ignoreFocusOut: true,
+        });
+
+        if (picked === 'yes') {
+          await accountStore.pushAccountGlobalCode(fileItem.accountId!, fileItem.filePath);
+        }
+
         return;
       },
     ),

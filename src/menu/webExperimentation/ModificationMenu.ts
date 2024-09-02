@@ -48,23 +48,12 @@ export async function addModificationInputBox(resource: ModificationWETree, cli:
 }
 
 async function inputModification(input: MultiStepInput, modif: any) {
-  modif.name = await input.showInputBox({
-    title: 'Modification name',
-    placeholder: 'Modification name',
-    step: 1,
-    totalSteps: 2,
-    shouldResume,
-    value: '',
-    ignoreFocusOut: true,
-    prompt: 'Enter your modification name',
-    validate: (value) => validateCredentials(value),
-  });
-
+  modif.name = 'Element JS';
   modif.selector = await input.showInputBox({
     title: 'Modification selector',
     placeholder: 'Modification selector',
-    step: 2,
-    totalSteps: 2,
+    step: 1,
+    totalSteps: 1,
     shouldResume,
     value: '',
     ignoreFocusOut: true,

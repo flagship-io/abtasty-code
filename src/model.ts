@@ -85,6 +85,7 @@ export type CampaignWE = {
   start_on: DateWE;
   stop_on: DateWE;
   reset_at: DateWE;
+  master: CampaignWE;
 };
 
 export type Traffic = {

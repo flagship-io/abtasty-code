@@ -71,6 +71,7 @@
       "abtasty": [
         {
           "id": "configWelcome",
+          "type": "webview",
           "name": "Configure your extension",
           "when": "abtasty:explorer == welcomePage"
         },
@@ -123,20 +124,14 @@
         }
       ]
     },
-    "viewsWelcome": [
-      {
-        "view": "configWelcome",
-        "contents": "Welcome to AB Tasty !\n Here are your first steps into our extension which will help you work with us.\nFor Feature experimentation, you have to set your credentials to connect your account\n[Configure Feature Exp](command:featureExperimentation.setCredentials)\n [Read our docs](https://docs.developers.flagship.io/docs/flagship-code) to learn more about how to use the Flagship extension.\nIf you need some help to understand how to retrieve your IDs [here are all the information you need](https://flagship.zendesk.com/hc/en-us/articles/4499017687708--Acting-on-your-account-remotely).\n If you need some help to setup a JSON file to store your credentials [here are all the information you need](https://docs.developers.flagship.io/docs/cli-configure).\nFor Web experimentation, you have to sign on\n[Configure Web Exp](command:webExperimentation.setCredentials)\n [Read our docs](https://docs.developers.flagship.io/docs/flagship-code) to learn more about how to use the Flagship extension."
-      }
-    ],
     "commands": [
       {
         "command": "featureExperimentation.clearConfig",
-        "title": "Feature Experimentation: Clear all configurations"
+        "title": "AB Tasty: Clear all configurations"
       },
       {
         "command": "abtasty.checkCliVersion",
-        "title": "Feature Experimentation: Check CLI version"
+        "title": "AB Tasty: Check CLI version"
       },
       {
         "command": "featureExperimentation.openBrowser",
@@ -817,6 +812,7 @@
   "dependencies": {
     "axios": "^1.3.5",
     "rimraf": "^5.0.0",
-    "tar-fs": "^3.0.3"
+    "tar-fs": "^3.0.3",
+    "@vscode/webview-ui-toolkit": "^1.4.0"
   }
 }

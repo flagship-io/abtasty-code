@@ -10,9 +10,11 @@ import configureWebExperimentationCmd from './commands/configureWebExperimentati
 import { featureExpExtensionReload } from './featureExpExtensionReload';
 import { WEB_EXPERIMENTATION } from './services/webExperimentation/const';
 import { webExpExtensionReload } from './webExpExtensionReload';
+import { WebviewViewProvider } from './providers/welcomeWebview';
 
 export async function register(context: vscode.ExtensionContext, stateConfig: StateConfiguration): Promise<void> {
   const outputChannel = vscode.window.createOutputChannel('AB Tasty', { log: true });
+  const webViewProvider = new WebviewViewProvider(context);
 
   const cliFE = new FEATURE_EXPERIMENTATION_CLI(context);
   const cliWE = new WEB_EXPERIMENTATION_CLI(context, outputChannel);
@@ -31,4 +33,6 @@ export async function register(context: vscode.ExtensionContext, stateConfig: St
     configureWebExperimentationCmd(context, cliWE),
     webExpExtensionReload(context, stateConfig, cliWE),
   ]);
+
+  context.subscriptions.push(vscode.window.registerWebviewViewProvider('configWelcome', webViewProvider));
 }
