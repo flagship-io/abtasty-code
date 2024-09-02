@@ -4,15 +4,17 @@
 
 > ⚠️ **Beta phase**
 >
-> Please note that as a beta phase, it may still contain some bugs and imperfections. Your feedback is instrumental in helping us identify and resolve any issues, so don't hesitate to report them by mail product.feedback@abtasty.com or open a ticket issue at [Github issues](https://github.com/flagship-io/flagship-code/issues)
+> Please note that as a beta phase, it may still contain some bugs and imperfections. Your feedback is instrumental in helping us identify and resolve any issues, so don't hesitate to report them by mail product.feedback@abtasty.com or open a ticket issue at [Github issues](https://github.com/flagship-io/abtasty-code/issues)
 
 ## Overview
 
-[Flagship](https://www.abtasty.com/feature-experimentation) optimization platform lets you manage, release, and experiment with features across all codebase and devices to drive growth with every deployment. This extension is designed to enhance your productivity within the VSCode environment, it offers a comprehensive set of utilities that simplify the management and utilization of feature flags using Flagship and let you handle most aspects of feature flag workflows directly within VSCode, eliminating the need to switch between your coding environment and the platform.
+[Web Experimentation & Personalization](https://www.abtasty.com/feature-experimentation) provides a range of tools and features designed to help companies improve user engagement, conversion rates, and overall customer satisfaction. This extension is designed to enhance your productivity within the VSCode environment, it offers a comprehensive set of utilities that simplify the management and utilization of campaigns(Tests) and let you handle aspects of campaigns global code directly within VSCode, eliminating the need to switch between your coding environment and the platform.
 
-![Overview screen](./media/screen.png)
+[Feature Experimentation & Rollout](https://www.abtasty.com/feature-experimentation) optimization platform lets you manage, release, and experiment with features across all codebase and devices to drive growth with every deployment. This extension is designed to enhance your productivity within the VSCode environment, it offers a comprehensive set of utilities that simplify the management and utilization of feature flags using Flagship and let you handle most aspects of feature flag workflows directly within VSCode, eliminating the need to switch between your coding environment and the platform.
 
-## Features
+## Features for Web experimentation
+
+## Features for Feature experimentation
 
 - Manage your configurations which it a combination of the Flagship Client ID, Client Secret, Account ID, Account Environment ID (To set up your credentials follow these [instructions](https://flagship.zendesk.com/hc/en-us/articles/4499017687708--Acting-on-your-account-remotely) or check this [documentation](https://docs.developers.flagship.io/docs/manage-configurations#overview)).
   To create a configuration:
