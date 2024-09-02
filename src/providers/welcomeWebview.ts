@@ -39,16 +39,12 @@ export class WebviewViewProvider implements vscode.WebviewViewProvider {
     );
 
     const configureUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this.context.extensionUri, 'src', 'scripts', 'configure.js'),
+      vscode.Uri.joinPath(this.context.extensionUri, 'scripts', 'configure.js'),
     );
 
-    const scriptUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this.context.extensionUri, 'src', 'scripts', 'script.js'),
-    );
+    const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'scripts', 'script.js'));
 
-    const styleUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this.context.extensionUri, 'src', 'scripts', 'styles.css'),
-    );
+    const styleUri = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'scripts', 'styles.css'));
 
     // Use a nonce to only allow a specific script to be run.
     const nonce = getNonce();
