@@ -296,14 +296,6 @@ export class AuthenticationMenu {
       return `Invalid ${credentialAttribute}`;
     }
 
-    if (credentialAttribute === 'ClientID' && !value.match(/^\w{53}$/g)) {
-      return `Invalid ${credentialAttribute}`;
-    }
-
-    if (credentialAttribute === 'ClientSecret' && !value.match(/^[a-zA-Z0-9]{50}$/g)) {
-      return `Invalid ${credentialAttribute}`;
-    }
-
     if (value === '' || value.match(/[^a-zA-Z\d\-\_]/g)) {
       return `Invalid ${credentialAttribute}`;
     }
