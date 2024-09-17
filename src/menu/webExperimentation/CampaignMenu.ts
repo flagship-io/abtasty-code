@@ -10,7 +10,7 @@ export async function deleteCampaignInputBox(campaign: CampaignWEItem, campaignS
     ignoreFocusOut: true,
   });
   if (picked === 'yes') {
-    const campaignId = Number(campaign.id!);
+    const campaignId = campaign.resourceId!;
     await campaignStore.deleteCampaign(campaignId);
     return;
   }
