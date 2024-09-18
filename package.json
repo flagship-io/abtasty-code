@@ -20,7 +20,7 @@
   "contributes": {
     "configuration": {
       "type": "object",
-      "title": "Flagship",
+      "title": "Abtasty",
       "properties": {
         "abtasty.baseUri": {
           "type": "string",
@@ -34,7 +34,7 @@
         "abtasty.featureExperimentation.flagsInFile": {
           "type": "boolean",
           "default": "",
-          "description": "Flagship Flags in File"
+          "description": "Feature Flags in File"
         },
         "abtasty.featureExperimentation.authenticationList": {
           "type": "Authentication[]",

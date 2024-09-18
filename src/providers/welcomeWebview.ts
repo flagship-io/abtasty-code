@@ -84,12 +84,12 @@ export class WebviewViewProvider implements vscode.WebviewViewProvider {
           <div class="useful-links">
             <h2>Useful links</h2>
             <ul id="web-links">
-              <li><a href="https://abtasty.com">👉 Using the Web Experimentation & Personalization</a></li>
-              <li><a href="https://abtasty.com">👉 Retrieving your IDs</a></li>
+              <li><a href="https://docs.developers.flagship.io/docs/visual-studio-code-abtasty-extension-web-experimentation">👉 Using the Web Experimentation & Personalization</a></li>
+              <li><a href="https://app2.abtasty.com/settings/public-api">👉 Retrieving your IDs</a></li>
             </ul>
             <ul id="feature-links" style="display:none;">
-              <li><a href="https://google.com">👉 Using the Feature Experimentation & Rollout extension</a></li>
-              <li><a href="https://google.com">👉 Retrieving your IDs</a></li>
+              <li><a href="https://docs.developers.flagship.io/docs/visual-studio-code-abtasty-extension-feature-experimentation">👉 Using the Feature Experimentation & Rollout extension</a></li>
+              <li><a href="https://flagship.zendesk.com/hc/en-us/articles/4499017687708--Acting-on-your-account-remotely">👉 Retrieving your IDs</a></li>
             </ul>
           </div>
           

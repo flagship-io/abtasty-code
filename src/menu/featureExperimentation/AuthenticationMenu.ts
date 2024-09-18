@@ -231,7 +231,7 @@ export class AuthenticationMenu {
       }
     } catch (e) {
       vscode.window.showErrorMessage('[AB Tasty] No such file or directory');
-      console.error(`[AB Tasty] Failed configuring Flagship Extension(provider): File or directory might not exist`);
+      console.error(`[AB Tasty] Failed configuring AB Tasty Extension(provider): File or directory might not exist`);
       this.cancelMode = true;
       return;
     }
