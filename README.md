@@ -45,6 +45,11 @@ For element JS code:
 ## Feature experimentation
 
 - Manage your configurations which it a combination of the Feature experimentation Client ID, Client Secret, Account ID, Account Environment ID (To set up your credentials follow these [instructions](https://flagship.zendesk.com/hc/en-us/articles/4499017687708--Acting-on-your-account-remotely) or check this [documentation](https://docs.developers.flagship.io/docs/visual-studio-code-abtasty-extension-fe-manage-configurations)).
+
+  To set up your credentials
+
+  ![Set Feature experimentation credentials](./media/feat-exp/createFeCred.gif)
+
   To create a configuration:
 
   ![Create configuration](./media/feat-exp/createConfiguration.gif)
