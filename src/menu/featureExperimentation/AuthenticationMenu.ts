@@ -211,6 +211,7 @@ export class AuthenticationMenu {
           : uriFile![0].path;
       const configFile = await readFile(pathConfig, 'utf8');
       this.authentication = load(configFile) as Authentication;
+      await this.authenticationStore.createOrSetAuthentication(this.authentication);
 
       if (
         !this.authentication.username ||
