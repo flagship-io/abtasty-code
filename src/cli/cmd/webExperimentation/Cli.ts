@@ -145,13 +145,13 @@ export class Cli {
     }
   }
 
-  async UseWorkingDir(authentication: Authentication): Promise<boolean> {
+  async UseWorkingDir(workingDir: string): Promise<boolean> {
     try {
       const cliBin = await this.CliBin();
       if (!cliBin) {
         return false;
       }
-      const command = `${cliBin} web-experimentation working-directory set --path  ${authentication.working_dir} --output-format json`;
+      const command = `${cliBin} web-experimentation working-directory set --path  ${workingDir} --output-format json`;
       const output = await this.exec(command, {});
       console.log(output);
       this.outputChannel.trace(command);

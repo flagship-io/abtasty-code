@@ -311,7 +311,7 @@ export class AuthenticationMenu {
     if (this.authentication.username) {
       if (rootPath) {
         this.authentication.working_dir = rootPath;
-        await this.authenticationStore.selectDefaultWorkingDir(this.authentication);
+        await this.authenticationStore.selectDefaultWorkingDir(this.authentication.working_dir);
       }
 
       await this.authenticationStore.selectAccount(this.authentication.account_id);

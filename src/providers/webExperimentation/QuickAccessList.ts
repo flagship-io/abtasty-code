@@ -5,6 +5,7 @@ import {
   FEATURE_EXPERIMENTATION_SET_CREDENTIALS,
   WEB_EXPERIMENTATION_CREATE_MODIFICATION,
   WEB_EXPERIMENTATION_QUICK_ACCESS_REFRESH,
+  WEB_EXPERIMENTATION_RESET_WORKING_DIR,
   WEB_EXPERIMENTATION_SET_CREDENTIALS,
 } from '../../commands/const';
 
@@ -45,6 +46,12 @@ export class QuickAccessListProvider implements vscode.TreeDataProvider<vscode.T
       new LinkItem(`Manage configurations`, NON_COLLAPSED, '', {
         title: 'Credentials',
         command: WEB_EXPERIMENTATION_SET_CREDENTIALS,
+      }),
+    );
+    this.items.push(
+      new LinkItem(`Set Working directory to workspace`, NON_COLLAPSED, '', {
+        title: 'Set working dir',
+        command: WEB_EXPERIMENTATION_RESET_WORKING_DIR,
       }),
     );
     this.items.push(new LinkItem(`Documentation`, NON_COLLAPSED, DOCUMENT_URI));

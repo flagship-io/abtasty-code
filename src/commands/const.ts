@@ -61,6 +61,7 @@ export const FEATURE_EXPERIMENTATION_LIST_FLAG_IN_WORKSPACE = 'featureExperiment
 
 export const WEB_EXPERIMENTATION_CLEAR_CONFIG = 'webExperimentation.clearConfig';
 export const WEB_EXPERIMENTATION_SET_CREDENTIALS = 'webExperimentation.setCredentials';
+export const WEB_EXPERIMENTATION_RESET_WORKING_DIR = 'webExperimentation.resetWorkingDir';
 
 export const WEB_EXPERIMENTATION_QUICK_ACCESS_REFRESH = 'webExperimentation.quickAccess.refresh';
 

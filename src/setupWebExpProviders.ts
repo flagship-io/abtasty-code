@@ -24,6 +24,7 @@ import {
   WEB_EXPERIMENTATION_MODIFICATION_ADD_MODIFICATION,
   WEB_EXPERIMENTATION_MODIFICATION_REFRESH_MODIFICATION,
   WEB_EXPERIMENTATION_MODIFICATION_DELETE_MODIFICATION,
+  WEB_EXPERIMENTATION_RESET_WORKING_DIR,
 } from './commands/const';
 import { selectAccountInputBox } from './menu/webExperimentation/AccountMenu';
 import { deleteCampaignInputBox } from './menu/webExperimentation/CampaignMenu';
@@ -331,6 +332,15 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
   ];
 
   const accountDisposables = [
+    vscode.commands.registerCommand(WEB_EXPERIMENTATION_RESET_WORKING_DIR, async () => {
+      if (rootPath) {
+        await authenticationStore.selectDefaultWorkingDir(rootPath);
+        return;
+      }
+
+      vscode.window.showErrorMessage(`Failed: No workspace found.`);
+    }),
+
     vscode.commands.registerCommand(WEB_EXPERIMENTATION_ACCOUNT_LIST_SELECT, async (account: AccountItem) => {
       await selectAccountInputBox(account, authenticationStore);
 

@@ -35,8 +35,8 @@ export class AuthenticationStore {
     vscode.window.showErrorMessage(`[AB Tasty] Error while selecting account !`);
   }
 
-  async selectDefaultWorkingDir(authentication: Authentication) {
-    const accSet = await this.cli.UseWorkingDir(authentication);
+  async selectDefaultWorkingDir(workingDir: string) {
+    const accSet = await this.cli.UseWorkingDir(workingDir);
     if (accSet) {
       vscode.window.showInformationMessage(`[AB Tasty] Working directory set successfully !`);
       return;
