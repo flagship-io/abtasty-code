@@ -151,7 +151,7 @@ export class Cli {
       if (!cliBin) {
         return false;
       }
-      const command = `${cliBin} web-experimentation working-directory set --path  ${workingDir} --output-format json`;
+      const command = `${cliBin} web-experimentation working-directory set --path  "${workingDir}" --output-format json`;
       const output = await this.exec(command, {});
       console.log(output);
       this.outputChannel.trace(command);

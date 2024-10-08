@@ -42,7 +42,7 @@ export class AuthenticationStore {
       return;
     }
 
-    vscode.window.showErrorMessage(`[AB Tasty] Error while selecting account !`);
+    vscode.window.showErrorMessage(`[AB Tasty] Error while setting working directory !`);
   }
 
   async createOrSetAuthentication(authentication: Authentication): Promise<Authentication> {
