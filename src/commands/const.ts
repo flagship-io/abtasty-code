@@ -12,6 +12,7 @@ export const SET_CONTEXT = 'setContext';
 
 export const FEATURE_EXPERIMENTATION_CREATE_PROJECT = 'featureExperimentation.createProject';
 export const FEATURE_EXPERIMENTATION_PROJECT_LIST_COPY = 'featureExperimentation.projectList.copyProject';
+export const FEATURE_EXPERIMENTATION_PROJECT_CHANGE_STATE = 'featureExperimentation.projectList.changeState';
 export const FEATURE_EXPERIMENTATION_PROJECT_LIST_REFRESH = 'featureExperimentation.projectList.refresh';
 export const FEATURE_EXPERIMENTATION_PROJECT_LIST_LOAD = 'featureExperimentation.projectList.load';
 export const FEATURE_EXPERIMENTATION_PROJECT_LIST_EDIT = 'featureExperimentation.projectList.editProject';
@@ -21,6 +22,7 @@ export const FEATURE_EXPERIMENTATION_CAMPAIGN_LIST_OPEN_IN_BROWSER =
   'featureExperimentation.campaignList.openInBrowser';
 export const FEATURE_EXPERIMENTATION_CAMPAIGN_LIST_DELETE = 'featureExperimentation.campaignList.deleteCampaign';
 export const FEATURE_EXPERIMENTATION_CAMPAIGN_LIST_COPY = 'featureExperimentation.campaignList.copyCampaign';
+export const FEATURE_EXPERIMENTATION_CAMPAIGN_CHANGE_STATE = 'featureExperimentation.campaignList.changeState';
 
 export const FEATURE_EXPERIMENTATION_VARIATION_GROUP_LIST_DELETE =
   'featureExperimentation.variationGroupList.deleteVariationGroup';
@@ -96,6 +98,7 @@ export const WEB_EXPERIMENTATION_CAMPAIGN_LIST_REFRESH = 'webExperimentation.cam
 export const WEB_EXPERIMENTATION_CAMPAIGN_LIST_LOAD = 'webExperimentation.campaignList.load';
 export const WEB_EXPERIMENTATION_CAMPAIGN_GET_VARIATION = 'webExperimentation.campaignList.getVariation';
 export const WEB_EXPERIMENTATION_CAMPAIGN_LIST_COPY = 'webExperimentation.campaignList.copyCampaign';
+export const WEB_EXPERIMENTATION_CAMPAIGN_CHANGE_STATE = 'webExperimentation.campaignList.changeState';
 export const WEB_EXPERIMENTATION_CAMPAIGN_GET_MODIFICATION = 'webExperimentation.campaignList.getModification';
 export const WEB_EXPERIMENTATION_CAMPAIGN_LIST_EDIT = 'webExperimentation.campaignList.editCampaign';
 export const WEB_EXPERIMENTATION_CAMPAIGN_LIST_DELETE = 'webExperimentation.campaignList.deleteCampaign';

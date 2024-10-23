@@ -120,49 +120,58 @@ export async function deleteVariationBox(context: vscode.ExtensionContext, varia
   return;
 }
 
-export async function switchProjectBox(context: vscode.ExtensionContext, project: ProjectItem, cli: Cli) {
-  const picked = await vscode.window.showQuickPick(['active', 'paused', 'interrupted'], {
+export async function switchProjectBox(project: ProjectItem, cli: Cli) {
+  const picked = await vscode.window.showQuickPick(['active', 'interrupted'], {
     title: `Switch the project ${project.name} state`,
-    placeHolder: 'Do you confirm ?',
+    placeHolder: 'Do you confirm state changes ?',
     ignoreFocusOut: true,
   });
+
   if (picked === 'active') {
-    await cli.SwitchProject(project.id!, picked);
-    vscode.window.showInformationMessage(`[AB Tasty] Project ${project.name} set to ${picked} successfully.`);
+    const response = await cli.SwitchProject(project.id!, picked);
+    if (response) {
+      vscode.window.showInformationMessage(`[AB Tasty] Project ${project.name} set to ${picked} successfully.`);
+    }
     return;
   }
-  if (picked === 'paused') {
-    await cli.SwitchProject(project.id!, picked);
-    vscode.window.showInformationMessage(`[AB Tasty] Project ${project.name} set to ${picked} successfully.`);
-    return;
-  }
+
   if (picked === 'interrupted') {
-    await cli.SwitchProject(project.id!, picked);
-    vscode.window.showInformationMessage(`[AB Tasty] Project ${project.name} set to ${picked} successfully.`);
+    const response = await cli.SwitchProject(project.id!, picked);
+    if (response) {
+      vscode.window.showInformationMessage(`[AB Tasty] Project ${project.name} set to ${picked} successfully.`);
+    }
     return;
   }
   return;
 }
 
-export async function switchCampaignBox(context: vscode.ExtensionContext, campaign: CampaignItem, cli: Cli) {
+export async function switchCampaignBox(campaign: CampaignItem, cli: Cli) {
   const picked = await vscode.window.showQuickPick(['active', 'paused', 'interrupted'], {
     title: `Switch the campaign ${campaign.name} state`,
-    placeHolder: 'Do you confirm ?',
+    placeHolder: 'Do you confirm state changes ?',
     ignoreFocusOut: true,
   });
   if (picked === 'active') {
-    await cli.SwitchProject(campaign.id!, picked);
-    vscode.window.showInformationMessage(`[AB Tasty] Campaign ${campaign.name} set to ${picked} successfully.`);
+    const resp = await cli.SwitchCampaign(campaign.id!, picked);
+    if (resp) {
+      vscode.window.showInformationMessage(`[AB Tasty] Campaign ${campaign.name} set to ${picked} successfully.`);
+    }
     return;
   }
+
   if (picked === 'paused') {
-    await cli.SwitchProject(campaign.id!, picked);
-    vscode.window.showInformationMessage(`[AB Tasty] Campaign ${campaign.name} set to ${picked} successfully.`);
+    const resp = await cli.SwitchCampaign(campaign.id!, picked);
+    if (resp) {
+      vscode.window.showInformationMessage(`[AB Tasty] Campaign ${campaign.name} set to ${picked} successfully.`);
+    }
     return;
   }
+
   if (picked === 'interrupted') {
-    await cli.SwitchProject(campaign.id!, picked);
-    vscode.window.showInformationMessage(`[AB Tasty] Campaign ${campaign.name} set to ${picked} successfully.`);
+    const resp = await cli.SwitchCampaign(campaign.id!, picked);
+    if (resp) {
+      vscode.window.showInformationMessage(`[AB Tasty] Campaign ${campaign.name} set to ${picked} successfully.`);
+    }
     return;
   }
   return;

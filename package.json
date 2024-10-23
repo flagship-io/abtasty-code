@@ -215,6 +215,11 @@
         "icon": "$(trash)"
       },
       {
+        "command": "featureExperimentation.projectList.changeState",
+        "title": "Feature Experimentation: Change the project's state",
+        "icon": "$(debug-disconnect)"
+      },
+      {
         "command": "featureExperimentation.campaignList.openInBrowser",
         "title": "Feature Experimentation: Open campaign in the platform",
         "icon": "$(link-external)"
@@ -223,6 +228,11 @@
         "command": "featureExperimentation.campaignList.copyCampaign",
         "title": "Feature Experimentation: Copy the campaign ID in clipboard",
         "icon": "$(clippy)"
+      },
+      {
+        "command": "featureExperimentation.campaignList.changeState",
+        "title": "Feature Experimentation: Change the campaign's state",
+        "icon": "$(debug-disconnect)"
       },
       {
         "command": "featureExperimentation.variationGroupList.copyVariationGroup",
@@ -499,6 +509,11 @@
           "group": "inline"
         },
         {
+          "command": "featureExperimentation.projectList.changeState",
+          "when": "view == featureExperimentation.projectList && viewItem == projectItem",
+          "group": "inline"
+        },
+        {
           "command": "featureExperimentation.projectList.deleteProject",
           "when": "view == featureExperimentation.projectList && viewItem == projectItem",
           "group": "inline"
@@ -510,6 +525,11 @@
         },
         {
           "command": "featureExperimentation.campaignList.copyCampaign",
+          "when": "view == featureExperimentation.projectList && viewItem == campaignItem",
+          "group": "inline"
+        },
+        {
+          "command": "featureExperimentation.campaignList.changeState",
           "when": "view == featureExperimentation.projectList && viewItem == campaignItem",
           "group": "inline"
         },

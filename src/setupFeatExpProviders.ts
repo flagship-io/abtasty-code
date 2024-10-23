@@ -10,6 +10,8 @@ import {
   deleteVariationBox,
   deleteVariationGroupBox,
   projectInputBox,
+  switchCampaignBox,
+  switchProjectBox,
 } from './menu/featureExperimentation/ProjectMenu';
 import {
   CampaignItem,
@@ -58,6 +60,9 @@ import {
   FEATURE_EXPERIMENTATION_VARIATION_GROUP_LIST_DELETE,
   FEATURE_EXPERIMENTATION_VARIATION_LIST_COPY,
   FEATURE_EXPERIMENTATION_VARIATION_LIST_DELETE,
+  FEATURE_EXPERIMENTATION_PROJECT_CHANGE_STATE,
+  FEATURE_EXPERIMENTATION_CAMPAIGN_CHANGE_STATE,
+  FEATURE_EXPERIMENTATION_PROJECT_LIST_REFRESH,
 } from './commands/const';
 import { DEFAULT_BASE_URI, PERMISSION_DENIED } from './const';
 import { Authentication, Configuration, Scope } from './model';
@@ -293,6 +298,11 @@ export async function setupFeatExpProviders(
       vscode.window.showInformationMessage(`[AB Tasty] Project: ${project.name}'s ID copied to your clipboard.`);
     }),
 
+    vscode.commands.registerCommand(FEATURE_EXPERIMENTATION_PROJECT_CHANGE_STATE, async (project: ProjectItem) => {
+      await switchProjectBox(project, cli);
+      await vscode.commands.executeCommand(FEATURE_EXPERIMENTATION_PROJECT_LIST_REFRESH);
+    }),
+
     vscode.commands.registerCommand(FEATURE_EXPERIMENTATION_PROJECT_LIST_EDIT, async (project: ProjectItem) => {
       const { scope } = (context.globalState.get(GLOBAL_CURRENT_AUTHENTICATION_FE) as Authentication) || {};
       if (scope?.includes('project.update')) {
@@ -320,6 +330,12 @@ export async function setupFeatExpProviders(
     vscode.commands.registerCommand(FEATURE_EXPERIMENTATION_CAMPAIGN_LIST_COPY, async (campaign: CampaignItem) => {
       vscode.env.clipboard.writeText(campaign.id!);
       vscode.window.showInformationMessage(`[AB Tasty] Campaign: ${campaign.name}'s ID copied to your clipboard.`);
+    }),
+
+    vscode.commands.registerCommand(FEATURE_EXPERIMENTATION_CAMPAIGN_CHANGE_STATE, async (campaign: CampaignItem) => {
+      await switchCampaignBox(campaign, cli);
+      await vscode.commands.executeCommand(FEATURE_EXPERIMENTATION_PROJECT_LIST_REFRESH);
+      console.log(campaign);
     }),
 
     vscode.commands.registerCommand(
