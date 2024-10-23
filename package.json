@@ -176,7 +176,7 @@
       },
       {
         "command": "featureExperimentation.flagList.copyFlag",
-        "title": "Feature Experimentation: Copy the flag in clipboard",
+        "title": "Feature Experimentation: Copy the flag ID in clipboard",
         "icon": "$(clippy)"
       },
       {
@@ -196,7 +196,7 @@
       },
       {
         "command": "featureExperimentation.projectList.copyProject",
-        "title": "Feature Experimentation: Copy the project id",
+        "title": "Feature Experimentation: Copy the project ID in clipboard",
         "icon": "$(clippy)"
       },
       {
@@ -221,17 +221,17 @@
       },
       {
         "command": "featureExperimentation.campaignList.copyCampaign",
-        "title": "Feature Experimentation: Copy the campaign id",
+        "title": "Feature Experimentation: Copy the campaign ID in clipboard",
         "icon": "$(clippy)"
       },
       {
         "command": "featureExperimentation.variationGroupList.copyVariationGroup",
-        "title": "Feature Experimentation: Copy the variation group id",
+        "title": "Feature Experimentation: Copy the variation group ID in clipboard",
         "icon": "$(clippy)"
       },
       {
         "command": "featureExperimentation.variationList.copyVariation",
-        "title": "Feature Experimentation: Copy the variation id",
+        "title": "Feature Experimentation: Copy the variation ID in clipboard",
         "icon": "$(clippy)"
       },
       {
@@ -330,6 +330,11 @@
         "icon": "$(repo-push)"
       },
       {
+        "command": "webExperimentation.campaignList.copyCampaign",
+        "title": "Web Experimentation: Copy the campaign ID in clipboard",
+        "icon": "$(clippy)"
+      },
+      {
         "command": "webExperimentation.accountList.pullGlobalCode",
         "title": "Pull account global code from the platform",
         "icon": "$(repo-sync)"
@@ -343,6 +348,16 @@
         "command": "webExperimentation.accountList.pushGlobalCode",
         "title": "Push account global code to the platform",
         "icon": "$(repo-push)"
+      },
+      {
+        "command": "webExperimentation.accountList.selectAccount",
+        "title": "Web Experimentation: Select account",
+        "icon": "$(run)"
+      },
+      {
+        "command": "webExperimentation.accountList.copyAccount",
+        "title": "Web Experimentation: Copy the account ID in clipboard",
+        "icon": "$(clippy)"
       },
       {
         "command": "webExperimentation.variationList.pullGlobalCodeJS",
@@ -370,6 +385,11 @@
         "icon": "$(add)"
       },
       {
+        "command": "webExperimentation.variationList.copyVariation",
+        "title": "Web Experimentation: Copy the variation ID in clipboard",
+        "icon": "$(clippy)"
+      },
+      {
         "command": "webExperimentation.modificationList.pullCode",
         "title": "Pull modification code from the platform",
         "icon": "$(repo-sync)"
@@ -380,6 +400,11 @@
         "icon": "$(repo-push)"
       },
       {
+        "command": "webExperimentation.modificationList.copyModification",
+        "title": "Web Experimentation: Copy the modification ID in clipboard",
+        "icon": "$(clippy)"
+      },
+      {
         "command": "webExperimentation.modificationList.addModification",
         "title": "Web Experimentation: Add modification",
         "icon": "$(add)"
@@ -388,11 +413,6 @@
         "command": "webExperimentation.modificationList.refreshModification",
         "title": "Web Experimentation: Refresh modifications",
         "icon": "$(refresh)"
-      },
-      {
-        "command": "webExperimentation.accountList.selectAccount",
-        "title": "Web Experimentation: Select account",
-        "icon": "$(run)"
       },
       {
         "command": "webExperimentation.campaignList.globalCodeOpenFile",
@@ -564,9 +584,9 @@
           "group": "inline"
         },
         {
-          "command": "webExperimentation.campaignList.setCampaign",
+          "command": "webExperimentation.campaignList.copyCampaign",
           "when": "view == webExperimentation.campaignList && viewItem == campaignWEItem",
-          "group": "navigation"
+          "group": "inline"
         },
         {
           "command": "webExperimentation.campaignList.pullGlobalCode",
@@ -619,6 +639,11 @@
           "group": "inline"
         },
         {
+          "command": "webExperimentation.variationList.copyVariation",
+          "when": "view == webExperimentation.campaignList && viewItem == variationWEItem",
+          "group": "inline"
+        },
+        {
           "command": "webExperimentation.modificationList.pullCode",
           "when": "view == webExperimentation.campaignList && viewItem == codeModificationItem",
           "group": "inline"
@@ -644,7 +669,17 @@
           "group": "inline"
         },
         {
+          "command": "webExperimentation.modificationList.copyModification",
+          "when": "view == webExperimentation.campaignList && viewItem == modificationWEItem",
+          "group": "inline"
+        },
+        {
           "command": "webExperimentation.accountList.selectAccount",
+          "when": "view == webExperimentation.accountList && viewItem == accountWEItem",
+          "group": "inline"
+        },
+        {
+          "command": "webExperimentation.accountList.copyAccount",
           "when": "view == webExperimentation.accountList && viewItem == accountWEItem",
           "group": "inline"
         }

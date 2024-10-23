@@ -25,6 +25,10 @@ import {
   WEB_EXPERIMENTATION_MODIFICATION_REFRESH_MODIFICATION,
   WEB_EXPERIMENTATION_MODIFICATION_DELETE_MODIFICATION,
   WEB_EXPERIMENTATION_RESET_WORKING_DIR,
+  WEB_EXPERIMENTATION_ACCOUNT_LIST_COPY,
+  WEB_EXPERIMENTATION_CAMPAIGN_LIST_COPY,
+  WEB_EXPERIMENTATION_MODIFICATION_LIST_COPY,
+  WEB_EXPERIMENTATION_VARIATION_LIST_COPY,
 } from './commands/const';
 import { selectAccountInputBox } from './menu/webExperimentation/AccountMenu';
 import { deleteCampaignInputBox } from './menu/webExperimentation/CampaignMenu';
@@ -38,6 +42,7 @@ import {
   GlobalCodeVariation,
   ModificationWETree,
   ModificationWEItem,
+  VariationWEItem,
 } from './providers/webExperimentation/CampaignList';
 import { QuickAccessListProvider } from './providers/webExperimentation/QuickAccessList';
 import {
@@ -91,6 +96,13 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
   }
 
   const campaignDisposables = [
+    vscode.commands.registerCommand(WEB_EXPERIMENTATION_CAMPAIGN_LIST_COPY, async (campaign: CampaignWEItem) => {
+      vscode.env.clipboard.writeText(String(campaign.resourceId));
+      vscode.window.showInformationMessage(
+        `[AB Tasty] Campaign ID: ${String(campaign.resourceId)} copied to your clipboard.`,
+      );
+    }),
+
     vscode.commands.registerCommand(WEB_EXPERIMENTATION_CAMPAIGN_LIST_DELETE, async (campaign: CampaignWEItem) => {
       await deleteCampaignInputBox(campaign, campaignStore);
       await vscode.commands.executeCommand(WEB_EXPERIMENTATION_CAMPAIGN_LIST_LOAD);
@@ -167,6 +179,13 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
         return;
       },
     ),
+
+    vscode.commands.registerCommand(WEB_EXPERIMENTATION_VARIATION_LIST_COPY, async (resource: VariationWEItem) => {
+      vscode.env.clipboard.writeText(String(resource.resourceId));
+      vscode.window.showInformationMessage(
+        `[AB Tasty] Variation ID: ${String(resource.resourceId)} copied to your clipboard.`,
+      );
+    }),
 
     vscode.commands.registerCommand(
       WEB_EXPERIMENTATION_VARIATION_PUSH_GLOBAL_CODE_JS,
@@ -302,6 +321,16 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
     ),
 
     vscode.commands.registerCommand(
+      WEB_EXPERIMENTATION_MODIFICATION_LIST_COPY,
+      async (resource: ModificationWETree) => {
+        vscode.env.clipboard.writeText(String(resource.resourceId));
+        vscode.window.showInformationMessage(
+          `[AB Tasty] Modification ID: ${String(resource.resourceId)} copied to your clipboard.`,
+        );
+      },
+    ),
+
+    vscode.commands.registerCommand(
       WEB_EXPERIMENTATION_MODIFICATION_DELETE_MODIFICATION,
       async (resource: ModificationWEItem) => {
         await deleteModificationInputBox(resource, cli);
@@ -332,6 +361,13 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
   ];
 
   const accountDisposables = [
+    vscode.commands.registerCommand(WEB_EXPERIMENTATION_ACCOUNT_LIST_COPY, async (account: AccountItem) => {
+      vscode.env.clipboard.writeText(String(account.resourceId!));
+      vscode.window.showInformationMessage(
+        `[AB Tasty] Account ID: ${String(account.resourceId)} copied to your clipboard.`,
+      );
+    }),
+
     vscode.commands.registerCommand(WEB_EXPERIMENTATION_RESET_WORKING_DIR, async () => {
       if (rootPath) {
         await authenticationStore.selectDefaultWorkingDir(rootPath);

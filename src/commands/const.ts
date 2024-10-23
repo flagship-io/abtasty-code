@@ -75,15 +75,16 @@ export const WEB_EXPERIMENTATION_MODIFICATION_PUSH_CODE = 'webExperimentation.mo
 export const WEB_EXPERIMENTATION_MODIFICATION_ADD_MODIFICATION = 'webExperimentation.modificationList.addModification';
 export const WEB_EXPERIMENTATION_MODIFICATION_REFRESH_MODIFICATION =
   'webExperimentation.modificationList.refreshModification';
-
 export const WEB_EXPERIMENTATION_MODIFICATION_DELETE_MODIFICATION =
   'webExperimentation.modificationList.deleteModification';
+export const WEB_EXPERIMENTATION_MODIFICATION_LIST_COPY = 'webExperimentation.modificationList.copyModification';
 
 export const WEB_EXPERIMENTATION_CREATE_VARIATION = 'webExperimentation.createVariation';
 export const WEB_EXPERIMENTATION_VARIATION_LIST_REFRESH = 'webExperimentation.variationList.refresh';
 export const WEB_EXPERIMENTATION_VARIATION_LIST_LOAD = 'webExperimentation.variationList.load';
 export const WEB_EXPERIMENTATION_VARIATION_LIST_EDIT = 'webExperimentation.variationList.editVariation';
 export const WEB_EXPERIMENTATION_VARIATION_LIST_DELETE = 'webExperimentation.variationList.deleteVariation';
+export const WEB_EXPERIMENTATION_VARIATION_LIST_COPY = 'webExperimentation.variationList.copyVariation';
 export const WEB_EXPERIMENTATION_VARIATION_ADD_GLOBAL_CODE = 'webExperimentation.variationList.addGlobalCode';
 export const WEB_EXPERIMENTATION_VARIATION_PULL_GLOBAL_CODE_JS = 'webExperimentation.variationList.pullGlobalCodeJS';
 export const WEB_EXPERIMENTATION_VARIATION_PUSH_GLOBAL_CODE_JS = 'webExperimentation.variationList.pushGlobalCodeJS';
@@ -94,6 +95,7 @@ export const WEB_EXPERIMENTATION_CREATE_CAMPAIGN = 'webExperimentation.createCam
 export const WEB_EXPERIMENTATION_CAMPAIGN_LIST_REFRESH = 'webExperimentation.campaignList.refresh';
 export const WEB_EXPERIMENTATION_CAMPAIGN_LIST_LOAD = 'webExperimentation.campaignList.load';
 export const WEB_EXPERIMENTATION_CAMPAIGN_GET_VARIATION = 'webExperimentation.campaignList.getVariation';
+export const WEB_EXPERIMENTATION_CAMPAIGN_LIST_COPY = 'webExperimentation.campaignList.copyCampaign';
 export const WEB_EXPERIMENTATION_CAMPAIGN_GET_MODIFICATION = 'webExperimentation.campaignList.getModification';
 export const WEB_EXPERIMENTATION_CAMPAIGN_LIST_EDIT = 'webExperimentation.campaignList.editCampaign';
 export const WEB_EXPERIMENTATION_CAMPAIGN_LIST_DELETE = 'webExperimentation.campaignList.deleteCampaign';
@@ -107,6 +109,7 @@ export const WEB_EXPERIMENTATION_ACCOUNT_GLOBAL_CODE_OPEN_FILE = 'webExperimenta
 export const WEB_EXPERIMENTATION_ACCOUNT_LIST_REFRESH = 'webExperimentation.accountList.refresh';
 export const WEB_EXPERIMENTATION_ACCOUNT_LIST_LOAD = 'webExperimentation.accountList.load';
 export const WEB_EXPERIMENTATION_ACCOUNT_LIST_SELECT = 'webExperimentation.accountList.selectAccount';
+export const WEB_EXPERIMENTATION_ACCOUNT_LIST_COPY = 'webExperimentation.accountList.copyAccount';
 export const WEB_EXPERIMENTATION_ACCOUNT_PULL_GLOBAL_CODE = 'webExperimentation.accountList.pullGlobalCode';
 export const WEB_EXPERIMENTATION_ACCOUNT_PUSH_GLOBAL_CODE = 'webExperimentation.accountList.pushGlobalCode';
 export const WEB_EXPERIMENTATION_ACCOUNT_ADD_GLOBAL_CODE = 'webExperimentation.accountList.addGlobalCode';
