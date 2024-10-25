@@ -335,7 +335,6 @@ export async function setupFeatExpProviders(
     vscode.commands.registerCommand(FEATURE_EXPERIMENTATION_CAMPAIGN_CHANGE_STATE, async (campaign: CampaignItem) => {
       await switchCampaignBox(campaign, cli);
       await vscode.commands.executeCommand(FEATURE_EXPERIMENTATION_PROJECT_LIST_REFRESH);
-      console.log(campaign);
     }),
 
     vscode.commands.registerCommand(

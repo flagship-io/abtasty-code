@@ -463,6 +463,27 @@ export class Cli {
     }
   }
 
+  async SwitchCampaignWE(id: string, status: string): Promise<boolean> {
+    try {
+      const cliBin = await this.CliBin();
+      if (!cliBin) {
+        return false;
+      }
+      const command = `${cliBin} web-experimentation campaign switch -i ${id} -s ${status}`;
+      const output = await this.exec(command, {});
+      console.log(output);
+      if (output.stderr) {
+        vscode.window.showErrorMessage(output.stderr);
+        return false;
+      }
+      return true;
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return false;
+    }
+  }
+
   async PullAccountGlobalCode(id: string, createFile?: boolean, override?: boolean, subFiles?: boolean): Promise<any> {
     try {
       const cliBin = await this.CliBin();

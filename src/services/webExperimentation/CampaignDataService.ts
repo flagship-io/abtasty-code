@@ -29,6 +29,13 @@ export class CampaignDataService {
     const oldCampaigns = this.campaignList.filter((c) => campaignId !== c.id);
     const newCampaigns = [...oldCampaigns, newCampaign];
     await this.loadState(newCampaigns);
+    return newCampaigns;
+  }
+
+  async editCampaignStatus(campaignId: number, status: string) {
+    const campaign = this.campaignList.find((c) => campaignId === c.id);
+    campaign!.state = status;
+    await this.editCampaign(campaignId, campaign!);
   }
 
   async deleteCampaign(campaignId: number) {

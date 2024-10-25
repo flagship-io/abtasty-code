@@ -334,7 +334,7 @@ export class CampaignListProvider implements vscode.TreeDataProvider<vscode.Tree
   }
 
   private getLoadedCampaigns() {
-    const campaignList = this.campaignStore.loadCampaign();
+    const campaignList = this.campaignStore.loadCampaigns();
     campaignList.sort((a, b) => b.id - a.id);
     this._tree = this.mappingTree(campaignList);
   }

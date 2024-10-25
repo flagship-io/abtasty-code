@@ -12,8 +12,12 @@ export class CampaignStore {
     this.campaignService = new CampaignDataService(context);
   }
 
-  loadCampaign(): CampaignWE[] {
+  loadCampaigns(): CampaignWE[] {
     return this.campaignService.getState();
+  }
+
+  async loadCampaignStatus(campaignId: number, status: string) {
+    return await this.campaignService.editCampaignStatus(campaignId, status);
   }
 
   async refreshCampaign(): Promise<CampaignWE[]> {

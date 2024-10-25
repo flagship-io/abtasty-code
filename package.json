@@ -320,11 +320,6 @@
         "icon": "$(trash)"
       },
       {
-        "command": "webExperimentation.campaignList.setCampaign",
-        "title": "Set as global campaign",
-        "icon": "$(run)"
-      },
-      {
         "command": "webExperimentation.campaignList.pullGlobalCode",
         "title": "Pull campaign global code from the platform",
         "icon": "$(repo-sync)"
@@ -343,6 +338,11 @@
         "command": "webExperimentation.campaignList.copyCampaign",
         "title": "Web Experimentation: Copy the campaign ID in clipboard",
         "icon": "$(clippy)"
+      },
+      {
+        "command": "webExperimentation.campaignList.changeState",
+        "title": "Web Experimentation: Change the campaign's state",
+        "icon": "$(debug-disconnect)"
       },
       {
         "command": "webExperimentation.accountList.pullGlobalCode",
@@ -605,6 +605,11 @@
         },
         {
           "command": "webExperimentation.campaignList.copyCampaign",
+          "when": "view == webExperimentation.campaignList && viewItem == campaignWEItem",
+          "group": "inline"
+        },
+        {
+          "command": "webExperimentation.campaignList.changeState",
           "when": "view == webExperimentation.campaignList && viewItem == campaignWEItem",
           "group": "inline"
         },

@@ -29,9 +29,11 @@ import {
   WEB_EXPERIMENTATION_CAMPAIGN_LIST_COPY,
   WEB_EXPERIMENTATION_MODIFICATION_LIST_COPY,
   WEB_EXPERIMENTATION_VARIATION_LIST_COPY,
+  WEB_EXPERIMENTATION_CAMPAIGN_CHANGE_STATE,
+  WEB_EXPERIMENTATION_CAMPAIGN_LIST_REFRESH,
 } from './commands/const';
 import { selectAccountInputBox } from './menu/webExperimentation/AccountMenu';
-import { deleteCampaignInputBox } from './menu/webExperimentation/CampaignMenu';
+import { deleteCampaignInputBox, switchCampaignBox } from './menu/webExperimentation/CampaignMenu';
 import { addModificationInputBox, deleteModificationInputBox } from './menu/webExperimentation/ModificationMenu';
 import { AccountItem, AccountListProvider, GlobalCodeAccount } from './providers/webExperimentation/AccountList';
 import {
@@ -101,6 +103,11 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
       vscode.window.showInformationMessage(
         `[AB Tasty] Campaign ID: ${String(campaign.resourceId)} copied to your clipboard.`,
       );
+    }),
+
+    vscode.commands.registerCommand(WEB_EXPERIMENTATION_CAMPAIGN_CHANGE_STATE, async (campaign: CampaignWEItem) => {
+      await switchCampaignBox(campaign, campaignStore, cli);
+      await vscode.commands.executeCommand(WEB_EXPERIMENTATION_CAMPAIGN_LIST_LOAD);
     }),
 
     vscode.commands.registerCommand(WEB_EXPERIMENTATION_CAMPAIGN_LIST_DELETE, async (campaign: CampaignWEItem) => {
