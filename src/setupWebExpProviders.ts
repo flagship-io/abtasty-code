@@ -31,6 +31,7 @@ import {
   WEB_EXPERIMENTATION_VARIATION_LIST_COPY,
   WEB_EXPERIMENTATION_CAMPAIGN_CHANGE_STATE,
   WEB_EXPERIMENTATION_CAMPAIGN_LIST_REFRESH,
+  WEB_EXPERIMENTATION_REBUILD_TAG,
 } from './commands/const';
 import { selectAccountInputBox } from './menu/webExperimentation/AccountMenu';
 import { deleteCampaignInputBox, switchCampaignBox } from './menu/webExperimentation/CampaignMenu';
@@ -382,6 +383,15 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
       }
 
       vscode.window.showErrorMessage(`Failed: No workspace found.`);
+    }),
+
+    vscode.commands.registerCommand(WEB_EXPERIMENTATION_REBUILD_TAG, async () => {
+      const isRequestSent = await accountStore.rebuildTag();
+      if (isRequestSent) {
+        vscode.window.showInformationMessage(`[AB Tasty] Rebuild tag request sent !`);
+        return;
+      }
+      return;
     }),
 
     vscode.commands.registerCommand(WEB_EXPERIMENTATION_ACCOUNT_LIST_SELECT, async (account: AccountItem) => {

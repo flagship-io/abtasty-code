@@ -46,4 +46,8 @@ export class AccountWEStore {
     }
     return cliResponse;
   }
+
+  async rebuildTag(): Promise<boolean> {
+    return this.cli.RebuildTag();
+  }
 }
