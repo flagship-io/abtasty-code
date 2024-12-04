@@ -10,6 +10,7 @@ import {
   Authentication,
   CampaignWE,
   CurrentAuthentication,
+  FavoriteUrl,
   ModificationWE,
   VariationWE,
 } from '../../../model';
@@ -540,6 +541,30 @@ export class Cli {
         return [];
       }
       const command = `${cliBin} web-experimentation audience list --output-format json`;
+      const output = await this.exec(command, {});
+      console.log(output);
+      this.outputChannel.trace(command);
+      logMessage(this.outputChannel, output.stdout);
+      if (output.stderr) {
+        this.outputChannel.error(output.stderr);
+        vscode.window.showErrorMessage(output.stderr);
+        return [];
+      }
+      return JSON.parse(output.stdout);
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return [];
+    }
+  }
+
+  async ListFavoriteUrl(): Promise<FavoriteUrl[]> {
+    try {
+      const cliBin = await this.CliBin();
+      if (!cliBin) {
+        return [];
+      }
+      const command = `${cliBin} web-experimentation favorite-url list --output-format json`;
       const output = await this.exec(command, {});
       console.log(output);
       this.outputChannel.trace(command);

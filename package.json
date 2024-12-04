@@ -126,6 +126,11 @@
           "id": "webExperimentation.audienceList",
           "name": "Audience",
           "when": "abtasty:explorer == webExperimentation"
+        },
+        {
+          "id": "webExperimentation.favoriteUrlList",
+          "name": "Favorite URL",
+          "when": "abtasty:explorer == webExperimentation"
         }
       ]
     },
@@ -320,6 +325,11 @@
         "icon": "$(refresh)"
       },
       {
+        "command": "webExperimentation.favoriteUrlList.refresh",
+        "title": "Web Experimentation: Refresh favorite URL panel",
+        "icon": "$(refresh)"
+      },
+      {
         "command": "webExperimentation.modificationList.deleteModification",
         "title": "Web Experimentation: Remove the modification",
         "icon": "$(trash)"
@@ -447,6 +457,16 @@
         "command": "webExperimentation.audienceList.openAudience",
         "title": "Web Experimentation: Open the audience information in JSON file",
         "icon": "$(code)"
+      },
+      {
+        "command": "webExperimentation.favoriteUrlList.copyFavoriteUrl",
+        "title": "Web Experimentation: Copy the favorite URL ID in clipboard",
+        "icon": "$(clippy)"
+      },
+      {
+        "command": "webExperimentation.favoriteUrlList.openFavoriteUrl",
+        "title": "Web Experimentation: Open the favorite URL information in JSON file",
+        "icon": "$(code)"
       }
     ],
     "menus": {
@@ -524,6 +544,11 @@
         {
           "command": "webExperimentation.audienceList.refresh",
           "when": "view == webExperimentation.audienceList",
+          "group": "navigation@0"
+        },
+        {
+          "command": "webExperimentation.favoriteUrlList.refresh",
+          "when": "view == webExperimentation.favoriteUrlList",
           "group": "navigation@0"
         }
       ],
@@ -741,6 +766,16 @@
         {
           "command": "webExperimentation.audienceList.openAudience",
           "when": "view == webExperimentation.audienceList && viewItem == audienceWEItem",
+          "group": "inline"
+        },
+        {
+          "command": "webExperimentation.favoriteUrlList.copyFavoriteUrl",
+          "when": "view == webExperimentation.favoriteUrlList && viewItem == favoriteUrlWEItem",
+          "group": "inline"
+        },
+        {
+          "command": "webExperimentation.favoriteUrlList.openFavoriteUrl",
+          "when": "view == webExperimentation.favoriteUrlList && viewItem == favoriteUrlWEItem",
           "group": "inline"
         }
       ]

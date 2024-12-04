@@ -30,10 +30,11 @@ import {
   WEB_EXPERIMENTATION_MODIFICATION_LIST_COPY,
   WEB_EXPERIMENTATION_VARIATION_LIST_COPY,
   WEB_EXPERIMENTATION_CAMPAIGN_CHANGE_STATE,
-  WEB_EXPERIMENTATION_CAMPAIGN_LIST_REFRESH,
   WEB_EXPERIMENTATION_REBUILD_TAG,
   WEB_EXPERIMENTATION_AUDIENCE_LIST_COPY,
   WEB_EXPERIMENTATION_AUDIENCE_LIST_OPEN,
+  WEB_EXPERIMENTATION_FAVORITE_URL_LIST_COPY,
+  WEB_EXPERIMENTATION_FAVORITE_URL_LIST_OPEN,
 } from './commands/const';
 import { selectAccountInputBox } from './menu/webExperimentation/AccountMenu';
 import { deleteCampaignInputBox, switchCampaignBox } from './menu/webExperimentation/CampaignMenu';
@@ -61,6 +62,9 @@ import { AccountTreeView } from '../treeView/webExperimentation/accountTreeView'
 import { AudienceListProvider, AudienceWEItem } from './providers/webExperimentation/AudienceList';
 import { AudienceStore } from './store/webExperimentation/AudienceStore';
 import { AudienceTreeView } from '../treeView/webExperimentation/audienceTreeView';
+import { FavoriteUrlStore } from './store/webExperimentation/FavoriteUrlStore';
+import { FavoriteUrlListProvider, FavoriteUrlWEItem } from './providers/webExperimentation/FavoriteUrlList';
+import { FavoriteUrlTreeView } from '../treeView/webExperimentation/FavoriteUrlTreeView';
 
 export const rootPath =
   vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0
@@ -72,6 +76,7 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
 
   const campaignStore = new CampaignStore(context, cli);
   const audienceStore = new AudienceStore(context, cli);
+  const favoriteUrlStore = new FavoriteUrlStore(context, cli);
   const accountStore = new AccountWEStore(context, cli);
   const authenticationStore = new AuthenticationStore(context, cli);
 
@@ -90,6 +95,9 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
   const audienceProvider = new AudienceListProvider(context, accountStore, audienceStore, account.account_id);
   const audienceTreeView = new AudienceTreeView(context, audienceProvider, cli, rootPath, account.account_id);
 
+  const favoriteUrlProvider = new FavoriteUrlListProvider(context, accountStore, favoriteUrlStore, account.account_id);
+  const favoriteUrlTreeView = new FavoriteUrlTreeView(context, favoriteUrlProvider, cli, rootPath, account.account_id);
+
   const accountProvider = new AccountListProvider(context, accountStore);
   const accountTreeView = new AccountTreeView(context, accountProvider, cli, rootPath, account.account_id);
 
@@ -101,6 +109,7 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
       accountProvider.refresh(),
       campaignTreeView.refresh(),
       audienceTreeView.refresh(),
+      favoriteUrlTreeView.refresh(),
     ]);
   } catch (error: any) {
     vscode.window.showErrorMessage(`Failed to fetch accounts: ${error.message}`);
@@ -495,6 +504,29 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
     }),
   ];
 
+  const favoriteUrlDisposables = [
+    vscode.commands.registerCommand(
+      WEB_EXPERIMENTATION_FAVORITE_URL_LIST_COPY,
+      async (favoriteUrl: FavoriteUrlWEItem) => {
+        vscode.env.clipboard.writeText(favoriteUrl.resourceId!);
+        vscode.window.showInformationMessage(
+          `[AB Tasty] Favorite URL ID: ${favoriteUrl.resourceId} copied to your clipboard.`,
+        );
+      },
+    ),
+
+    vscode.commands.registerCommand(
+      WEB_EXPERIMENTATION_FAVORITE_URL_LIST_OPEN,
+      async (favoriteUrl: FavoriteUrlWEItem) => {
+        const document = await vscode.workspace.openTextDocument({
+          content: JSON.stringify(favoriteUrl.favoriteUrl!),
+          language: 'json',
+        });
+        await vscode.window.showTextDocument(document);
+      },
+    ),
+  ];
+
   context.subscriptions.push(
     quickAccessProvider,
     campaignTreeView,
@@ -503,5 +535,6 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
     ...campaignDisposables,
     ...accountDisposables,
     ...audienceDisposables,
+    ...favoriteUrlDisposables,
   );
 }

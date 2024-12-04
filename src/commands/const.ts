@@ -122,3 +122,8 @@ export const WEB_EXPERIMENTATION_AUDIENCE_LIST_REFRESH = 'webExperimentation.aud
 export const WEB_EXPERIMENTATION_AUDIENCE_LIST_LOAD = 'webExperimentation.audienceList.load';
 export const WEB_EXPERIMENTATION_AUDIENCE_LIST_COPY = 'webExperimentation.audienceList.copyAudience';
 export const WEB_EXPERIMENTATION_AUDIENCE_LIST_OPEN = 'webExperimentation.audienceList.openAudience';
+
+export const WEB_EXPERIMENTATION_FAVORITE_URL_LIST_REFRESH = 'webExperimentation.favoriteUrlList.refresh';
+export const WEB_EXPERIMENTATION_FAVORITE_URL_LIST_LOAD = 'webExperimentation.favoriteUrlList.load';
+export const WEB_EXPERIMENTATION_FAVORITE_URL_LIST_COPY = 'webExperimentation.favoriteUrlList.copyFavoriteUrl';
+export const WEB_EXPERIMENTATION_FAVORITE_URL_LIST_OPEN = 'webExperimentation.favoriteUrlList.openFavoriteUrl';
