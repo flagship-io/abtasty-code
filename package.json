@@ -121,6 +121,11 @@
           "id": "webExperimentation.campaignList",
           "name": "Campaign",
           "when": "abtasty:explorer == webExperimentation"
+        },
+        {
+          "id": "webExperimentation.audienceList",
+          "name": "Audience",
+          "when": "abtasty:explorer == webExperimentation"
         }
       ]
     },
@@ -310,6 +315,11 @@
         "icon": "$(refresh)"
       },
       {
+        "command": "webExperimentation.audienceList.refresh",
+        "title": "Web Experimentation: Refresh audience panel",
+        "icon": "$(refresh)"
+      },
+      {
         "command": "webExperimentation.modificationList.deleteModification",
         "title": "Web Experimentation: Remove the modification",
         "icon": "$(trash)"
@@ -427,6 +437,16 @@
       {
         "command": "webExperimentation.campaignList.globalCodeOpenFile",
         "title": "Web Experimentation: Open code file"
+      },
+      {
+        "command": "webExperimentation.audienceList.copyAudience",
+        "title": "Web Experimentation: Copy the audience ID in clipboard",
+        "icon": "$(clippy)"
+      },
+      {
+        "command": "webExperimentation.audienceList.openAudience",
+        "title": "Web Experimentation: Open the audience information in JSON file",
+        "icon": "$(code)"
       }
     ],
     "menus": {
@@ -499,6 +519,11 @@
         {
           "command": "webExperimentation.accountList.refresh",
           "when": "view == webExperimentation.accountList",
+          "group": "navigation@0"
+        },
+        {
+          "command": "webExperimentation.audienceList.refresh",
+          "when": "view == webExperimentation.audienceList",
           "group": "navigation@0"
         }
       ],
@@ -706,6 +731,16 @@
         {
           "command": "webExperimentation.accountList.copyAccount",
           "when": "view == webExperimentation.accountList && viewItem == accountWEItem",
+          "group": "inline"
+        },
+        {
+          "command": "webExperimentation.audienceList.copyAudience",
+          "when": "view == webExperimentation.audienceList && viewItem == audienceWEItem",
+          "group": "inline"
+        },
+        {
+          "command": "webExperimentation.audienceList.openAudience",
+          "when": "view == webExperimentation.audienceList && viewItem == audienceWEItem",
           "group": "inline"
         }
       ]

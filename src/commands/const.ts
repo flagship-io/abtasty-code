@@ -117,3 +117,8 @@ export const WEB_EXPERIMENTATION_ACCOUNT_LIST_COPY = 'webExperimentation.account
 export const WEB_EXPERIMENTATION_ACCOUNT_PULL_GLOBAL_CODE = 'webExperimentation.accountList.pullGlobalCode';
 export const WEB_EXPERIMENTATION_ACCOUNT_PUSH_GLOBAL_CODE = 'webExperimentation.accountList.pushGlobalCode';
 export const WEB_EXPERIMENTATION_ACCOUNT_ADD_GLOBAL_CODE = 'webExperimentation.accountList.addGlobalCode';
+
+export const WEB_EXPERIMENTATION_AUDIENCE_LIST_REFRESH = 'webExperimentation.audienceList.refresh';
+export const WEB_EXPERIMENTATION_AUDIENCE_LIST_LOAD = 'webExperimentation.audienceList.load';
+export const WEB_EXPERIMENTATION_AUDIENCE_LIST_COPY = 'webExperimentation.audienceList.copyAudience';
+export const WEB_EXPERIMENTATION_AUDIENCE_LIST_OPEN = 'webExperimentation.audienceList.openAudience';

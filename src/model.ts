@@ -88,6 +88,21 @@ export type CampaignWE = {
   master: CampaignWE;
 };
 
+export type Audience = {
+  id: string;
+  name: string;
+  description: string;
+  hidden: boolean;
+  created_at: DateWE;
+  updated_at: DateWE;
+  archive: boolean;
+  is_segment: boolean;
+  test_ids: string[];
+  live_test_ids: string[];
+  live_tests_source: any;
+  groups: any;
+};
+
 export type Traffic = {
   value: number;
   last_increased_traffic: string;

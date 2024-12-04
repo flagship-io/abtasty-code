@@ -32,6 +32,8 @@ import {
   WEB_EXPERIMENTATION_CAMPAIGN_CHANGE_STATE,
   WEB_EXPERIMENTATION_CAMPAIGN_LIST_REFRESH,
   WEB_EXPERIMENTATION_REBUILD_TAG,
+  WEB_EXPERIMENTATION_AUDIENCE_LIST_COPY,
+  WEB_EXPERIMENTATION_AUDIENCE_LIST_OPEN,
 } from './commands/const';
 import { selectAccountInputBox } from './menu/webExperimentation/AccountMenu';
 import { deleteCampaignInputBox, switchCampaignBox } from './menu/webExperimentation/CampaignMenu';
@@ -48,11 +50,7 @@ import {
   VariationWEItem,
 } from './providers/webExperimentation/CampaignList';
 import { QuickAccessListProvider } from './providers/webExperimentation/QuickAccessList';
-import {
-  CURRENT_SET_CAMPAIGN_ID,
-  CURRENT_SET_VARIATIONS_ID,
-  WEB_EXPERIMENTATION_CONFIGURED,
-} from './services/webExperimentation/const';
+import { WEB_EXPERIMENTATION_CONFIGURED } from './services/webExperimentation/const';
 import { AccountWEStore } from './store/webExperimentation/AccountStore';
 import { AuthenticationStore } from './store/webExperimentation/AuthenticationStore';
 import { CampaignStore } from './store/webExperimentation/CampaignStore';
@@ -60,6 +58,9 @@ import { CampaignStore } from './store/webExperimentation/CampaignStore';
 import { CampaignTreeView } from '../treeView/webExperimentation/campaignTreeView';
 import { showIndefiniteProgress } from './commands/configureWebExperimentation';
 import { AccountTreeView } from '../treeView/webExperimentation/accountTreeView';
+import { AudienceListProvider, AudienceWEItem } from './providers/webExperimentation/AudienceList';
+import { AudienceStore } from './store/webExperimentation/AudienceStore';
+import { AudienceTreeView } from '../treeView/webExperimentation/audienceTreeView';
 
 export const rootPath =
   vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0
@@ -70,6 +71,7 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
   const configured = await context.globalState.get(WEB_EXPERIMENTATION_CONFIGURED);
 
   const campaignStore = new CampaignStore(context, cli);
+  const audienceStore = new AudienceStore(context, cli);
   const accountStore = new AccountWEStore(context, cli);
   const authenticationStore = new AuthenticationStore(context, cli);
 
@@ -85,13 +87,21 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
   const campaignProvider = new CampaignListProvider(context, campaignStore, accountStore, account.account_id);
   const campaignTreeView = new CampaignTreeView(context, campaignProvider, cli, rootPath);
 
+  const audienceProvider = new AudienceListProvider(context, accountStore, audienceStore, account.account_id);
+  const audienceTreeView = new AudienceTreeView(context, audienceProvider, cli, rootPath, account.account_id);
+
   const accountProvider = new AccountListProvider(context, accountStore);
   const accountTreeView = new AccountTreeView(context, accountProvider, cli, rootPath, account.account_id);
 
   const progressIndicator = showIndefiniteProgress('Fetching Resources');
 
   try {
-    await Promise.all([quickAccessView.refresh(), accountProvider.refresh(), campaignTreeView.refresh()]);
+    await Promise.all([
+      quickAccessView.refresh(),
+      accountProvider.refresh(),
+      campaignTreeView.refresh(),
+      audienceTreeView.refresh(),
+    ]);
   } catch (error: any) {
     vscode.window.showErrorMessage(`Failed to fetch accounts: ${error.message}`);
   } finally {
@@ -470,11 +480,28 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
     ),
   ];
 
+  const audienceDisposables = [
+    vscode.commands.registerCommand(WEB_EXPERIMENTATION_AUDIENCE_LIST_COPY, async (audience: AudienceWEItem) => {
+      vscode.env.clipboard.writeText(audience.resourceId!);
+      vscode.window.showInformationMessage(`[AB Tasty] Audience ID: ${audience.resourceId} copied to your clipboard.`);
+    }),
+
+    vscode.commands.registerCommand(WEB_EXPERIMENTATION_AUDIENCE_LIST_OPEN, async (audience: AudienceWEItem) => {
+      const document = await vscode.workspace.openTextDocument({
+        content: JSON.stringify(audience.audience!),
+        language: 'json',
+      });
+      await vscode.window.showTextDocument(document);
+    }),
+  ];
+
   context.subscriptions.push(
     quickAccessProvider,
     campaignTreeView,
     accountTreeView,
+    audienceTreeView,
     ...campaignDisposables,
     ...accountDisposables,
+    ...audienceDisposables,
   );
 }

@@ -6,6 +6,7 @@ import { join } from 'path';
 import * as vscode from 'vscode';
 import {
   AccountWE,
+  Audience,
   Authentication,
   CampaignWE,
   CurrentAuthentication,
@@ -481,6 +482,78 @@ export class Cli {
       vscode.window.showErrorMessage(err.error);
       console.error(err);
       return false;
+    }
+  }
+
+  async ListTrigger(): Promise<Audience[]> {
+    try {
+      const cliBin = await this.CliBin();
+      if (!cliBin) {
+        return [];
+      }
+      const command = `${cliBin} web-experimentation trigger list --output-format json`;
+      const output = await this.exec(command, {});
+      console.log(output);
+      this.outputChannel.trace(command);
+      logMessage(this.outputChannel, output.stdout);
+      if (output.stderr) {
+        this.outputChannel.error(output.stderr);
+        vscode.window.showErrorMessage(output.stderr);
+        return [];
+      }
+      return JSON.parse(output.stdout);
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return [];
+    }
+  }
+
+  async ListSegment(): Promise<Audience[]> {
+    try {
+      const cliBin = await this.CliBin();
+      if (!cliBin) {
+        return [];
+      }
+      const command = `${cliBin} web-experimentation segment list --output-format json`;
+      const output = await this.exec(command, {});
+      console.log(output);
+      this.outputChannel.trace(command);
+      logMessage(this.outputChannel, output.stdout);
+      if (output.stderr) {
+        this.outputChannel.error(output.stderr);
+        vscode.window.showErrorMessage(output.stderr);
+        return [];
+      }
+      return JSON.parse(output.stdout);
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return [];
+    }
+  }
+
+  async ListAudience(): Promise<Audience[]> {
+    try {
+      const cliBin = await this.CliBin();
+      if (!cliBin) {
+        return [];
+      }
+      const command = `${cliBin} web-experimentation audience list --output-format json`;
+      const output = await this.exec(command, {});
+      console.log(output);
+      this.outputChannel.trace(command);
+      logMessage(this.outputChannel, output.stdout);
+      if (output.stderr) {
+        this.outputChannel.error(output.stderr);
+        vscode.window.showErrorMessage(output.stderr);
+        return [];
+      }
+      return JSON.parse(output.stdout);
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return [];
     }
   }
 

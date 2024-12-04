@@ -36,3 +36,5 @@ export const BEAKER = new vscode.ThemeIcon('beaker');
 export const BEAKER_ACTIVE = new vscode.ThemeIcon('beaker', new vscode.ThemeColor('charts.green'));
 export const BEAKER_PAUSED = new vscode.ThemeIcon('beaker', new vscode.ThemeColor('charts.orange'));
 export const BEAKER_INTERRUPTED = new vscode.ThemeIcon('beaker', new vscode.ThemeColor('charts.red'));
+export const SYMBOL_EVENT = new vscode.ThemeIcon('zap');
+export const MOVE = new vscode.ThemeIcon('move');
