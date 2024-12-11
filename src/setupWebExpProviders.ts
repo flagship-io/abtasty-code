@@ -35,6 +35,10 @@ import {
   WEB_EXPERIMENTATION_AUDIENCE_LIST_OPEN,
   WEB_EXPERIMENTATION_FAVORITE_URL_LIST_COPY,
   WEB_EXPERIMENTATION_FAVORITE_URL_LIST_OPEN,
+  WEB_EXPERIMENTATION_TARGETING_OPEN_FILE,
+  WEB_EXPERIMENTATION_CAMPAIGN_PULL_TARGETING,
+  WEB_EXPERIMENTATION_CAMPAIGN_PUSH_TARGETING,
+  WEB_EXPERIMENTATION_CAMPAIGN_ADD_TARGETING,
 } from './commands/const';
 import { selectAccountInputBox } from './menu/webExperimentation/AccountMenu';
 import { deleteCampaignInputBox, switchCampaignBox } from './menu/webExperimentation/CampaignMenu';
@@ -49,6 +53,7 @@ import {
   ModificationWETree,
   ModificationWEItem,
   VariationWEItem,
+  TargetingCampaign,
 } from './providers/webExperimentation/CampaignList';
 import { QuickAccessListProvider } from './providers/webExperimentation/QuickAccessList';
 import { WEB_EXPERIMENTATION_CONFIGURED } from './services/webExperimentation/const';
@@ -191,6 +196,80 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
       },
     ),
 
+    vscode.commands.registerCommand(WEB_EXPERIMENTATION_CAMPAIGN_PULL_TARGETING, async (fileItem: ResourceArgument) => {
+      const picked = await vscode.window.showQuickPick(['yes', 'no'], {
+        title: `Pull campaign targeting for the ID ${fileItem.campaignId}`,
+        placeHolder: 'Do you confirm ?',
+        ignoreFocusOut: true,
+      });
+
+      if (picked === 'yes') {
+        await campaignStore.pullCampaignTargeting(fileItem.campaignId!, true, true);
+      }
+      return;
+    }),
+
+    vscode.commands.registerCommand(WEB_EXPERIMENTATION_CAMPAIGN_PUSH_TARGETING, async (fileItem: ResourceArgument) => {
+      const picked = await vscode.window.showQuickPick(['yes', 'no'], {
+        title: `Push campaign targeting for the ID ${fileItem.campaignId}`,
+        placeHolder: 'Do you confirm ?',
+        ignoreFocusOut: true,
+      });
+
+      if (picked === 'yes') {
+        await campaignStore.pushCampaignTargeting(fileItem.campaignId!, fileItem.filePath);
+      }
+      return;
+    }),
+
+    vscode.commands.registerCommand(WEB_EXPERIMENTATION_CAMPAIGN_ADD_TARGETING, async (fileItem: TargetingCampaign) => {
+      const account = await accountStore.currentAccount();
+      const campaignPath = `${rootPath}/.abtasty/${account.account_id}/${fileItem.resourceId}`;
+      const campaignTargetingFilePath = `${campaignPath}/targeting/targeting.json`;
+      if (!fs.existsSync(campaignTargetingFilePath)) {
+        fs.mkdirSync(campaignPath, { recursive: true });
+        const createStream = fs.createWriteStream(campaignTargetingFilePath);
+        createStream.write(`{
+  "audience_ids": [],
+  "targeting_event_mode": "noajax",
+  "url_scopes": [
+    {
+    "value": "https://example.com",
+    "include": true,
+    "condition": 40
+    }
+  ],
+  "selector_scopes": [
+    {
+      "condition": 43,
+      "include": true,
+      "value": "#div"
+    }
+  ],
+  "code_scopes": [
+   {
+      "value": "console.log('Hello world !')"
+    }
+  ],
+  "favorite_url_scopes": [],
+  "segment_mode": "some",
+  "trigger_mode": "some",
+  "display_frequency_type": "any"
+}      
+`);
+        createStream.end();
+        vscode.window.showInformationMessage(`[AB Tasty] File created at ${campaignTargetingFilePath}`);
+        vscode.workspace.openTextDocument(campaignTargetingFilePath).then((doc) => {
+          vscode.window.showTextDocument(doc);
+        });
+
+        campaignTreeView.reveal(fileItem, { select: true, focus: true, expand: false });
+        vscode.commands.executeCommand('list.collapseAllToFocus');
+        campaignTreeView.reveal(fileItem, { select: true, focus: true, expand: true });
+      }
+      return;
+    }),
+
     vscode.commands.registerCommand(
       WEB_EXPERIMENTATION_VARIATION_PULL_GLOBAL_CODE_JS,
       async (fileItem: ResourceArgument) => {
@@ -306,6 +385,12 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
     ),
 
     vscode.commands.registerCommand(WEB_EXPERIMENTATION_GLOBAL_CODE_OPEN_FILE, (fileItem: ResourceArgument) => {
+      vscode.workspace.openTextDocument(fileItem.filePath).then((doc) => {
+        vscode.window.showTextDocument(doc);
+      });
+    }),
+
+    vscode.commands.registerCommand(WEB_EXPERIMENTATION_TARGETING_OPEN_FILE, (fileItem: ResourceArgument) => {
       vscode.workspace.openTextDocument(fileItem.filePath).then((doc) => {
         vscode.window.showTextDocument(doc);
       });

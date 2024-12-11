@@ -16,6 +16,8 @@ import {
   ModificationWETree,
   Parent,
   SimpleItem,
+  TargetingCampaign,
+  TargetingCampaignItem,
   VariationWEItem,
 } from '../../src/providers/webExperimentation/CampaignList';
 import { Cli } from '../../src/cli/cmd/webExperimentation/Cli';
@@ -177,6 +179,23 @@ export class CampaignTreeView {
           element.children?.push(
             new GlobalCodeCampaignItem('campaignGlobalCode.js', campaignGlobalCodePath, campaignId),
           );
+        }
+
+        this.campaignListProvider._onDidChangeTreeData.fire();
+      }
+
+      if (element instanceof TargetingCampaign) {
+        const accountId = String((element.parent as Parent).parent.id);
+        const campaignId = String((element.parent as Parent).id);
+        const campaignTargetingPath = `${workspaceABTasty}/.abtasty/${accountId}/${campaignId}/targeting/targeting.json`;
+        if (element.children?.length === 0 || element.children![0].label === NO_RESOURCE_FOUND) {
+          await cli.PullCampaignTargeting(campaignId, true, true);
+        }
+
+        element.children?.splice(0, 1)!;
+
+        if (fs.existsSync(campaignTargetingPath)) {
+          element.children?.push(new TargetingCampaignItem('targeting.json', campaignTargetingPath, campaignId));
         }
 
         this.campaignListProvider._onDidChangeTreeData.fire();

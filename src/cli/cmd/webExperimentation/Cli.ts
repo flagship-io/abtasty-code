@@ -41,6 +41,8 @@ export class Cli {
         { maxBuffer: 1024 * 1024 * 50 },
         (error, stdout, stderr) => {
           if (error) {
+            this.outputChannel.error(error.message);
+            vscode.window.showErrorMessage(stderr);
             reject({ error, stdout, stderr });
           }
           resolve({ stdout, stderr });
@@ -895,6 +897,60 @@ export class Cli {
         return false;
       }
       command = `${cliBin} web-experimentation modification create --campaign-id ${campaignId} --data-raw '{"input_type":"modification","name":"${name}","value":"","selector":"${selector}","type":"customScriptNew","variation_id": ${variationId},"engine":"engine"}'`;
+      const output = await this.exec(command, {});
+      console.log(output);
+      this.outputChannel.trace(command);
+      logMessage(this.outputChannel, output.stdout);
+      if (output.stderr) {
+        this.outputChannel.error(output.stderr);
+        vscode.window.showErrorMessage(output.stderr);
+        return false;
+      }
+      return true;
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return false;
+    }
+  }
+
+  async PullCampaignTargeting(id: string, createFile?: boolean, override?: boolean): Promise<any> {
+    try {
+      const cliBin = await this.CliBin();
+      let command: string;
+      if (!cliBin) {
+        return false;
+      }
+      command = `${cliBin} web-experimentation campaign-targeting get -i ${id} ${createFile ? `--create-file` : ``} ${
+        override ? `--override` : ``
+      }`;
+      const output = await this.exec(command, {});
+      console.log(output);
+      this.outputChannel.trace(command);
+      logMessage(this.outputChannel, output.stdout);
+      if (output.stderr) {
+        this.outputChannel.error(output.stderr);
+        vscode.window.showErrorMessage(output.stderr);
+        return false;
+      }
+      return output.stdout;
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return false;
+    }
+  }
+
+  async PushCampaignTargeting(id: string, filepath?: string, dataRaw?: string): Promise<boolean> {
+    try {
+      const cliBin = await this.CliBin();
+      let command: string;
+      if (!cliBin) {
+        return false;
+      }
+      command = `${cliBin} web-experimentation campaign-targeting push -i ${id} ${
+        dataRaw ? `--data-raw ${dataRaw}` : ``
+      } ${filepath ? `--file ${filepath}` : ``}`;
       const output = await this.exec(command, {});
       console.log(output);
       this.outputChannel.trace(command);

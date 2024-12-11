@@ -4,6 +4,7 @@ import {
   WEB_EXPERIMENTATION_GLOBAL_CODE_OPEN_FILE,
   WEB_EXPERIMENTATION_CAMPAIGN_LIST_LOAD,
   WEB_EXPERIMENTATION_CAMPAIGN_LIST_REFRESH,
+  WEB_EXPERIMENTATION_TARGETING_OPEN_FILE,
 } from '../../commands/const';
 import {
   BEAKER,
@@ -20,6 +21,7 @@ import {
   MILESTONE_ACTIVE,
   MILESTONE_INTERRUPTED,
   MILESTONE_PAUSED,
+  MOVE,
   PENCIL,
   ROCKET,
   TARGET,
@@ -256,6 +258,13 @@ export class CampaignListProvider implements vscode.TreeDataProvider<vscode.Tree
             [new CampaignTreeItem(NO_RESOURCE_FOUND, 0, undefined)],
             campaignParent,
             CODE,
+          ),
+          new TargetingCampaign(
+            'Campaign Targeting',
+            c.id,
+            [new CampaignTreeItem(NO_RESOURCE_FOUND, 0, undefined)],
+            campaignParent,
+            MOVE,
           ),
         );
       }
@@ -515,6 +524,55 @@ export class GlobalCodeCampaignItem extends CampaignTreeItem {
     this.command = {
       title: 'Open File',
       command: WEB_EXPERIMENTATION_GLOBAL_CODE_OPEN_FILE,
+      arguments: [{ campaignId, filePath } as ResourceArgument],
+    };
+
+    this.iconPath = FILE_CODE;
+  }
+}
+
+export class TargetingCampaign extends vscode.TreeItem {
+  children: CampaignTreeItem[] | undefined;
+  parent: any;
+  resourceId: number | undefined;
+  treeView?: CampaignTreeView;
+
+  constructor(
+    label?: string,
+    resourceId?: number,
+    children?: CampaignTreeItem[],
+    parent?: any,
+    iconPath?: vscode.ThemeIcon,
+    treeView?: CampaignTreeView,
+  ) {
+    super(
+      label!,
+      children === undefined ? vscode.TreeItemCollapsibleState.None : vscode.TreeItemCollapsibleState.Collapsed,
+    );
+    this.children = children;
+    this.parent = parent;
+    this.iconPath = iconPath;
+    this.resourceId = resourceId;
+    this.contextValue = 'targetingCampaign';
+    this.treeView = treeView;
+  }
+}
+
+export class TargetingCampaignItem extends CampaignTreeItem {
+  filePath: string;
+  type: string | undefined;
+  campaignId: string | undefined;
+
+  constructor(label: string, filePath: string, campaignId: string) {
+    super(label);
+
+    this.filePath = filePath;
+    this.campaignId = campaignId;
+
+    this.contextValue = 'targetingCampaignItem';
+    this.command = {
+      title: 'Open File',
+      command: WEB_EXPERIMENTATION_TARGETING_OPEN_FILE,
       arguments: [{ campaignId, filePath } as ResourceArgument],
     };
 

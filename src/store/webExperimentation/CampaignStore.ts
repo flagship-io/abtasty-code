@@ -78,6 +78,22 @@ export class CampaignStore {
     return cliResponse;
   }
 
+  async pullCampaignTargeting(campaignId: string, createFile?: boolean, override?: boolean): Promise<any> {
+    const cliResponse = campaignId ? await this.cli.PullCampaignTargeting(campaignId, createFile, override) : false;
+    if (cliResponse) {
+      vscode.window.showInformationMessage(`[AB Tasty] Campaign targeting pulled successfully`);
+    }
+    return cliResponse;
+  }
+
+  async pushCampaignTargeting(campaignId: string, filepath?: string, dataRaw?: string): Promise<any> {
+    const cliResponse = campaignId ? await this.cli.PushCampaignTargeting(campaignId, filepath, dataRaw) : false;
+    if (cliResponse) {
+      vscode.window.showInformationMessage(`[AB Tasty] Campaign targeting pushed successfully`);
+    }
+    return cliResponse;
+  }
+
   async pullVariationGlobalCodeJS(
     variationId: string,
     campaignId: string,

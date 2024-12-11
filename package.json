@@ -355,6 +355,21 @@
         "icon": "$(repo-push)"
       },
       {
+        "command": "webExperimentation.campaignList.pullTargeting",
+        "title": "Pull campaign targeting from the platform",
+        "icon": "$(repo-sync)"
+      },
+      {
+        "command": "webExperimentation.campaignList.addTargeting",
+        "title": "Add campaign targeting",
+        "icon": "$(add)"
+      },
+      {
+        "command": "webExperimentation.campaignList.pushTargeting",
+        "title": "Push campaign targeting to the platform",
+        "icon": "$(repo-push)"
+      },
+      {
         "command": "webExperimentation.campaignList.copyCampaign",
         "title": "Web Experimentation: Copy the campaign ID in clipboard",
         "icon": "$(clippy)"
@@ -447,6 +462,10 @@
       {
         "command": "webExperimentation.campaignList.globalCodeOpenFile",
         "title": "Web Experimentation: Open code file"
+      },
+      {
+        "command": "webExperimentation.campaignList.targetingOpenFile",
+        "title": "Web Experimentation: Open targeting details file"
       },
       {
         "command": "webExperimentation.audienceList.copyAudience",
@@ -676,6 +695,21 @@
         {
           "command": "webExperimentation.campaignList.pushGlobalCode",
           "when": "view == webExperimentation.campaignList && viewItem == globalCodeCampaignItem",
+          "group": "inline"
+        },
+        {
+          "command": "webExperimentation.campaignList.pullTargeting",
+          "when": "view == webExperimentation.campaignList && viewItem == targetingCampaignItem",
+          "group": "inline"
+        },
+        {
+          "command": "webExperimentation.campaignList.addTargeting",
+          "when": "view == webExperimentation.campaignList && viewItem == targetingCampaign",
+          "group": "inline"
+        },
+        {
+          "command": "webExperimentation.campaignList.pushTargeting",
+          "when": "view == webExperimentation.campaignList && viewItem == targetingCampaignItem",
           "group": "inline"
         },
         {

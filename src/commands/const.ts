@@ -108,6 +108,10 @@ export const WEB_EXPERIMENTATION_CAMPAIGN_PULL_GLOBAL_CODE = 'webExperimentation
 export const WEB_EXPERIMENTATION_CAMPAIGN_PUSH_GLOBAL_CODE = 'webExperimentation.campaignList.pushGlobalCode';
 export const WEB_EXPERIMENTATION_CAMPAIGN_ADD_GLOBAL_CODE = 'webExperimentation.campaignList.addGlobalCode';
 export const WEB_EXPERIMENTATION_GLOBAL_CODE_OPEN_FILE = 'webExperimentation.campaignList.globalCodeOpenFile';
+export const WEB_EXPERIMENTATION_CAMPAIGN_PULL_TARGETING = 'webExperimentation.campaignList.pullTargeting';
+export const WEB_EXPERIMENTATION_CAMPAIGN_PUSH_TARGETING = 'webExperimentation.campaignList.pushTargeting';
+export const WEB_EXPERIMENTATION_CAMPAIGN_ADD_TARGETING = 'webExperimentation.campaignList.addTargeting';
+export const WEB_EXPERIMENTATION_TARGETING_OPEN_FILE = 'webExperimentation.campaignList.targetingOpenFile';
 export const WEB_EXPERIMENTATION_ACCOUNT_GLOBAL_CODE_OPEN_FILE = 'webExperimentation.accountList.globalCodeOpenFile';
 
 export const WEB_EXPERIMENTATION_ACCOUNT_LIST_REFRESH = 'webExperimentation.accountList.refresh';
