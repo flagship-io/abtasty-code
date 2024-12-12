@@ -39,6 +39,7 @@ import {
   WEB_EXPERIMENTATION_CAMPAIGN_PULL_TARGETING,
   WEB_EXPERIMENTATION_CAMPAIGN_PUSH_TARGETING,
   WEB_EXPERIMENTATION_CAMPAIGN_ADD_TARGETING,
+  WEB_EXPERIMENTATION_VARIATION_OPEN_WEB_PREVIEW,
 } from './commands/const';
 import { selectAccountInputBox } from './menu/webExperimentation/AccountMenu';
 import { deleteCampaignInputBox, switchCampaignBox } from './menu/webExperimentation/CampaignMenu';
@@ -70,6 +71,7 @@ import { AudienceTreeView } from '../treeView/webExperimentation/audienceTreeVie
 import { FavoriteUrlStore } from './store/webExperimentation/FavoriteUrlStore';
 import { FavoriteUrlListProvider, FavoriteUrlWEItem } from './providers/webExperimentation/FavoriteUrlList';
 import { FavoriteUrlTreeView } from '../treeView/webExperimentation/FavoriteUrlTreeView';
+import open from 'open';
 
 export const rootPath =
   vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0
@@ -292,6 +294,18 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
         `[AB Tasty] Variation ID: ${String(resource.resourceId)} copied to your clipboard.`,
       );
     }),
+
+    vscode.commands.registerCommand(
+      WEB_EXPERIMENTATION_VARIATION_OPEN_WEB_PREVIEW,
+      async (resource: VariationWEItem) => {
+        const webPreviewDetails = await campaignStore.openWebPreview(
+          String(resource.parent!.id),
+          String(resource.resourceId),
+        );
+
+        open(webPreviewDetails.url);
+      },
+    ),
 
     vscode.commands.registerCommand(
       WEB_EXPERIMENTATION_VARIATION_PUSH_GLOBAL_CODE_JS,

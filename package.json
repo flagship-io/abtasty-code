@@ -435,6 +435,11 @@
         "icon": "$(clippy)"
       },
       {
+        "command": "webExperimentation.variationList.openWebPreviewVariation",
+        "title": "Web Experimentation: Open web preview for the variation",
+        "icon": "$(globe)"
+      },
+      {
         "command": "webExperimentation.modificationList.pullCode",
         "title": "Pull modification code from the platform",
         "icon": "$(repo-sync)"
@@ -753,6 +758,11 @@
           "group": "inline"
         },
         {
+          "command": "webExperimentation.variationList.openWebPreviewVariation",
+          "when": "view == webExperimentation.campaignList && viewItem == variationWEItem",
+          "group": "inline"
+        },
+        {
           "command": "webExperimentation.modificationList.pullCode",
           "when": "view == webExperimentation.campaignList && viewItem == codeModificationItem",
           "group": "inline"
@@ -974,9 +984,10 @@
     "webpack-cli": "^5.0.1"
   },
   "dependencies": {
+    "@vscode/webview-ui-toolkit": "^1.4.0",
     "axios": "^1.3.5",
+    "open": "^10.1.0",
     "rimraf": "^5.0.0",
-    "tar-fs": "^3.0.3",
-    "@vscode/webview-ui-toolkit": "^1.4.0"
+    "tar-fs": "^3.0.3"
   }
 }

@@ -1,3 +1,5 @@
+export const SIMPLE_BROWSER_SHOW = 'simpleBrowser.show';
+
 // FEATURE EXP
 
 export const FEATURE_EXPERIMENTATION_FLAG_IN_FILE_REFRESH = 'featureExperimentation.flagsInFile.refresh';
@@ -88,6 +90,8 @@ export const WEB_EXPERIMENTATION_VARIATION_LIST_LOAD = 'webExperimentation.varia
 export const WEB_EXPERIMENTATION_VARIATION_LIST_EDIT = 'webExperimentation.variationList.editVariation';
 export const WEB_EXPERIMENTATION_VARIATION_LIST_DELETE = 'webExperimentation.variationList.deleteVariation';
 export const WEB_EXPERIMENTATION_VARIATION_LIST_COPY = 'webExperimentation.variationList.copyVariation';
+export const WEB_EXPERIMENTATION_VARIATION_OPEN_WEB_PREVIEW =
+  'webExperimentation.variationList.openWebPreviewVariation';
 export const WEB_EXPERIMENTATION_VARIATION_ADD_GLOBAL_CODE = 'webExperimentation.variationList.addGlobalCode';
 export const WEB_EXPERIMENTATION_VARIATION_PULL_GLOBAL_CODE_JS = 'webExperimentation.variationList.pullGlobalCodeJS';
 export const WEB_EXPERIMENTATION_VARIATION_PUSH_GLOBAL_CODE_JS = 'webExperimentation.variationList.pushGlobalCodeJS';

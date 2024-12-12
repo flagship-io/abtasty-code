@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { Cli } from '../../cli/cmd/webExperimentation/Cli';
-import { CampaignWE, ModificationWE } from '../../model';
+import { CampaignWE, WebPreview } from '../../model';
 import { CampaignDataService } from '../../services/webExperimentation/CampaignDataService';
 
 export class CampaignStore {
@@ -185,6 +185,12 @@ export class CampaignStore {
     if (cliResponse) {
       vscode.window.showInformationMessage(`[AB Tasty] Modification code pushed successfully`);
     }
+    return cliResponse;
+  }
+
+  async openWebPreview(campaignId: string, variationId: string): Promise<WebPreview> {
+    const cliResponse =
+      campaignId && variationId ? await this.cli.OpenWebPreviewVariation(campaignId, variationId) : ({} as WebPreview);
     return cliResponse;
   }
 }
