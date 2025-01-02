@@ -146,15 +146,20 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
     vscode.commands.registerCommand(
       WEB_EXPERIMENTATION_CAMPAIGN_PULL_GLOBAL_CODE,
       async (fileItem: ResourceArgument) => {
-        const picked = await vscode.window.showQuickPick(['yes', 'no'], {
+        const picked = await vscode.window.showQuickPick(['yes', 'no', 'override'], {
           title: `Pull campaign global code for the ID ${fileItem.campaignId}`,
           placeHolder: 'Do you confirm ?',
           ignoreFocusOut: true,
         });
 
         if (picked === 'yes') {
+          await campaignStore.pullCampaignGlobalCode(fileItem.campaignId!, true, false, false);
+        }
+
+        if (picked === 'override') {
           await campaignStore.pullCampaignGlobalCode(fileItem.campaignId!, true, true, false);
         }
+
         return;
       },
     ),
@@ -162,15 +167,20 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
     vscode.commands.registerCommand(
       WEB_EXPERIMENTATION_CAMPAIGN_PUSH_GLOBAL_CODE,
       async (fileItem: ResourceArgument) => {
-        const picked = await vscode.window.showQuickPick(['yes', 'no'], {
+        const picked = await vscode.window.showQuickPick(['yes', 'no', 'override'], {
           title: `Push campaign global code for the ID ${fileItem.campaignId}`,
           placeHolder: 'Do you confirm ?',
           ignoreFocusOut: true,
         });
 
         if (picked === 'yes') {
-          await campaignStore.pushCampaignGlobalCode(fileItem.campaignId!, fileItem.filePath);
+          await campaignStore.pushCampaignGlobalCode(fileItem.campaignId!, fileItem.filePath, '', false);
         }
+
+        if (picked === 'override') {
+          await campaignStore.pushCampaignGlobalCode(fileItem.campaignId!, fileItem.filePath, '', true);
+        }
+
         return;
       },
     ),
@@ -275,15 +285,20 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
     vscode.commands.registerCommand(
       WEB_EXPERIMENTATION_VARIATION_PULL_GLOBAL_CODE_JS,
       async (fileItem: ResourceArgument) => {
-        const picked = await vscode.window.showQuickPick(['yes', 'no'], {
+        const picked = await vscode.window.showQuickPick(['yes', 'no', 'override'], {
           title: `Pull variation global code js for the ID ${fileItem.variationId}`,
           placeHolder: 'Do you confirm ?',
           ignoreFocusOut: true,
         });
 
         if (picked === 'yes') {
+          await campaignStore.pullVariationGlobalCodeJS(fileItem.variationId, fileItem.campaignId, true, false);
+        }
+
+        if (picked === 'override') {
           await campaignStore.pullVariationGlobalCodeJS(fileItem.variationId, fileItem.campaignId, true, true);
         }
+
         return;
       },
     ),
@@ -310,15 +325,32 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
     vscode.commands.registerCommand(
       WEB_EXPERIMENTATION_VARIATION_PUSH_GLOBAL_CODE_JS,
       async (fileItem: ResourceArgument) => {
-        const picked = await vscode.window.showQuickPick(['yes', 'no'], {
+        const picked = await vscode.window.showQuickPick(['yes', 'no', 'override'], {
           title: `Push variation global code js for the ID ${fileItem.variationId}`,
           placeHolder: 'Do you confirm ?',
           ignoreFocusOut: true,
         });
 
         if (picked === 'yes') {
-          await campaignStore.pushVariationGlobalCodeJS(fileItem.variationId, fileItem.campaignId, fileItem.filePath);
+          await campaignStore.pushVariationGlobalCodeJS(
+            fileItem.variationId,
+            fileItem.campaignId,
+            fileItem.filePath,
+            '',
+            false,
+          );
         }
+
+        if (picked === 'override') {
+          await campaignStore.pushVariationGlobalCodeJS(
+            fileItem.variationId,
+            fileItem.campaignId,
+            fileItem.filePath,
+            '',
+            true,
+          );
+        }
+
         return;
       },
     ),
@@ -326,15 +358,20 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
     vscode.commands.registerCommand(
       WEB_EXPERIMENTATION_VARIATION_PULL_GLOBAL_CODE_CSS,
       async (fileItem: ResourceArgument) => {
-        const picked = await vscode.window.showQuickPick(['yes', 'no'], {
+        const picked = await vscode.window.showQuickPick(['yes', 'no', 'override'], {
           title: `Pull variation global code css for the ID ${fileItem.variationId}`,
           placeHolder: 'Do you confirm ?',
           ignoreFocusOut: true,
         });
 
         if (picked === 'yes') {
+          await campaignStore.pullVariationGlobalCodeCSS(fileItem.variationId, fileItem.campaignId, true, false);
+        }
+
+        if (picked === 'override') {
           await campaignStore.pullVariationGlobalCodeCSS(fileItem.variationId, fileItem.campaignId, true, true);
         }
+
         return;
       },
     ),
@@ -342,15 +379,32 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
     vscode.commands.registerCommand(
       WEB_EXPERIMENTATION_VARIATION_PUSH_GLOBAL_CODE_CSS,
       async (fileItem: ResourceArgument) => {
-        const picked = await vscode.window.showQuickPick(['yes', 'no'], {
+        const picked = await vscode.window.showQuickPick(['yes', 'no', 'override'], {
           title: `Push variation global code css for the ID ${fileItem.variationId}`,
           placeHolder: 'Do you confirm ?',
           ignoreFocusOut: true,
         });
 
         if (picked === 'yes') {
-          await campaignStore.pushVariationGlobalCodeCSS(fileItem.variationId, fileItem.campaignId, fileItem.filePath);
+          await campaignStore.pushVariationGlobalCodeCSS(
+            fileItem.variationId,
+            fileItem.campaignId,
+            fileItem.filePath,
+            '',
+            false,
+          );
         }
+
+        if (picked === 'override') {
+          await campaignStore.pushVariationGlobalCodeCSS(
+            fileItem.variationId,
+            fileItem.campaignId,
+            fileItem.filePath,
+            '',
+            true,
+          );
+        }
+
         return;
       },
     ),
@@ -411,15 +465,20 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
     }),
 
     vscode.commands.registerCommand(WEB_EXPERIMENTATION_MODIFICATION_PULL_CODE, async (fileItem: ResourceArgument) => {
-      const picked = await vscode.window.showQuickPick(['yes', 'no'], {
+      const picked = await vscode.window.showQuickPick(['yes', 'no', 'override'], {
         title: `Pull modification code for the ID ${fileItem.modificationId}`,
         placeHolder: 'Do you confirm ?',
         ignoreFocusOut: true,
       });
 
       if (picked === 'yes') {
+        await campaignStore.pullModificationCode(fileItem.modificationId, fileItem.campaignId, true, false);
+      }
+
+      if (picked === 'override') {
         await campaignStore.pullModificationCode(fileItem.modificationId, fileItem.campaignId, true, true);
       }
+
       return;
     }),
 
@@ -468,7 +527,7 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
     ),
 
     vscode.commands.registerCommand(WEB_EXPERIMENTATION_MODIFICATION_PUSH_CODE, async (fileItem: ResourceArgument) => {
-      const picked = await vscode.window.showQuickPick(['yes', 'no'], {
+      const picked = await vscode.window.showQuickPick(['yes', 'no', 'override'], {
         title: `Push modification code for the ID ${fileItem.modificationId}`,
         placeHolder: 'Do you confirm ?',
         ignoreFocusOut: true,
@@ -480,6 +539,19 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
           fileItem.variationId,
           fileItem.campaignId,
           fileItem.filePath,
+          '',
+          false,
+        );
+      }
+
+      if (picked === 'override') {
+        await campaignStore.pushModificationCode(
+          fileItem.modificationId,
+          fileItem.variationId,
+          fileItem.campaignId,
+          fileItem.filePath,
+          '',
+          true,
         );
       }
       return;
@@ -533,13 +605,17 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
     vscode.commands.registerCommand(
       WEB_EXPERIMENTATION_ACCOUNT_PULL_GLOBAL_CODE,
       async (fileItem: ResourceArgument) => {
-        const picked = await vscode.window.showQuickPick(['yes', 'no'], {
+        const picked = await vscode.window.showQuickPick(['yes', 'no', 'override'], {
           title: `Pull account global code for the ID ${fileItem.accountId!}`,
           placeHolder: 'Do you confirm ?',
           ignoreFocusOut: true,
         });
 
         if (picked === 'yes') {
+          await accountStore.pullAccountGlobalCode(fileItem.accountId!, true, false);
+        }
+
+        if (picked === 'override') {
           await accountStore.pullAccountGlobalCode(fileItem.accountId!, true, true);
         }
 
@@ -550,14 +626,18 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
     vscode.commands.registerCommand(
       WEB_EXPERIMENTATION_ACCOUNT_PUSH_GLOBAL_CODE,
       async (fileItem: ResourceArgument) => {
-        const picked = await vscode.window.showQuickPick(['yes', 'no'], {
+        const picked = await vscode.window.showQuickPick(['yes', 'no', 'override'], {
           title: `Push account global code for the ID ${fileItem.accountId!}`,
           placeHolder: 'Do you confirm ?',
           ignoreFocusOut: true,
         });
 
         if (picked === 'yes') {
-          await accountStore.pushAccountGlobalCode(fileItem.accountId!, fileItem.filePath);
+          await accountStore.pushAccountGlobalCode(fileItem.accountId!, fileItem.filePath, '', false);
+        }
+
+        if (picked === 'override') {
+          await accountStore.pushAccountGlobalCode(fileItem.accountId!, fileItem.filePath, '', true);
         }
 
         return;

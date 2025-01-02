@@ -70,8 +70,10 @@ export class CampaignStore {
     return cliResponse;
   }
 
-  async pushCampaignGlobalCode(campaignId: string, filepath?: string, code?: string): Promise<any> {
-    const cliResponse = campaignId ? await this.cli.PushCampaignGlobalCode(campaignId, filepath, code) : false;
+  async pushCampaignGlobalCode(campaignId: string, filepath: string, code: string, override: boolean): Promise<any> {
+    const cliResponse = campaignId
+      ? await this.cli.PushCampaignGlobalCode(campaignId, filepath, code, override)
+      : false;
     if (cliResponse) {
       vscode.window.showInformationMessage(`[AB Tasty] Campaign global code pushed successfully`);
     }
@@ -113,11 +115,12 @@ export class CampaignStore {
   async pushVariationGlobalCodeJS(
     variationId: string,
     campaignId: string,
-    filepath?: string,
-    code?: string,
+    filepath: string,
+    code: string,
+    override: boolean,
   ): Promise<any> {
     const cliResponse = campaignId
-      ? await this.cli.PushVariationGlobalCodeJS(variationId, campaignId, filepath, code)
+      ? await this.cli.PushVariationGlobalCodeJS(variationId, campaignId, filepath, code, override)
       : false;
     if (cliResponse) {
       vscode.window.showInformationMessage(`[AB Tasty] Variation global code JS pushed successfully`);
@@ -144,11 +147,12 @@ export class CampaignStore {
   async pushVariationGlobalCodeCSS(
     variationId: string,
     campaignId: string,
-    filepath?: string,
-    code?: string,
+    filepath: string,
+    code: string,
+    override: boolean,
   ): Promise<any> {
     const cliResponse = campaignId
-      ? await this.cli.PushVariationGlobalCodeCSS(variationId, campaignId, filepath, code)
+      ? await this.cli.PushVariationGlobalCodeCSS(variationId, campaignId, filepath, code, override)
       : false;
     if (cliResponse) {
       vscode.window.showInformationMessage(`[AB Tasty] Variation global code CSS pushed successfully`);
@@ -176,11 +180,12 @@ export class CampaignStore {
     modificationId: string,
     campaignId: string,
     variationId: string,
-    filepath?: string,
-    code?: string,
+    filepath: string,
+    code: string,
+    override: boolean,
   ): Promise<any> {
     const cliResponse = campaignId
-      ? await this.cli.PushModificationCode(modificationId, variationId, campaignId, filepath, code)
+      ? await this.cli.PushModificationCode(modificationId, variationId, campaignId, filepath, code, override)
       : false;
     if (cliResponse) {
       vscode.window.showInformationMessage(`[AB Tasty] Modification code pushed successfully`);

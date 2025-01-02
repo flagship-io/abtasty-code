@@ -84,7 +84,7 @@ export class AudienceListProvider implements vscode.TreeDataProvider<vscode.Tree
       const audienceParent = { id: a.id, parent: accountParent } as Parent;
       const audienceData: AudienceTreeItem[] = [];
       const audienceDetails = Object.entries(a)
-        .filter(([key, value]) => value !== null)
+        .filter(([key, value]) => key !== 'groups' && key !== 'live_tests_source' && value !== null)
         .map(([key, value]) => {
           if (key === 'created_at') {
             const createdAt = Object.entries(a.created_at).map(([key, value]) => {
@@ -217,6 +217,12 @@ export class AudienceWEItem extends AudienceTreeItem {
     this.children = children;
     this.parent = parent;
     this.audience = audience;
+
+    if (isSegment) {
+      this.iconPath = MOVE;
+    } else {
+      this.iconPath = SYMBOL_EVENT;
+    }
   }
 
   contextValue = 'audienceWEItem';

@@ -39,8 +39,8 @@ export class AccountWEStore {
     return cliResponse;
   }
 
-  async pushAccountGlobalCode(accountId: string, filepath?: string, code?: string): Promise<any> {
-    const cliResponse = accountId ? await this.cli.PushAccountGlobalCode(accountId, filepath, code) : false;
+  async pushAccountGlobalCode(accountId: string, filepath: string, code: string, override: boolean): Promise<any> {
+    const cliResponse = accountId ? await this.cli.PushAccountGlobalCode(accountId, filepath, code, override) : false;
     if (cliResponse) {
       vscode.window.showInformationMessage(`[AB Tasty] Account global code pushed successfully`);
     }

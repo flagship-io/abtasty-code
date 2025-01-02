@@ -125,7 +125,21 @@ export async function pushCampaignGlobalCodeOperationInputBox(campaign: Campaign
         ? path.resolve(uri!.path, uriFile![0].path).replace(/\\/g, '/').replace('C:/', '')
         : uriFile![0].path;
 
-    await campaignStore.pushCampaignGlobalCode(campaign.id!, pathConfig);
+    const picked = await vscode.window.showQuickPick(['yes', 'no', 'override'], {
+      title: `Push campaign global code for the ID ${campaign.id!}`,
+      placeHolder: 'Do you confirm ?',
+      ignoreFocusOut: true,
+    });
+
+    if (picked === 'yes') {
+      await campaignStore.pushCampaignGlobalCode(campaign.id!, pathConfig, '', false);
+    }
+
+    if (picked === 'override') {
+      await campaignStore.pushCampaignGlobalCode(campaign.id!, pathConfig, '', true);
+    }
+
+    return;
   }
   return;
 }

@@ -3,7 +3,7 @@ import {
   WEB_EXPERIMENTATION_FAVORITE_URL_LIST_REFRESH,
   WEB_EXPERIMENTATION_FAVORITE_URL_LIST_LOAD,
 } from '../../commands/const';
-import { CIRCLE_FILLED, INFO, MOVE, SYMBOL_EVENT, TARGET } from '../../icons';
+import { CIRCLE_FILLED, INFO, LINK, MOVE, SYMBOL_EVENT, TARGET } from '../../icons';
 import { NO_RESOURCE_FOUND } from '../../const';
 import { AccountWEStore } from '../../store/webExperimentation/AccountStore';
 import { FavoriteUrlStore } from '../../store/webExperimentation/FavoriteUrlStore';
@@ -84,7 +84,7 @@ export class FavoriteUrlListProvider implements vscode.TreeDataProvider<vscode.T
       const favoriteUrlParent = { id: f.id, parent: accountParent } as Parent;
       const favoriteUrlData: FavoriteUrlTreeItem[] = [];
       const favoriteUrlDetails = Object.entries(f)
-        .filter(([key, value]) => value !== null)
+        .filter(([key, value]) => key !== 'conditions' && value !== null)
         .map(([key, value]) => {
           if (key === 'created_at') {
             const createdAt = Object.entries(f.created_at).map(([key, value]) => {
@@ -181,6 +181,8 @@ export class FavoriteUrlWEItem extends FavoriteUrlTreeItem {
     this.children = children;
     this.parent = parent;
     this.favoriteUrl = favoriteUrl;
+
+    this.iconPath = LINK;
   }
 
   contextValue = 'favoriteUrlWEItem';

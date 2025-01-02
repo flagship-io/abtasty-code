@@ -633,7 +633,7 @@ export class Cli {
     }
   }
 
-  async PushAccountGlobalCode(id: string, filepath?: string, code?: string): Promise<boolean> {
+  async PushAccountGlobalCode(id: string, filepath?: string, code?: string, override?: boolean): Promise<boolean> {
     try {
       const cliBin = await this.CliBin();
       let command: string;
@@ -642,7 +642,7 @@ export class Cli {
       }
       command = `${cliBin} web-experimentation account-global-code push -i ${id} ${code ? `--code ${code}` : ``} ${
         filepath ? `--file ${filepath}` : ``
-      }`;
+      } ${override ? `--override` : ``}`;
 
       const output = await this.exec(command, {});
       console.log(output);
@@ -688,7 +688,7 @@ export class Cli {
     }
   }
 
-  async PushCampaignGlobalCode(id: string, filepath?: string, code?: string): Promise<boolean> {
+  async PushCampaignGlobalCode(id: string, filepath?: string, code?: string, override?: boolean): Promise<boolean> {
     try {
       const cliBin = await this.CliBin();
       let command: string;
@@ -697,7 +697,7 @@ export class Cli {
       }
       command = `${cliBin} web-experimentation campaign-global-code push -i ${id} ${code ? `--code ${code}` : ``} ${
         filepath ? `--file ${filepath}` : ``
-      }`;
+      } ${override ? `--override` : ``}`;
       const output = await this.exec(command, {});
       console.log(output);
       this.outputChannel.trace(command);
@@ -746,7 +746,13 @@ export class Cli {
     }
   }
 
-  async PushVariationGlobalCodeJS(id: string, campaignId: string, filepath?: string, code?: string): Promise<boolean> {
+  async PushVariationGlobalCodeJS(
+    id: string,
+    campaignId: string,
+    filepath?: string,
+    code?: string,
+    override?: boolean,
+  ): Promise<boolean> {
     try {
       const cliBin = await this.CliBin();
       let command: string;
@@ -755,7 +761,7 @@ export class Cli {
       }
       command = `${cliBin} web-experimentation variation-global-code push-js -i ${id} --campaign-id ${campaignId} ${
         code ? `--code ${code}` : ``
-      } ${filepath ? `--file ${filepath}` : ``}`;
+      } ${filepath ? `--file ${filepath}` : ``} ${override ? `--override` : ``}`;
       const output = await this.exec(command, {});
       console.log(output);
       this.outputChannel.trace(command);
@@ -804,7 +810,13 @@ export class Cli {
     }
   }
 
-  async PushVariationGlobalCodeCSS(id: string, campaignId: string, filepath?: string, code?: string): Promise<boolean> {
+  async PushVariationGlobalCodeCSS(
+    id: string,
+    campaignId: string,
+    filepath?: string,
+    code?: string,
+    override?: boolean,
+  ): Promise<boolean> {
     try {
       const cliBin = await this.CliBin();
       let command: string;
@@ -813,7 +825,7 @@ export class Cli {
       }
       command = `${cliBin} web-experimentation variation-global-code push-css -i ${id} --campaign-id ${campaignId} ${
         code ? `--code ${code}` : ``
-      } ${filepath ? `--file ${filepath}` : ``}`;
+      } ${filepath ? `--file ${filepath}` : ``} ${override ? `--override` : ``}`;
       const output = await this.exec(command, {});
       console.log(output);
       this.outputChannel.trace(command);
@@ -863,6 +875,7 @@ export class Cli {
     variationId: string,
     filepath?: string,
     code?: string,
+    override?: boolean,
   ): Promise<boolean> {
     try {
       const cliBin = await this.CliBin();
@@ -872,7 +885,7 @@ export class Cli {
       }
       command = `${cliBin} web-experimentation modification-code push -i ${id} --campaign-id ${campaignId} --variation-id ${variationId} ${
         code ? `--code ${code}` : ``
-      } ${filepath ? `--file ${filepath}` : ``}`;
+      } ${filepath ? `--file ${filepath}` : ``} ${override ? `--override` : ``}`;
       const output = await this.exec(command, {});
       console.log(output);
       this.outputChannel.trace(command);
