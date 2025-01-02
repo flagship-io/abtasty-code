@@ -808,17 +808,7 @@
           "group": "inline"
         },
         {
-          "command": "webExperimentation.audienceList.openAudience",
-          "when": "view == webExperimentation.audienceList && viewItem == audienceWEItem",
-          "group": "inline"
-        },
-        {
           "command": "webExperimentation.favoriteUrlList.copyFavoriteUrl",
-          "when": "view == webExperimentation.favoriteUrlList && viewItem == favoriteUrlWEItem",
-          "group": "inline"
-        },
-        {
-          "command": "webExperimentation.favoriteUrlList.openFavoriteUrl",
           "when": "view == webExperimentation.favoriteUrlList && viewItem == favoriteUrlWEItem",
           "group": "inline"
         }
