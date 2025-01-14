@@ -56,7 +56,7 @@ export class QuickAccessListProvider implements vscode.TreeDataProvider<vscode.T
       }),
     );
     this.items.push(
-      new LinkItem(`Sent Refresh/Rebuild tag request`, NON_COLLAPSED, '', {
+      new LinkItem(`Send Refresh/Rebuild tag request`, NON_COLLAPSED, '', {
         title: 'Refresh tag',
         command: WEB_EXPERIMENTATION_REBUILD_TAG,
       }),
