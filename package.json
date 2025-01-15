@@ -121,6 +121,16 @@
           "id": "webExperimentation.campaignList",
           "name": "Campaign",
           "when": "abtasty:explorer == webExperimentation"
+        },
+        {
+          "id": "webExperimentation.audienceList",
+          "name": "Audience",
+          "when": "abtasty:explorer == webExperimentation"
+        },
+        {
+          "id": "webExperimentation.favoriteUrlList",
+          "name": "Favorite URL",
+          "when": "abtasty:explorer == webExperimentation"
         }
       ]
     },
@@ -176,7 +186,7 @@
       },
       {
         "command": "featureExperimentation.flagList.copyFlag",
-        "title": "Feature Experimentation: Copy the flag in clipboard",
+        "title": "Feature Experimentation: Copy the flag ID in clipboard",
         "icon": "$(clippy)"
       },
       {
@@ -196,7 +206,7 @@
       },
       {
         "command": "featureExperimentation.projectList.copyProject",
-        "title": "Feature Experimentation: Copy the project id",
+        "title": "Feature Experimentation: Copy the project ID in clipboard",
         "icon": "$(clippy)"
       },
       {
@@ -215,23 +225,33 @@
         "icon": "$(trash)"
       },
       {
+        "command": "featureExperimentation.projectList.changeState",
+        "title": "Feature Experimentation: Change the project's state",
+        "icon": "$(debug-disconnect)"
+      },
+      {
         "command": "featureExperimentation.campaignList.openInBrowser",
         "title": "Feature Experimentation: Open campaign in the platform",
         "icon": "$(link-external)"
       },
       {
         "command": "featureExperimentation.campaignList.copyCampaign",
-        "title": "Feature Experimentation: Copy the campaign id",
+        "title": "Feature Experimentation: Copy the campaign ID in clipboard",
         "icon": "$(clippy)"
       },
       {
+        "command": "featureExperimentation.campaignList.changeState",
+        "title": "Feature Experimentation: Change the campaign's state",
+        "icon": "$(debug-disconnect)"
+      },
+      {
         "command": "featureExperimentation.variationGroupList.copyVariationGroup",
-        "title": "Feature Experimentation: Copy the variation group id",
+        "title": "Feature Experimentation: Copy the variation group ID in clipboard",
         "icon": "$(clippy)"
       },
       {
         "command": "featureExperimentation.variationList.copyVariation",
-        "title": "Feature Experimentation: Copy the variation id",
+        "title": "Feature Experimentation: Copy the variation ID in clipboard",
         "icon": "$(clippy)"
       },
       {
@@ -300,6 +320,16 @@
         "icon": "$(refresh)"
       },
       {
+        "command": "webExperimentation.audienceList.refresh",
+        "title": "Web Experimentation: Refresh audience panel",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "webExperimentation.favoriteUrlList.refresh",
+        "title": "Web Experimentation: Refresh favorite URL panel",
+        "icon": "$(refresh)"
+      },
+      {
         "command": "webExperimentation.modificationList.deleteModification",
         "title": "Web Experimentation: Remove the modification",
         "icon": "$(trash)"
@@ -308,11 +338,6 @@
         "command": "webExperimentation.campaignList.deleteCampaign",
         "title": "Web Experimentation: Remove the goal",
         "icon": "$(trash)"
-      },
-      {
-        "command": "webExperimentation.campaignList.setCampaign",
-        "title": "Set as global campaign",
-        "icon": "$(run)"
       },
       {
         "command": "webExperimentation.campaignList.pullGlobalCode",
@@ -330,6 +355,31 @@
         "icon": "$(repo-push)"
       },
       {
+        "command": "webExperimentation.campaignList.pullTargeting",
+        "title": "Pull campaign targeting from the platform",
+        "icon": "$(repo-sync)"
+      },
+      {
+        "command": "webExperimentation.campaignList.addTargeting",
+        "title": "Add campaign targeting",
+        "icon": "$(add)"
+      },
+      {
+        "command": "webExperimentation.campaignList.pushTargeting",
+        "title": "Push campaign targeting to the platform",
+        "icon": "$(repo-push)"
+      },
+      {
+        "command": "webExperimentation.campaignList.copyCampaign",
+        "title": "Web Experimentation: Copy the campaign ID in clipboard",
+        "icon": "$(clippy)"
+      },
+      {
+        "command": "webExperimentation.campaignList.changeState",
+        "title": "Web Experimentation: Change the campaign's state",
+        "icon": "$(debug-disconnect)"
+      },
+      {
         "command": "webExperimentation.accountList.pullGlobalCode",
         "title": "Pull account global code from the platform",
         "icon": "$(repo-sync)"
@@ -343,6 +393,16 @@
         "command": "webExperimentation.accountList.pushGlobalCode",
         "title": "Push account global code to the platform",
         "icon": "$(repo-push)"
+      },
+      {
+        "command": "webExperimentation.accountList.selectAccount",
+        "title": "Web Experimentation: Select account",
+        "icon": "$(run)"
+      },
+      {
+        "command": "webExperimentation.accountList.copyAccount",
+        "title": "Web Experimentation: Copy the account ID in clipboard",
+        "icon": "$(clippy)"
       },
       {
         "command": "webExperimentation.variationList.pullGlobalCodeJS",
@@ -370,6 +430,16 @@
         "icon": "$(add)"
       },
       {
+        "command": "webExperimentation.variationList.copyVariation",
+        "title": "Web Experimentation: Copy the variation ID in clipboard",
+        "icon": "$(clippy)"
+      },
+      {
+        "command": "webExperimentation.variationList.openWebPreviewVariation",
+        "title": "Web Experimentation: Open web preview for the variation",
+        "icon": "$(globe)"
+      },
+      {
         "command": "webExperimentation.modificationList.pullCode",
         "title": "Pull modification code from the platform",
         "icon": "$(repo-sync)"
@@ -378,6 +448,11 @@
         "command": "webExperimentation.modificationList.pushCode",
         "title": "Push modification code to the platform",
         "icon": "$(repo-push)"
+      },
+      {
+        "command": "webExperimentation.modificationList.copyModification",
+        "title": "Web Experimentation: Copy the modification ID in clipboard",
+        "icon": "$(clippy)"
       },
       {
         "command": "webExperimentation.modificationList.addModification",
@@ -390,13 +465,32 @@
         "icon": "$(refresh)"
       },
       {
-        "command": "webExperimentation.accountList.selectAccount",
-        "title": "Web Experimentation: Select account",
-        "icon": "$(run)"
-      },
-      {
         "command": "webExperimentation.campaignList.globalCodeOpenFile",
         "title": "Web Experimentation: Open code file"
+      },
+      {
+        "command": "webExperimentation.campaignList.targetingOpenFile",
+        "title": "Web Experimentation: Open targeting details file"
+      },
+      {
+        "command": "webExperimentation.audienceList.copyAudience",
+        "title": "Web Experimentation: Copy the audience ID in clipboard",
+        "icon": "$(clippy)"
+      },
+      {
+        "command": "webExperimentation.audienceList.openAudience",
+        "title": "Web Experimentation: Open the audience information in JSON file",
+        "icon": "$(code)"
+      },
+      {
+        "command": "webExperimentation.favoriteUrlList.copyFavoriteUrl",
+        "title": "Web Experimentation: Copy the favorite URL ID in clipboard",
+        "icon": "$(clippy)"
+      },
+      {
+        "command": "webExperimentation.favoriteUrlList.openFavoriteUrl",
+        "title": "Web Experimentation: Open the favorite URL information in JSON file",
+        "icon": "$(code)"
       }
     ],
     "menus": {
@@ -470,11 +564,26 @@
           "command": "webExperimentation.accountList.refresh",
           "when": "view == webExperimentation.accountList",
           "group": "navigation@0"
+        },
+        {
+          "command": "webExperimentation.audienceList.refresh",
+          "when": "view == webExperimentation.audienceList",
+          "group": "navigation@0"
+        },
+        {
+          "command": "webExperimentation.favoriteUrlList.refresh",
+          "when": "view == webExperimentation.favoriteUrlList",
+          "group": "navigation@0"
         }
       ],
       "view/item/context": [
         {
           "command": "featureExperimentation.projectList.copyProject",
+          "when": "view == featureExperimentation.projectList && viewItem == projectItem",
+          "group": "inline"
+        },
+        {
+          "command": "featureExperimentation.projectList.changeState",
           "when": "view == featureExperimentation.projectList && viewItem == projectItem",
           "group": "inline"
         },
@@ -490,6 +599,11 @@
         },
         {
           "command": "featureExperimentation.campaignList.copyCampaign",
+          "when": "view == featureExperimentation.projectList && viewItem == campaignItem",
+          "group": "inline"
+        },
+        {
+          "command": "featureExperimentation.campaignList.changeState",
           "when": "view == featureExperimentation.projectList && viewItem == campaignItem",
           "group": "inline"
         },
@@ -564,9 +678,14 @@
           "group": "inline"
         },
         {
-          "command": "webExperimentation.campaignList.setCampaign",
+          "command": "webExperimentation.campaignList.copyCampaign",
           "when": "view == webExperimentation.campaignList && viewItem == campaignWEItem",
-          "group": "navigation"
+          "group": "inline"
+        },
+        {
+          "command": "webExperimentation.campaignList.changeState",
+          "when": "view == webExperimentation.campaignList && viewItem == campaignWEItem",
+          "group": "inline"
         },
         {
           "command": "webExperimentation.campaignList.pullGlobalCode",
@@ -581,6 +700,21 @@
         {
           "command": "webExperimentation.campaignList.pushGlobalCode",
           "when": "view == webExperimentation.campaignList && viewItem == globalCodeCampaignItem",
+          "group": "inline"
+        },
+        {
+          "command": "webExperimentation.campaignList.pullTargeting",
+          "when": "view == webExperimentation.campaignList && viewItem == targetingCampaignItem",
+          "group": "inline"
+        },
+        {
+          "command": "webExperimentation.campaignList.addTargeting",
+          "when": "view == webExperimentation.campaignList && viewItem == targetingCampaign",
+          "group": "inline"
+        },
+        {
+          "command": "webExperimentation.campaignList.pushTargeting",
+          "when": "view == webExperimentation.campaignList && viewItem == targetingCampaignItem",
           "group": "inline"
         },
         {
@@ -619,6 +753,16 @@
           "group": "inline"
         },
         {
+          "command": "webExperimentation.variationList.copyVariation",
+          "when": "view == webExperimentation.campaignList && viewItem == variationWEItem",
+          "group": "inline"
+        },
+        {
+          "command": "webExperimentation.variationList.openWebPreviewVariation",
+          "when": "view == webExperimentation.campaignList && viewItem == variationWEItem",
+          "group": "inline"
+        },
+        {
           "command": "webExperimentation.modificationList.pullCode",
           "when": "view == webExperimentation.campaignList && viewItem == codeModificationItem",
           "group": "inline"
@@ -644,8 +788,28 @@
           "group": "inline"
         },
         {
+          "command": "webExperimentation.modificationList.copyModification",
+          "when": "view == webExperimentation.campaignList && viewItem == modificationWEItem",
+          "group": "inline"
+        },
+        {
           "command": "webExperimentation.accountList.selectAccount",
           "when": "view == webExperimentation.accountList && viewItem == accountWEItem",
+          "group": "inline"
+        },
+        {
+          "command": "webExperimentation.accountList.copyAccount",
+          "when": "view == webExperimentation.accountList && viewItem == accountWEItem",
+          "group": "inline"
+        },
+        {
+          "command": "webExperimentation.audienceList.copyAudience",
+          "when": "view == webExperimentation.audienceList && viewItem == audienceWEItem",
+          "group": "inline"
+        },
+        {
+          "command": "webExperimentation.favoriteUrlList.copyFavoriteUrl",
+          "when": "view == webExperimentation.favoriteUrlList && viewItem == favoriteUrlWEItem",
           "group": "inline"
         }
       ]
@@ -810,9 +974,10 @@
     "webpack-cli": "^5.0.1"
   },
   "dependencies": {
+    "@vscode/webview-ui-toolkit": "^1.4.0",
     "axios": "^1.3.5",
+    "open": "^10.1.0",
     "rimraf": "^5.0.0",
-    "tar-fs": "^3.0.3",
-    "@vscode/webview-ui-toolkit": "^1.4.0"
+    "tar-fs": "^3.0.3"
   }
 }

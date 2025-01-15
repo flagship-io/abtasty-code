@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { Cli } from '../../cli/cmd/webExperimentation/Cli';
-import { CampaignWE, ModificationWE } from '../../model';
+import { CampaignWE, WebPreview } from '../../model';
 import { CampaignDataService } from '../../services/webExperimentation/CampaignDataService';
 
 export class CampaignStore {
@@ -12,8 +12,12 @@ export class CampaignStore {
     this.campaignService = new CampaignDataService(context);
   }
 
-  loadCampaign(): CampaignWE[] {
+  loadCampaigns(): CampaignWE[] {
     return this.campaignService.getState();
+  }
+
+  async loadCampaignStatus(campaignId: number, status: string) {
+    return await this.campaignService.editCampaignStatus(campaignId, status);
   }
 
   async refreshCampaign(): Promise<CampaignWE[]> {
@@ -66,10 +70,28 @@ export class CampaignStore {
     return cliResponse;
   }
 
-  async pushCampaignGlobalCode(campaignId: string, filepath?: string, code?: string): Promise<any> {
-    const cliResponse = campaignId ? await this.cli.PushCampaignGlobalCode(campaignId, filepath, code) : false;
+  async pushCampaignGlobalCode(campaignId: string, filepath: string, code: string, override: boolean): Promise<any> {
+    const cliResponse = campaignId
+      ? await this.cli.PushCampaignGlobalCode(campaignId, filepath, code, override)
+      : false;
     if (cliResponse) {
       vscode.window.showInformationMessage(`[AB Tasty] Campaign global code pushed successfully`);
+    }
+    return cliResponse;
+  }
+
+  async pullCampaignTargeting(campaignId: string, createFile?: boolean, override?: boolean): Promise<any> {
+    const cliResponse = campaignId ? await this.cli.PullCampaignTargeting(campaignId, createFile, override) : false;
+    if (cliResponse) {
+      vscode.window.showInformationMessage(`[AB Tasty] Campaign targeting pulled successfully`);
+    }
+    return cliResponse;
+  }
+
+  async pushCampaignTargeting(campaignId: string, filepath?: string, dataRaw?: string): Promise<any> {
+    const cliResponse = campaignId ? await this.cli.PushCampaignTargeting(campaignId, filepath, dataRaw) : false;
+    if (cliResponse) {
+      vscode.window.showInformationMessage(`[AB Tasty] Campaign targeting pushed successfully`);
     }
     return cliResponse;
   }
@@ -93,11 +115,12 @@ export class CampaignStore {
   async pushVariationGlobalCodeJS(
     variationId: string,
     campaignId: string,
-    filepath?: string,
-    code?: string,
+    filepath: string,
+    code: string,
+    override: boolean,
   ): Promise<any> {
     const cliResponse = campaignId
-      ? await this.cli.PushVariationGlobalCodeJS(variationId, campaignId, filepath, code)
+      ? await this.cli.PushVariationGlobalCodeJS(variationId, campaignId, filepath, code, override)
       : false;
     if (cliResponse) {
       vscode.window.showInformationMessage(`[AB Tasty] Variation global code JS pushed successfully`);
@@ -124,11 +147,12 @@ export class CampaignStore {
   async pushVariationGlobalCodeCSS(
     variationId: string,
     campaignId: string,
-    filepath?: string,
-    code?: string,
+    filepath: string,
+    code: string,
+    override: boolean,
   ): Promise<any> {
     const cliResponse = campaignId
-      ? await this.cli.PushVariationGlobalCodeCSS(variationId, campaignId, filepath, code)
+      ? await this.cli.PushVariationGlobalCodeCSS(variationId, campaignId, filepath, code, override)
       : false;
     if (cliResponse) {
       vscode.window.showInformationMessage(`[AB Tasty] Variation global code CSS pushed successfully`);
@@ -156,15 +180,22 @@ export class CampaignStore {
     modificationId: string,
     campaignId: string,
     variationId: string,
-    filepath?: string,
-    code?: string,
+    filepath: string,
+    code: string,
+    override: boolean,
   ): Promise<any> {
     const cliResponse = campaignId
-      ? await this.cli.PushModificationCode(modificationId, variationId, campaignId, filepath, code)
+      ? await this.cli.PushModificationCode(modificationId, variationId, campaignId, filepath, code, override)
       : false;
     if (cliResponse) {
       vscode.window.showInformationMessage(`[AB Tasty] Modification code pushed successfully`);
     }
+    return cliResponse;
+  }
+
+  async openWebPreview(campaignId: string, variationId: string): Promise<WebPreview> {
+    const cliResponse =
+      campaignId && variationId ? await this.cli.OpenWebPreviewVariation(campaignId, variationId) : ({} as WebPreview);
     return cliResponse;
   }
 }

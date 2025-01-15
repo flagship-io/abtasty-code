@@ -6,11 +6,14 @@ import { join } from 'path';
 import * as vscode from 'vscode';
 import {
   AccountWE,
+  Audience,
   Authentication,
   CampaignWE,
   CurrentAuthentication,
+  FavoriteUrl,
   ModificationWE,
   VariationWE,
+  WebPreview,
 } from '../../../model';
 import { CliVersion } from '../../cliDownloader';
 
@@ -39,6 +42,8 @@ export class Cli {
         { maxBuffer: 1024 * 1024 * 50 },
         (error, stdout, stderr) => {
           if (error) {
+            this.outputChannel.error(error.message);
+            vscode.window.showErrorMessage(stderr);
             reject({ error, stdout, stderr });
           }
           resolve({ stdout, stderr });
@@ -463,6 +468,123 @@ export class Cli {
     }
   }
 
+  async SwitchCampaignWE(id: string, status: string): Promise<boolean> {
+    try {
+      const cliBin = await this.CliBin();
+      if (!cliBin) {
+        return false;
+      }
+      const command = `${cliBin} web-experimentation campaign switch -i ${id} -s ${status}`;
+      const output = await this.exec(command, {});
+      console.log(output);
+      if (output.stderr) {
+        vscode.window.showErrorMessage(output.stderr);
+        return false;
+      }
+      return true;
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return false;
+    }
+  }
+
+  async ListTrigger(): Promise<Audience[]> {
+    try {
+      const cliBin = await this.CliBin();
+      if (!cliBin) {
+        return [];
+      }
+      const command = `${cliBin} web-experimentation trigger list --output-format json`;
+      const output = await this.exec(command, {});
+      console.log(output);
+      this.outputChannel.trace(command);
+      logMessage(this.outputChannel, output.stdout);
+      if (output.stderr) {
+        this.outputChannel.error(output.stderr);
+        vscode.window.showErrorMessage(output.stderr);
+        return [];
+      }
+      return JSON.parse(output.stdout);
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return [];
+    }
+  }
+
+  async ListSegment(): Promise<Audience[]> {
+    try {
+      const cliBin = await this.CliBin();
+      if (!cliBin) {
+        return [];
+      }
+      const command = `${cliBin} web-experimentation segment list --output-format json`;
+      const output = await this.exec(command, {});
+      console.log(output);
+      this.outputChannel.trace(command);
+      logMessage(this.outputChannel, output.stdout);
+      if (output.stderr) {
+        this.outputChannel.error(output.stderr);
+        vscode.window.showErrorMessage(output.stderr);
+        return [];
+      }
+      return JSON.parse(output.stdout);
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return [];
+    }
+  }
+
+  async ListAudience(): Promise<Audience[]> {
+    try {
+      const cliBin = await this.CliBin();
+      if (!cliBin) {
+        return [];
+      }
+      const command = `${cliBin} web-experimentation audience list --output-format json`;
+      const output = await this.exec(command, {});
+      console.log(output);
+      this.outputChannel.trace(command);
+      logMessage(this.outputChannel, output.stdout);
+      if (output.stderr) {
+        this.outputChannel.error(output.stderr);
+        vscode.window.showErrorMessage(output.stderr);
+        return [];
+      }
+      return JSON.parse(output.stdout);
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return [];
+    }
+  }
+
+  async ListFavoriteUrl(): Promise<FavoriteUrl[]> {
+    try {
+      const cliBin = await this.CliBin();
+      if (!cliBin) {
+        return [];
+      }
+      const command = `${cliBin} web-experimentation favorite-url list --output-format json`;
+      const output = await this.exec(command, {});
+      console.log(output);
+      this.outputChannel.trace(command);
+      logMessage(this.outputChannel, output.stdout);
+      if (output.stderr) {
+        this.outputChannel.error(output.stderr);
+        vscode.window.showErrorMessage(output.stderr);
+        return [];
+      }
+      return JSON.parse(output.stdout);
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return [];
+    }
+  }
+
   async PullAccountGlobalCode(id: string, createFile?: boolean, override?: boolean, subFiles?: boolean): Promise<any> {
     try {
       const cliBin = await this.CliBin();
@@ -490,7 +612,28 @@ export class Cli {
     }
   }
 
-  async PushAccountGlobalCode(id: string, filepath?: string, code?: string): Promise<boolean> {
+  async RebuildTag(): Promise<boolean> {
+    try {
+      const cliBin = await this.CliBin();
+      if (!cliBin) {
+        return false;
+      }
+      const command = `${cliBin} web-experimentation tag-rebuild`;
+      const output = await this.exec(command, {});
+      console.log(output);
+      if (output.stderr) {
+        vscode.window.showErrorMessage(output.stderr);
+        return false;
+      }
+      return true;
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return false;
+    }
+  }
+
+  async PushAccountGlobalCode(id: string, filepath?: string, code?: string, override?: boolean): Promise<boolean> {
     try {
       const cliBin = await this.CliBin();
       let command: string;
@@ -499,7 +642,7 @@ export class Cli {
       }
       command = `${cliBin} web-experimentation account-global-code push -i ${id} ${code ? `--code ${code}` : ``} ${
         filepath ? `--file ${filepath}` : ``
-      }`;
+      } ${override ? `--override` : ``}`;
 
       const output = await this.exec(command, {});
       console.log(output);
@@ -545,7 +688,7 @@ export class Cli {
     }
   }
 
-  async PushCampaignGlobalCode(id: string, filepath?: string, code?: string): Promise<boolean> {
+  async PushCampaignGlobalCode(id: string, filepath?: string, code?: string, override?: boolean): Promise<boolean> {
     try {
       const cliBin = await this.CliBin();
       let command: string;
@@ -554,7 +697,7 @@ export class Cli {
       }
       command = `${cliBin} web-experimentation campaign-global-code push -i ${id} ${code ? `--code ${code}` : ``} ${
         filepath ? `--file ${filepath}` : ``
-      }`;
+      } ${override ? `--override` : ``}`;
       const output = await this.exec(command, {});
       console.log(output);
       this.outputChannel.trace(command);
@@ -603,7 +746,13 @@ export class Cli {
     }
   }
 
-  async PushVariationGlobalCodeJS(id: string, campaignId: string, filepath?: string, code?: string): Promise<boolean> {
+  async PushVariationGlobalCodeJS(
+    id: string,
+    campaignId: string,
+    filepath?: string,
+    code?: string,
+    override?: boolean,
+  ): Promise<boolean> {
     try {
       const cliBin = await this.CliBin();
       let command: string;
@@ -612,7 +761,7 @@ export class Cli {
       }
       command = `${cliBin} web-experimentation variation-global-code push-js -i ${id} --campaign-id ${campaignId} ${
         code ? `--code ${code}` : ``
-      } ${filepath ? `--file ${filepath}` : ``}`;
+      } ${filepath ? `--file ${filepath}` : ``} ${override ? `--override` : ``}`;
       const output = await this.exec(command, {});
       console.log(output);
       this.outputChannel.trace(command);
@@ -661,7 +810,13 @@ export class Cli {
     }
   }
 
-  async PushVariationGlobalCodeCSS(id: string, campaignId: string, filepath?: string, code?: string): Promise<boolean> {
+  async PushVariationGlobalCodeCSS(
+    id: string,
+    campaignId: string,
+    filepath?: string,
+    code?: string,
+    override?: boolean,
+  ): Promise<boolean> {
     try {
       const cliBin = await this.CliBin();
       let command: string;
@@ -670,7 +825,7 @@ export class Cli {
       }
       command = `${cliBin} web-experimentation variation-global-code push-css -i ${id} --campaign-id ${campaignId} ${
         code ? `--code ${code}` : ``
-      } ${filepath ? `--file ${filepath}` : ``}`;
+      } ${filepath ? `--file ${filepath}` : ``} ${override ? `--override` : ``}`;
       const output = await this.exec(command, {});
       console.log(output);
       this.outputChannel.trace(command);
@@ -720,6 +875,7 @@ export class Cli {
     variationId: string,
     filepath?: string,
     code?: string,
+    override?: boolean,
   ): Promise<boolean> {
     try {
       const cliBin = await this.CliBin();
@@ -729,7 +885,7 @@ export class Cli {
       }
       command = `${cliBin} web-experimentation modification-code push -i ${id} --campaign-id ${campaignId} --variation-id ${variationId} ${
         code ? `--code ${code}` : ``
-      } ${filepath ? `--file ${filepath}` : ``}`;
+      } ${filepath ? `--file ${filepath}` : ``} ${override ? `--override` : ``}`;
       const output = await this.exec(command, {});
       console.log(output);
       this.outputChannel.trace(command);
@@ -769,6 +925,85 @@ export class Cli {
       vscode.window.showErrorMessage(err.error);
       console.error(err);
       return false;
+    }
+  }
+
+  async PullCampaignTargeting(id: string, createFile?: boolean, override?: boolean): Promise<any> {
+    try {
+      const cliBin = await this.CliBin();
+      let command: string;
+      if (!cliBin) {
+        return false;
+      }
+      command = `${cliBin} web-experimentation campaign-targeting get -i ${id} ${createFile ? `--create-file` : ``} ${
+        override ? `--override` : ``
+      }`;
+      const output = await this.exec(command, {});
+      console.log(output);
+      this.outputChannel.trace(command);
+      logMessage(this.outputChannel, output.stdout);
+      if (output.stderr) {
+        this.outputChannel.error(output.stderr);
+        vscode.window.showErrorMessage(output.stderr);
+        return false;
+      }
+      return output.stdout;
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return false;
+    }
+  }
+
+  async PushCampaignTargeting(id: string, filepath?: string, dataRaw?: string): Promise<boolean> {
+    try {
+      const cliBin = await this.CliBin();
+      let command: string;
+      if (!cliBin) {
+        return false;
+      }
+      command = `${cliBin} web-experimentation campaign-targeting push -i ${id} ${
+        dataRaw ? `--data-raw ${dataRaw}` : ``
+      } ${filepath ? `--file ${filepath}` : ``}`;
+      const output = await this.exec(command, {});
+      console.log(output);
+      this.outputChannel.trace(command);
+      logMessage(this.outputChannel, output.stdout);
+      if (output.stderr) {
+        this.outputChannel.error(output.stderr);
+        vscode.window.showErrorMessage(output.stderr);
+        return false;
+      }
+      return true;
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return false;
+    }
+  }
+
+  async OpenWebPreviewVariation(campaignId: string, variationId: string): Promise<WebPreview> {
+    try {
+      const cliBin = await this.CliBin();
+      let command: string;
+      if (!cliBin) {
+        return {} as WebPreview;
+      }
+      command = `${cliBin} web-experimentation web-preview open --campaign-id ${campaignId} --variation-id ${variationId} --output-format json`;
+      const output = await this.exec(command, {});
+      console.log(output);
+      this.outputChannel.trace(command);
+      logMessage(this.outputChannel, output.stdout);
+      if (output.stderr) {
+        this.outputChannel.error(output.stderr);
+        vscode.window.showErrorMessage(output.stderr);
+        return {} as WebPreview;
+      }
+      return JSON.parse(output.stdout);
+    } catch (err: any) {
+      vscode.window.showErrorMessage(err.error);
+      console.error(err);
+      return {} as WebPreview;
     }
   }
 }

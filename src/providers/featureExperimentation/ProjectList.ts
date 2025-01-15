@@ -132,36 +132,43 @@ export class ProjectListProvider implements vscode.TreeDataProvider<vscode.TreeI
             const targeting = new ProjectTreeItem('Targetings', targetings, undefined, TARGET);
             return new VariationGroupItem(vg.id, vg.name, [variation, targeting], c.id);
           });
-          const schedulerItems = Object.entries(c.scheduler).map(
-            ([key, value]) => new SimpleItem(key, value, undefined),
-          );
-          const scheduler = new SchedulerItem('Scheduler', c.scheduler, schedulerItems);
+
           const variationGroup = new ProjectTreeItem(
             'Variation Groups',
             [...variationGroups],
             undefined,
             GROUP_BY_REF_TYPE,
           );
+
+          const campaignChild = [variationGroup];
+
+          if (c.scheduler) {
+            const schedulerItems = Object.entries(c.scheduler).map(
+              ([key, value]) => new SimpleItem(key, value, undefined),
+            );
+
+            const scheduler = new SchedulerItem('Scheduler', c.scheduler, schedulerItems);
+            campaignChild.push(scheduler);
+          }
+
           switch (c.type) {
             case 'ab':
-              abCampaigns.push(new CampaignItem(c.id, c.name, c.type, c.status, [variationGroup, scheduler], p.id));
+              abCampaigns.push(new CampaignItem(c.id, c.name, c.type, c.status, campaignChild, p.id));
               break;
             case 'toggle':
-              toggleCampaigns.push(new CampaignItem(c.id, c.name, c.type, c.status, [variationGroup, scheduler], p.id));
+              toggleCampaigns.push(new CampaignItem(c.id, c.name, c.type, c.status, campaignChild, p.id));
               break;
             case 'perso':
-              persoCampaigns.push(new CampaignItem(c.id, c.name, c.type, c.status, [variationGroup, scheduler], p.id));
+              persoCampaigns.push(new CampaignItem(c.id, c.name, c.type, c.status, campaignChild, p.id));
               break;
             case 'deployment':
-              deploymentCampaigns.push(
-                new CampaignItem(c.id, c.name, c.type, c.status, [variationGroup, scheduler], p.id),
-              );
+              deploymentCampaigns.push(new CampaignItem(c.id, c.name, c.type, c.status, campaignChild, p.id));
               break;
             case 'flag':
-              flagCampaigns.push(new CampaignItem(c.id, c.name, c.type, c.status, [variationGroup, scheduler], p.id));
+              flagCampaigns.push(new CampaignItem(c.id, c.name, c.type, c.status, campaignChild, p.id));
               break;
             case 'custom':
-              customCampaigns.push(new CampaignItem(c.id, c.name, c.type, c.status, [variationGroup, scheduler], p.id));
+              customCampaigns.push(new CampaignItem(c.id, c.name, c.type, c.status, campaignChild, p.id));
               break;
           }
         });

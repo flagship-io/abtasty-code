@@ -2,6 +2,8 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import { CampaignWEItem } from '../../providers/webExperimentation/CampaignList';
 import { CampaignStore } from '../../store/webExperimentation/CampaignStore';
+import { Cli } from '../../cli/cmd/webExperimentation/Cli';
+import { MILESTONE_ACTIVE, MILESTONE_INTERRUPTED } from '../../icons';
 
 export async function deleteCampaignInputBox(campaign: CampaignWEItem, campaignStore: CampaignStore) {
   const picked = await vscode.window.showQuickPick(['yes', 'no'], {
@@ -14,6 +16,34 @@ export async function deleteCampaignInputBox(campaign: CampaignWEItem, campaignS
     await campaignStore.deleteCampaign(campaignId);
     return;
   }
+  return;
+}
+
+export async function switchCampaignBox(campaign: CampaignWEItem, campaignStore: CampaignStore, cli: Cli) {
+  const picked = await vscode.window.showQuickPick(['play', 'pause'], {
+    title: `Switch the campaign ${campaign.name} state`,
+    placeHolder: 'Do you confirm ?',
+    ignoreFocusOut: true,
+  });
+
+  if (picked === 'play') {
+    const resp = await cli.SwitchCampaignWE(String(campaign.resourceId!), 'active');
+    if (resp) {
+      await campaignStore.loadCampaignStatus(campaign.resourceId!, 'play');
+      vscode.window.showInformationMessage(`[AB Tasty] Campaign ${campaign.name} set to ${picked} successfully.`);
+    }
+    return;
+  }
+  if (picked === 'pause') {
+    const resp = await cli.SwitchCampaignWE(String(campaign.resourceId!), 'paused');
+    if (resp) {
+      await campaignStore.loadCampaignStatus(campaign.resourceId!, 'pause');
+      vscode.window.showInformationMessage(`[AB Tasty] Campaign ${campaign.name} set to ${picked} successfully.`);
+    }
+    return;
+  }
+
+  campaignStore.loadCampaigns();
   return;
 }
 
@@ -95,7 +125,21 @@ export async function pushCampaignGlobalCodeOperationInputBox(campaign: Campaign
         ? path.resolve(uri!.path, uriFile![0].path).replace(/\\/g, '/').replace('C:/', '')
         : uriFile![0].path;
 
-    await campaignStore.pushCampaignGlobalCode(campaign.id!, pathConfig);
+    const picked = await vscode.window.showQuickPick(['yes', 'no', 'override'], {
+      title: `Push campaign global code for the ID ${campaign.id!}`,
+      placeHolder: 'Do you confirm ?',
+      ignoreFocusOut: true,
+    });
+
+    if (picked === 'yes') {
+      await campaignStore.pushCampaignGlobalCode(campaign.id!, pathConfig, '', false);
+    }
+
+    if (picked === 'override') {
+      await campaignStore.pushCampaignGlobalCode(campaign.id!, pathConfig, '', true);
+    }
+
+    return;
   }
   return;
 }

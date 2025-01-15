@@ -5,6 +5,7 @@ import {
   FEATURE_EXPERIMENTATION_SET_CREDENTIALS,
   WEB_EXPERIMENTATION_CREATE_MODIFICATION,
   WEB_EXPERIMENTATION_QUICK_ACCESS_REFRESH,
+  WEB_EXPERIMENTATION_REBUILD_TAG,
   WEB_EXPERIMENTATION_RESET_WORKING_DIR,
   WEB_EXPERIMENTATION_SET_CREDENTIALS,
 } from '../../commands/const';
@@ -52,6 +53,12 @@ export class QuickAccessListProvider implements vscode.TreeDataProvider<vscode.T
       new LinkItem(`Set Working directory to workspace`, NON_COLLAPSED, '', {
         title: 'Set working dir',
         command: WEB_EXPERIMENTATION_RESET_WORKING_DIR,
+      }),
+    );
+    this.items.push(
+      new LinkItem(`Send Refresh/Rebuild tag request`, NON_COLLAPSED, '', {
+        title: 'Refresh tag',
+        command: WEB_EXPERIMENTATION_REBUILD_TAG,
       }),
     );
     this.items.push(new LinkItem(`Documentation`, NON_COLLAPSED, DOCUMENT_URI));

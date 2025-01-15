@@ -24,6 +24,18 @@ To create a configuration:
 
 ![Create configuration](./media/web-exp/configureWE.gif)
 
+- Open campaign web preview
+
+![Open web preview](./media/web-exp/openPreview.gif)
+
+- Push/Pull campaign targeting
+
+![campaign targeting](./media/web-exp/campaign-targeting.gif)
+
+- Set working directory & rebuild tag
+
+![Set working directory & rebuild tag](./media/web-exp/set-working-dir-rebuild-tag.png)
+
 - Manage Global code for multiple resources such as account, campaign, variation and modification/ElementJS.
 
 For account global code:

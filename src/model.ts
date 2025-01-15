@@ -88,6 +88,41 @@ export type CampaignWE = {
   master: CampaignWE;
 };
 
+export type WebPreview = {
+  campaign_id: string;
+  variation_id: string;
+  url: string;
+};
+
+export type Audience = {
+  id: string;
+  name: string;
+  description: string;
+  hidden: boolean;
+  created_at: DateWE;
+  updated_at: DateWE;
+  archive: boolean;
+  is_segment: boolean;
+  test_ids: string[];
+  live_test_ids: string[];
+  live_tests_source: any;
+  groups: any;
+};
+
+export type FavoriteUrl = {
+  id: string;
+  name: string;
+  all_positive_conditions: boolean;
+  all_negative_conditions: boolean;
+  css_selector_displayed: boolean;
+  css_code: string;
+  created_at: DateWE;
+  updated_at: DateWE;
+  conditions: any;
+  datalayer_conditions: any;
+  css_selector_conditions: any;
+};
+
 export type Traffic = {
   value: number;
   last_increased_traffic: string;
