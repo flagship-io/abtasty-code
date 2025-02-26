@@ -1,11 +1,11 @@
 import * as vscode from 'vscode';
-import { Authentication, Configuration, Flag } from '../../model';
-import { StateConfiguration } from '../../stateConfiguration';
-import { DEFAULT_BASE_URI } from '../../const';
-import { FEATURE_EXPERIMENTATION_CREATE_FLAG, FEATURE_EXPERIMENTATION_OPEN_BROWSER } from '../../commands/const';
-import { isGetFlagFunction } from '../../setupFeatExpProviders';
-import { GLOBAL_CURRENT_AUTHENTICATION_FE } from '../../services/featureExperimentation/const';
 import { Cli } from '../../cli/cmd/featureExperimentation/Cli';
+import { FEATURE_EXPERIMENTATION_CREATE_FLAG, FEATURE_EXPERIMENTATION_OPEN_BROWSER } from '../../commands/const';
+import { DEFAULT_BASE_URI } from '../../const';
+import { Authentication, Flag } from '../../model';
+import { GLOBAL_CURRENT_AUTHENTICATION_FE } from '../../services/featureExperimentation/const';
+import { isGetFlagFunction } from '../../setupFeatExpProviders';
+import { StateConfiguration } from '../../stateConfiguration';
 
 export const CANDIDATE_REGEX = /[\w\d][.\w\d\_\-]*/;
 

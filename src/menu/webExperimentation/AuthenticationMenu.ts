@@ -1,14 +1,11 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import * as vscode from 'vscode';
-import { MultiStepInput } from '../../multipleStepInput';
-import { load } from 'js-yaml';
-import { readFile } from 'fs/promises';
-import path = require('path');
+import { WEB_EXPERIMENTATION_CLEAR_CONFIG } from '../../commands/const';
 import { CONFIG_ADD_ICON, CONFIG_CLEAR_ALL_ICON } from '../../icons';
 import { AccountWE, Authentication } from '../../model';
-import { WEB_EXPERIMENTATION_CLEAR_CONFIG } from '../../commands/const';
-import { AuthenticationStore } from '../../store/webExperimentation/AuthenticationStore';
+import { MultiStepInput } from '../../multipleStepInput';
 import { rootPath } from '../../setupWebExpProviders';
+import { AuthenticationStore } from '../../store/webExperimentation/AuthenticationStore';
 
 class CustomButton implements vscode.QuickInputButton {
   constructor(

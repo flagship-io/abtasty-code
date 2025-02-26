@@ -2,13 +2,10 @@ import * as vscode from 'vscode';
 import { Cli } from '../cli/cmd/webExperimentation/Cli';
 import {
   SET_CONTEXT,
-  WEB_EXPERIMENTATION_ACCOUNT_LIST_LOAD,
   WEB_EXPERIMENTATION_ACCOUNT_LIST_REFRESH,
   WEB_EXPERIMENTATION_CAMPAIGN_LIST_REFRESH,
-  WEB_EXPERIMENTATION_MODIFICATION_LIST_REFRESH,
   WEB_EXPERIMENTATION_QUICK_ACCESS_REFRESH,
   WEB_EXPERIMENTATION_SET_CREDENTIALS,
-  WEB_EXPERIMENTATION_VARIATION_LIST_REFRESH,
 } from './const';
 
 import { AuthenticationMenu } from '../menu/webExperimentation/AuthenticationMenu';

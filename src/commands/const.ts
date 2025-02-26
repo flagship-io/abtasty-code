@@ -1,5 +1,3 @@
-export const SIMPLE_BROWSER_SHOW = 'simpleBrowser.show';
-
 // FEATURE EXP
 
 export const FEATURE_EXPERIMENTATION_FLAG_IN_FILE_REFRESH = 'featureExperimentation.flagsInFile.refresh';

@@ -1,6 +1,4 @@
 import * as vscode from 'vscode';
-import { StateConfiguration } from '../../stateConfiguration';
-import { DOCUMENT_URI } from '../../const';
 import {
   FEATURE_EXPERIMENTATION_CREATE_FLAG,
   FEATURE_EXPERIMENTATION_CREATE_GOAL,
@@ -11,6 +9,8 @@ import {
   FEATURE_EXPERIMENTATION_SET_CREDENTIALS,
   WEB_EXPERIMENTATION_SET_CREDENTIALS,
 } from '../../commands/const';
+import { DOCUMENT_URI } from '../../const';
+import { StateConfiguration } from '../../stateConfiguration';
 
 const NON_COLLAPSED = vscode.TreeItemCollapsibleState.None;
 export class QuickAccessListProvider implements vscode.TreeDataProvider<vscode.TreeItem> {

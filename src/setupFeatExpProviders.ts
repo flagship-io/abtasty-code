@@ -1,9 +1,45 @@
 import * as vscode from 'vscode';
-import { StateConfiguration } from './stateConfiguration';
 import { Cli } from './cli/cmd/featureExperimentation/Cli';
-import { QuickAccessListProvider } from './providers/featureExperimentation/QuickAccessList';
+import {
+  FEATURE_EXPERIMENTATION_ADD_FLAG,
+  FEATURE_EXPERIMENTATION_CAMPAIGN_CHANGE_STATE,
+  FEATURE_EXPERIMENTATION_CAMPAIGN_LIST_COPY,
+  FEATURE_EXPERIMENTATION_CAMPAIGN_LIST_DELETE,
+  FEATURE_EXPERIMENTATION_CAMPAIGN_LIST_OPEN_IN_BROWSER,
+  FEATURE_EXPERIMENTATION_CREATE_FLAG,
+  FEATURE_EXPERIMENTATION_CREATE_GOAL,
+  FEATURE_EXPERIMENTATION_CREATE_PROJECT,
+  FEATURE_EXPERIMENTATION_CREATE_TARGETING_KEY,
+  FEATURE_EXPERIMENTATION_FIND_IN_FILE,
+  FEATURE_EXPERIMENTATION_FLAG_IN_FILE_REFRESH,
+  FEATURE_EXPERIMENTATION_FLAG_LIST_COPY,
+  FEATURE_EXPERIMENTATION_FLAG_LIST_DELETE,
+  FEATURE_EXPERIMENTATION_FLAG_LIST_EDIT,
+  FEATURE_EXPERIMENTATION_FLAG_LIST_LOAD,
+  FEATURE_EXPERIMENTATION_GET_TOKEN_SCOPE,
+  FEATURE_EXPERIMENTATION_GOAL_LIST_DELETE,
+  FEATURE_EXPERIMENTATION_GOAL_LIST_EDIT,
+  FEATURE_EXPERIMENTATION_GOAL_LIST_LOAD,
+  FEATURE_EXPERIMENTATION_LIST_FLAG_IN_WORKSPACE,
+  FEATURE_EXPERIMENTATION_OPEN_BROWSER,
+  FEATURE_EXPERIMENTATION_PROJECT_CHANGE_STATE,
+  FEATURE_EXPERIMENTATION_PROJECT_LIST_COPY,
+  FEATURE_EXPERIMENTATION_PROJECT_LIST_DELETE,
+  FEATURE_EXPERIMENTATION_PROJECT_LIST_EDIT,
+  FEATURE_EXPERIMENTATION_PROJECT_LIST_LOAD,
+  FEATURE_EXPERIMENTATION_PROJECT_LIST_REFRESH,
+  FEATURE_EXPERIMENTATION_TARGETING_KEY_LIST_DELETE,
+  FEATURE_EXPERIMENTATION_TARGETING_KEY_LIST_EDIT,
+  FEATURE_EXPERIMENTATION_TARGETING_KEY_LIST_LOAD,
+  FEATURE_EXPERIMENTATION_VARIATION_GROUP_LIST_COPY,
+  FEATURE_EXPERIMENTATION_VARIATION_GROUP_LIST_DELETE,
+  FEATURE_EXPERIMENTATION_VARIATION_LIST_COPY,
+  FEATURE_EXPERIMENTATION_VARIATION_LIST_DELETE,
+  SET_CONTEXT,
+} from './commands/const';
+import { DEFAULT_BASE_URI, PERMISSION_DENIED } from './const';
 import { deleteFlagInputBox, flagInputBox } from './menu/featureExperimentation/FlagMenu';
-import { FlagItem, FlagListProvider } from './providers/featureExperimentation/FlagList';
+import { deleteGoalInputBox, goalInputBox } from './menu/featureExperimentation/GoalMenu';
 import {
   deleteCampaignBox,
   deleteProjectInputBox,
@@ -13,6 +49,13 @@ import {
   switchCampaignBox,
   switchProjectBox,
 } from './menu/featureExperimentation/ProjectMenu';
+import { deleteTargetingKeyInputBox, targetingKeyInputBox } from './menu/featureExperimentation/TargetingKeyMenu';
+import { Authentication, Scope } from './model';
+import { FileAnalyzedProvider, FlagAnalyzed } from './providers/featureExperimentation/FlagAnalyzeList';
+import { FlagItem, FlagListProvider } from './providers/featureExperimentation/FlagList';
+import FlagshipCompletionProvider from './providers/featureExperimentation/FlagshipCompletion';
+import FlagshipHoverProvider from './providers/featureExperimentation/FlagshipHover';
+import { GoalItem, GoalListProvider } from './providers/featureExperimentation/GoalList';
 import {
   CampaignItem,
   ProjectItem,
@@ -20,60 +63,17 @@ import {
   VariationGroupItem,
   VariationItem,
 } from './providers/featureExperimentation/ProjectList';
-import { FileAnalyzedProvider, FlagAnalyzed } from './providers/featureExperimentation/FlagAnalyzeList';
-import { deleteTargetingKeyInputBox, targetingKeyInputBox } from './menu/featureExperimentation/TargetingKeyMenu';
+import { QuickAccessListProvider } from './providers/featureExperimentation/QuickAccessList';
 import { TargetingKeyItem, TargetingKeyListProvider } from './providers/featureExperimentation/TargetingKeyList';
-import { deleteGoalInputBox, goalInputBox } from './menu/featureExperimentation/GoalMenu';
-import { GoalItem, GoalListProvider } from './providers/featureExperimentation/GoalList';
-import FlagshipCompletionProvider from './providers/featureExperimentation/FlagshipCompletion';
-import FlagshipHoverProvider from './providers/featureExperimentation/FlagshipHover';
-import {
-  FEATURE_EXPERIMENTATION_ADD_FLAG,
-  FEATURE_EXPERIMENTATION_CAMPAIGN_LIST_COPY,
-  FEATURE_EXPERIMENTATION_CAMPAIGN_LIST_DELETE,
-  FEATURE_EXPERIMENTATION_CAMPAIGN_LIST_OPEN_IN_BROWSER,
-  FEATURE_EXPERIMENTATION_FIND_IN_FILE,
-  FEATURE_EXPERIMENTATION_CREATE_FLAG,
-  FEATURE_EXPERIMENTATION_CREATE_GOAL,
-  FEATURE_EXPERIMENTATION_CREATE_PROJECT,
-  FEATURE_EXPERIMENTATION_CREATE_TARGETING_KEY,
-  FEATURE_EXPERIMENTATION_GET_TOKEN_SCOPE,
-  FEATURE_EXPERIMENTATION_OPEN_BROWSER,
-  FEATURE_EXPERIMENTATION_FLAG_IN_FILE_REFRESH,
-  FEATURE_EXPERIMENTATION_FLAG_LIST_COPY,
-  FEATURE_EXPERIMENTATION_FLAG_LIST_DELETE,
-  FEATURE_EXPERIMENTATION_FLAG_LIST_EDIT,
-  FEATURE_EXPERIMENTATION_FLAG_LIST_LOAD,
-  FEATURE_EXPERIMENTATION_GOAL_LIST_DELETE,
-  FEATURE_EXPERIMENTATION_GOAL_LIST_EDIT,
-  FEATURE_EXPERIMENTATION_GOAL_LIST_LOAD,
-  FEATURE_EXPERIMENTATION_LIST_FLAG_IN_WORKSPACE,
-  FEATURE_EXPERIMENTATION_PROJECT_LIST_COPY,
-  FEATURE_EXPERIMENTATION_PROJECT_LIST_DELETE,
-  FEATURE_EXPERIMENTATION_PROJECT_LIST_EDIT,
-  FEATURE_EXPERIMENTATION_PROJECT_LIST_LOAD,
-  SET_CONTEXT,
-  FEATURE_EXPERIMENTATION_TARGETING_KEY_LIST_DELETE,
-  FEATURE_EXPERIMENTATION_TARGETING_KEY_LIST_EDIT,
-  FEATURE_EXPERIMENTATION_TARGETING_KEY_LIST_LOAD,
-  FEATURE_EXPERIMENTATION_VARIATION_GROUP_LIST_COPY,
-  FEATURE_EXPERIMENTATION_VARIATION_GROUP_LIST_DELETE,
-  FEATURE_EXPERIMENTATION_VARIATION_LIST_COPY,
-  FEATURE_EXPERIMENTATION_VARIATION_LIST_DELETE,
-  FEATURE_EXPERIMENTATION_PROJECT_CHANGE_STATE,
-  FEATURE_EXPERIMENTATION_CAMPAIGN_CHANGE_STATE,
-  FEATURE_EXPERIMENTATION_PROJECT_LIST_REFRESH,
-} from './commands/const';
-import { DEFAULT_BASE_URI, PERMISSION_DENIED } from './const';
-import { Authentication, Configuration, Scope } from './model';
-import { FlagStore } from './store/featureExperimentation/FlagStore';
-import { ProjectStore } from './store/featureExperimentation/ProjectStore';
-import { TargetingKeyStore } from './store/featureExperimentation/TargetingKeyStore';
-import { GoalStore } from './store/featureExperimentation/GoalStore';
 import {
   FEATURE_EXPERIMENTATION_CONFIGURED,
   GLOBAL_CURRENT_AUTHENTICATION_FE,
 } from './services/featureExperimentation/const';
+import { StateConfiguration } from './stateConfiguration';
+import { FlagStore } from './store/featureExperimentation/FlagStore';
+import { GoalStore } from './store/featureExperimentation/GoalStore';
+import { ProjectStore } from './store/featureExperimentation/ProjectStore';
+import { TargetingKeyStore } from './store/featureExperimentation/TargetingKeyStore';
 
 const documentSelector: vscode.DocumentSelector = [
   {
@@ -190,7 +190,7 @@ export async function setupFeatExpProviders(
     fileAnalyzedProvider,
   );
 
-  const projectProvider = new ProjectListProvider(context, projectStore, stateConfig);
+  const projectProvider = new ProjectListProvider(context, projectStore);
   vscode.window.registerTreeDataProvider('featureExperimentation.projectList', projectProvider);
 
   const flagListProvider = new FlagListProvider(context, flagStore);

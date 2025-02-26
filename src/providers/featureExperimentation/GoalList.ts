@@ -5,9 +5,9 @@ import {
 } from '../../commands/const';
 import { PERMISSION_DENIED_PANEL } from '../../const';
 import { ROCKET } from '../../icons';
-import { Authentication, Configuration, ItemResource } from '../../model';
-import { GoalStore } from '../../store/featureExperimentation/GoalStore';
+import { Authentication, ItemResource } from '../../model';
 import { GLOBAL_CURRENT_AUTHENTICATION_FE } from '../../services/featureExperimentation/const';
+import { GoalStore } from '../../store/featureExperimentation/GoalStore';
 
 export class GoalListProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
   private _goals: GoalItem[] = [];

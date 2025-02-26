@@ -5,7 +5,7 @@ import {
   WEB_EXPERIMENTATION_GLOBAL_CODE_OPEN_FILE,
 } from '../../commands/const';
 import { ACCOUNT, CIRCLE_FILLED, CODE, CURRENT_ACCOUNT, FILE_CODE, INFO } from '../../icons';
-import { AccountWE, ItemResource } from '../../model';
+import { AccountWE } from '../../model';
 import { AccountWEStore } from '../../store/webExperimentation/AccountStore';
 import { ResourceArgument } from './CampaignList';
 import { NO_RESOURCE_FOUND } from '../../const';

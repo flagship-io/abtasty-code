@@ -1,16 +1,16 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { Authentication, Configuration, ItemResource } from '../../model';
-import { DEFAULT_BASE_URI, PERMISSION_DENIED_PANEL } from '../../const';
 import {
-  FEATURE_EXPERIMENTATION_OPEN_BROWSER,
   FEATURE_EXPERIMENTATION_FLAG_LIST_LOAD,
   FEATURE_EXPERIMENTATION_FLAG_LIST_OPEN_IN_BROWSER,
   FEATURE_EXPERIMENTATION_FLAG_LIST_REFRESH,
+  FEATURE_EXPERIMENTATION_OPEN_BROWSER,
 } from '../../commands/const';
-import { FlagStore } from '../../store/featureExperimentation/FlagStore';
+import { DEFAULT_BASE_URI, PERMISSION_DENIED_PANEL } from '../../const';
+import { Authentication, ItemResource } from '../../model';
 import { GLOBAL_CURRENT_AUTHENTICATION_FE } from '../../services/featureExperimentation/const';
+import { FlagStore } from '../../store/featureExperimentation/FlagStore';
 
 export class FlagListProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
   private _flags: FlagItem[] = [];

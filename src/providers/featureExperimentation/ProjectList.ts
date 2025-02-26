@@ -4,6 +4,7 @@ import {
   FEATURE_EXPERIMENTATION_PROJECT_LIST_LOAD,
   FEATURE_EXPERIMENTATION_PROJECT_LIST_REFRESH,
 } from '../../commands/const';
+import { NO_RESOURCE_FOUND, PERMISSION_DENIED_PANEL } from '../../const';
 import {
   CIRCLE_FILLED,
   CIRCLE_OUTLINE,
@@ -19,30 +20,22 @@ import {
   TARGET,
   WATCH,
 } from '../../icons';
-import { NO_RESOURCE_FOUND, PERMISSION_DENIED_PANEL } from '../../const';
-import { Authentication, Configuration, Project } from '../../model';
+import { Authentication, Project } from '../../model';
 import { ProjectStore } from '../../store/featureExperimentation/ProjectStore';
 
-import { StateConfiguration } from '../../stateConfiguration';
 import { GLOBAL_CURRENT_AUTHENTICATION_FE } from '../../services/featureExperimentation/const';
 
 export class ProjectListProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
   private _tree: ProjectTreeItem[] = [];
   private projectStore: ProjectStore;
-  private stateConfig: StateConfiguration;
 
   private _onDidChangeTreeData: vscode.EventEmitter<vscode.TreeItem | undefined | void> = new vscode.EventEmitter<
     vscode.TreeItem | undefined | void
   >();
   readonly onDidChangeTreeData: vscode.Event<vscode.TreeItem | undefined | void> = this._onDidChangeTreeData.event;
 
-  public constructor(
-    private context: vscode.ExtensionContext,
-    projectStore: ProjectStore,
-    stateConfig: StateConfiguration,
-  ) {
+  public constructor(private context: vscode.ExtensionContext, projectStore: ProjectStore) {
     this.projectStore = projectStore;
-    this.stateConfig = stateConfig;
 
     vscode.commands.registerCommand(FEATURE_EXPERIMENTATION_PROJECT_LIST_LOAD, () => this.load());
     vscode.commands.registerCommand(FEATURE_EXPERIMENTATION_PROJECT_LIST_REFRESH, async () => await this.refresh());

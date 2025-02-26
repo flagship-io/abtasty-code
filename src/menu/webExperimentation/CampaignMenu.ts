@@ -1,9 +1,8 @@
-import * as vscode from 'vscode';
 import * as path from 'path';
+import * as vscode from 'vscode';
+import { Cli } from '../../cli/cmd/webExperimentation/Cli';
 import { CampaignWEItem } from '../../providers/webExperimentation/CampaignList';
 import { CampaignStore } from '../../store/webExperimentation/CampaignStore';
-import { Cli } from '../../cli/cmd/webExperimentation/Cli';
-import { MILESTONE_ACTIVE, MILESTONE_INTERRUPTED } from '../../icons';
 
 export async function deleteCampaignInputBox(campaign: CampaignWEItem, campaignStore: CampaignStore) {
   const picked = await vscode.window.showQuickPick(['yes', 'no'], {

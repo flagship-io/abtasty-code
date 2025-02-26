@@ -71,7 +71,6 @@ import { AudienceTreeView } from '../treeView/webExperimentation/audienceTreeVie
 import { FavoriteUrlStore } from './store/webExperimentation/FavoriteUrlStore';
 import { FavoriteUrlListProvider, FavoriteUrlWEItem } from './providers/webExperimentation/FavoriteUrlList';
 import { FavoriteUrlTreeView } from '../treeView/webExperimentation/FavoriteUrlTreeView';
-import open from 'open';
 
 export const rootPath =
   vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0
