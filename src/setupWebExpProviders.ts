@@ -313,12 +313,14 @@ export async function setupWebExpProviders(context: vscode.ExtensionContext, cli
     vscode.commands.registerCommand(
       WEB_EXPERIMENTATION_VARIATION_OPEN_WEB_PREVIEW,
       async (resource: VariationWEItem) => {
-        const webPreviewDetails = await campaignStore.openWebPreview(
-          String(resource.parent!.id),
-          String(resource.resourceId),
-        );
-
-        open(webPreviewDetails.url);
+        const opened = await campaignStore.openWebPreview(String(resource.parent!.id), String(resource.resourceId));
+        if (opened) {
+          vscode.window.showInformationMessage(
+            `[AB Tasty] Web Preview opened for Campaign ID: ${String(resource.parent!.id)} and Variation ID: ${String(
+              resource.resourceId,
+            )}`,
+          );
+        }
       },
     ),
 

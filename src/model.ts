@@ -88,12 +88,6 @@ export type CampaignWE = {
   master: CampaignWE;
 };
 
-export type WebPreview = {
-  campaign_id: string;
-  variation_id: string;
-  url: string;
-};
-
 export type Audience = {
   id: string;
   name: string;

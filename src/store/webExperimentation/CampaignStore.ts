@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { Cli } from '../../cli/cmd/webExperimentation/Cli';
-import { CampaignWE, WebPreview } from '../../model';
+import { CampaignWE } from '../../model';
 import { CampaignDataService } from '../../services/webExperimentation/CampaignDataService';
 
 export class CampaignStore {
@@ -193,9 +193,9 @@ export class CampaignStore {
     return cliResponse;
   }
 
-  async openWebPreview(campaignId: string, variationId: string): Promise<WebPreview> {
+  async openWebPreview(campaignId: string, variationId: string): Promise<boolean> {
     const cliResponse =
-      campaignId && variationId ? await this.cli.OpenWebPreviewVariation(campaignId, variationId) : ({} as WebPreview);
+      campaignId && variationId ? await this.cli.OpenWebPreviewVariation(campaignId, variationId) : false;
     return cliResponse;
   }
 }

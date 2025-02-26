@@ -13,7 +13,6 @@ import {
   FavoriteUrl,
   ModificationWE,
   VariationWE,
-  WebPreview,
 } from '../../../model';
 import { CliVersion } from '../../cliDownloader';
 
@@ -982,12 +981,12 @@ export class Cli {
     }
   }
 
-  async OpenWebPreviewVariation(campaignId: string, variationId: string): Promise<WebPreview> {
+  async OpenWebPreviewVariation(campaignId: string, variationId: string): Promise<boolean> {
     try {
       const cliBin = await this.CliBin();
       let command: string;
       if (!cliBin) {
-        return {} as WebPreview;
+        return false;
       }
       command = `${cliBin} web-experimentation web-preview open --campaign-id ${campaignId} --variation-id ${variationId} --output-format json`;
       const output = await this.exec(command, {});
@@ -997,13 +996,13 @@ export class Cli {
       if (output.stderr) {
         this.outputChannel.error(output.stderr);
         vscode.window.showErrorMessage(output.stderr);
-        return {} as WebPreview;
+        return false;
       }
-      return JSON.parse(output.stdout);
+      return true;
     } catch (err: any) {
       vscode.window.showErrorMessage(err.error);
       console.error(err);
-      return {} as WebPreview;
+      return false;
     }
   }
 }
