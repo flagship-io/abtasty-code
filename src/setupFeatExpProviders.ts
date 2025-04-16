@@ -28,6 +28,7 @@ import {
   FEATURE_EXPERIMENTATION_PROJECT_LIST_EDIT,
   FEATURE_EXPERIMENTATION_PROJECT_LIST_LOAD,
   FEATURE_EXPERIMENTATION_PROJECT_LIST_REFRESH,
+  FEATURE_EXPERIMENTATION_SELECT_PROVIDER,
   FEATURE_EXPERIMENTATION_TARGETING_KEY_LIST_DELETE,
   FEATURE_EXPERIMENTATION_TARGETING_KEY_LIST_EDIT,
   FEATURE_EXPERIMENTATION_TARGETING_KEY_LIST_LOAD,
@@ -38,7 +39,7 @@ import {
   SET_CONTEXT,
 } from './commands/const';
 import { DEFAULT_BASE_URI, PERMISSION_DENIED } from './const';
-import { deleteFlagInputBox, flagInputBox } from './menu/featureExperimentation/FlagMenu';
+import { deleteFlagInputBox, flagInputBox, selectFlagProviderBox } from './menu/featureExperimentation/FlagMenu';
 import { deleteGoalInputBox, goalInputBox } from './menu/featureExperimentation/GoalMenu';
 import {
   deleteCampaignBox,
@@ -444,6 +445,23 @@ export async function setupFeatExpProviders(
 
     vscode.commands.registerCommand(FEATURE_EXPERIMENTATION_LIST_FLAG_IN_WORKSPACE, async () => {
       await vscode.commands.executeCommand(FEATURE_EXPERIMENTATION_FLAG_IN_FILE_REFRESH, rootPath, true);
+    }),
+
+    vscode.commands.registerCommand(FEATURE_EXPERIMENTATION_SELECT_PROVIDER, async () => {
+      const activeEditor = vscode.window.activeTextEditor;
+      const provider = await selectFlagProviderBox();
+      if (provider) {
+        if (activeEditor) {
+          await vscode.commands.executeCommand(
+            FEATURE_EXPERIMENTATION_FLAG_IN_FILE_REFRESH,
+            activeEditor?.document.uri.path,
+            true,
+            provider,
+          );
+        } else {
+          await vscode.commands.executeCommand(FEATURE_EXPERIMENTATION_FLAG_IN_FILE_REFRESH, rootPath, true, provider);
+        }
+      }
     }),
   ];
 

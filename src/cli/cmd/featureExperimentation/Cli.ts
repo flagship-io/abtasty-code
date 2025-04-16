@@ -694,7 +694,7 @@ export class Cli {
     }
   }
 
-  async ListAnalyzedFlag(path: string): Promise<FileAnalyzedType[]> {
+  async ListAnalyzedFlag(path: string, provider?: string): Promise<FileAnalyzedType[]> {
     try {
       const cliBin = await this.CliBin();
       if (!cliBin) {
@@ -704,13 +704,12 @@ export class Cli {
       if (process.platform.toString() === 'win32') {
         path = path.replaceAll('/', '\\');
       }
-      const command = `${cliBin} feature-experimentation analyze flag list --output-format json --directory ${path}`;
+      const command = `${cliBin} feature-experimentation analyze flag list --output-format json --directory ${path} ${
+        provider ? `--origin-platform ${provider}` : ``
+      }`;
       const output = await this.exec(command, {});
       console.log(output);
-      if (output.stderr) {
-        vscode.window.showErrorMessage(output.stderr);
-        return [];
-      }
+
       let obj: FileAnalyzedType[] = JSON.parse(output.stdout);
       return obj;
     } catch (err: any) {

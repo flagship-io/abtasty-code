@@ -170,6 +170,11 @@
         "icon": "$(list-flat)"
       },
       {
+        "command": "featureExperimentation.flagsInFile.selectProvider",
+        "title": "abtasty: List and select Providers",
+        "icon": "$(settings)"
+      },
+      {
         "command": "featureExperimentation.createFlag",
         "title": "Feature Experimentation: Create a flag",
         "icon": "$(add)"
@@ -502,6 +507,11 @@
         },
         {
           "command": "featureExperimentation.flagsInFile.listFlagInWorkspace",
+          "when": "view == featureExperimentation.flagsInFile",
+          "group": "navigation@0"
+        },
+        {
+          "command": "featureExperimentation.flagsInFile.selectProvider",
           "when": "view == featureExperimentation.flagsInFile",
           "group": "navigation@0"
         },

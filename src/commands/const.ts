@@ -58,6 +58,7 @@ export const FEATURE_EXPERIMENTATION_GOAL_LIST_DELETE = 'featureExperimentation.
 export const FEATURE_EXPERIMENTATION_FIND_IN_FILE = 'featureExperimentation.flagsInFile.findInFile';
 export const FEATURE_EXPERIMENTATION_ADD_FLAG = 'featureExperimentation.flagsInFile.addFlag';
 export const FEATURE_EXPERIMENTATION_LIST_FLAG_IN_WORKSPACE = 'featureExperimentation.flagsInFile.listFlagInWorkspace';
+export const FEATURE_EXPERIMENTATION_SELECT_PROVIDER = 'featureExperimentation.flagsInFile.selectProvider';
 
 // WEB EXP
 

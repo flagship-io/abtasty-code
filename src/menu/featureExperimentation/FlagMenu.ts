@@ -12,6 +12,8 @@ interface FlagSchema {
   defaultValue: any;
 }
 
+const flagProviderList = ['Launchdarkly', 'OpenFeature', 'Optimizely', 'Split', 'VWO'];
+
 const flagTypes: vscode.QuickPickItem[] = ['string', 'boolean', 'number', 'array', 'object'].map((label) => ({
   label,
 }));
@@ -189,4 +191,13 @@ export async function deleteFlagInputBox(flag: FlagItem, flagStore: FlagStore) {
     return;
   }
   return;
+}
+
+export async function selectFlagProviderBox() {
+  const picked = await vscode.window.showQuickPick(flagProviderList, {
+    title: `Select Flag provider`,
+    placeHolder: 'Do you confirm ?',
+    ignoreFocusOut: true,
+  });
+  return picked;
 }

@@ -76,11 +76,11 @@ export class FileAnalyzedProvider implements vscode.TreeDataProvider<vscode.Tree
 
     vscode.commands.registerCommand(
       FEATURE_EXPERIMENTATION_FLAG_IN_FILE_REFRESH,
-      async (path: string, forceListFlags: boolean) => {
+      async (path: string, forceListFlags: boolean, originPlatform?: string) => {
         if (path) {
-          return await this.refresh(path, forceListFlags);
+          return await this.refresh(path, forceListFlags, originPlatform);
         }
-        return await this.refresh(rootPath, forceListFlags);
+        return await this.refresh(rootPath, forceListFlags, originPlatform);
       },
     );
   }
@@ -100,19 +100,23 @@ export class FileAnalyzedProvider implements vscode.TreeDataProvider<vscode.Tree
     return this.fileAnalyzed.filter((f) => f === element).flatMap((a) => a.children);
   }
 
-  public async refresh(path?: string, forceListFlags?: boolean) {
+  public async refresh(path?: string, forceListFlags?: boolean, originPlatform?: string) {
     this.fileAnalyzed = [];
     if (vscode.workspace.workspaceFolders) {
       this.path = path;
       if (this.path) {
-        await this.getFileAnalyzed(path !== undefined ? path : rootPath!, !!forceListFlags);
+        await this.getFileAnalyzed(
+          path !== undefined ? path : rootPath!,
+          !!forceListFlags,
+          originPlatform !== '' ? originPlatform : '',
+        );
         this._onDidChangeTreeData.fire(undefined);
         return;
       }
     }
   }
 
-  private async getFileAnalyzed(path: string, forceListFlags: boolean) {
+  private async getFileAnalyzed(path: string, forceListFlags: boolean, originPlatform?: string) {
     const OSPath =
       (process.platform.toString() === 'win32'
         ? forceListFlags
@@ -121,7 +125,7 @@ export class FileAnalyzedProvider implements vscode.TreeDataProvider<vscode.Tree
         : forceListFlags
         ? path
         : vscode.window.activeTextEditor?.document.uri.path!) || rootPath;
-    const filesAnalyzed = await this.cli.ListAnalyzedFlag(OSPath!);
+    const filesAnalyzed = await this.cli.ListAnalyzedFlag(OSPath!, originPlatform);
     if (filesAnalyzed) {
       filesAnalyzed.map(({ File, FileURL, Error, Results }) => {
         const fileClass = new FileAnalyzed(
