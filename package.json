@@ -161,17 +161,17 @@
       },
       {
         "command": "featureExperimentation.flagsInFile.refresh",
-        "title": "Feature Experimentation: Refresh flags in file panel",
+        "title": "Feature Experimentation: Refresh feature experimentation flags in file panel",
         "icon": "$(refresh)"
       },
       {
         "command": "featureExperimentation.flagsInFile.listFlagInWorkspace",
-        "title": "abtasty: List flags in the workspace",
+        "title": "Feature Experimentation: List feature experimentation flags in the workspace",
         "icon": "$(list-flat)"
       },
       {
         "command": "featureExperimentation.flagsInFile.selectProvider",
-        "title": "abtasty: List and select Providers",
+        "title": "Feature Experimentation: Set flag provider to analyze",
         "icon": "$(settings)"
       },
       {
