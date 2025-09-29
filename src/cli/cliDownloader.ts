@@ -8,7 +8,7 @@ import axios from 'axios';
 import { rimraf } from 'rimraf';
 import { createGunzip } from 'zlib';
 
-export const CliVersion = '1.3.1';
+export const CliVersion = '1.4.0';
 
 export async function CliDownloader(context: vscode.ExtensionContext, binaryDir: string) {
   const abtastyDir = context.asAbsolutePath('abtasty-cli');
